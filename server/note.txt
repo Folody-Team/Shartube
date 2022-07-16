@@ -1,0 +1,2 @@
+dev command : npx nodemon --exec go run ./server.go --signal SIGTERM
+start command : go run ./server.go
