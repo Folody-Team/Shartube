@@ -1,2 +1,2 @@
-dev command : npx nodemon --exec go run ./server.go --signal SIGTERM
+dev command : go run github.com/cosmtrek/air
 start command : go run ./server.go

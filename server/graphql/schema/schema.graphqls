@@ -1,25 +1,6 @@
-directive @constraint(
-  format: String
-) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
-type User {
-  _id: String!@constraint(format: "_id")
-  username: String!
-  email: String!
-}
-
-input RegisterUserInput {
-  username: String!
-  email: String!
-  password: String!
-}
-
-input LoginUserInput {
-  UsernameOrEmail: String!
-  password: String!
-}
-
 type Query {
   Me: User!
+  Users: [User!]
 }
 
 type Mutation {

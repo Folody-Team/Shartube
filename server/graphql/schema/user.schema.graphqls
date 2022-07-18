@@ -1,0 +1,20 @@
+scalar Time
+
+type User {
+  _id: ID!
+  username: String!
+  email: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+input RegisterUserInput {
+  username: String!
+  email: String!
+  password: String!
+}
+
+input LoginUserInput {
+  UsernameOrEmail: String!
+  password: String!
+}

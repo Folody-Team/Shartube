@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"time"
+)
+
 type LoginUserInput struct {
 	UsernameOrEmail string `json:"UsernameOrEmail"`
 	Password        string `json:"password"`
@@ -14,7 +18,9 @@ type RegisterUserInput struct {
 }
 
 type User struct {
-	ID       string `json:"_id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	ID        string    `json:"_id" bson:"_id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }

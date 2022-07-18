@@ -1,7 +1,8 @@
-package plugins
+package main
+
 import (
 	"fmt"
-	"github.com/vektah/gqlparser/v2/ast"
+	"log"
 	"os"
 
 	"github.com/99designs/gqlgen/api"
@@ -9,32 +10,30 @@ import (
 	"github.com/99designs/gqlgen/plugin/modelgen"
 )
 
-// Defining mutation function
-func constraintFieldHook(td *ast.Definition, fd *ast.FieldDefinition, f *modelgen.Field) (*modelgen.Field, error) {
+func mutateHook(b *modelgen.ModelBuild) *modelgen.ModelBuild {
 
-	c := fd.Directives.ForName("constraint")
-	if c != nil {
-		formatConstraint := c.Arguments.ForName("format")
-
-		if formatConstraint != nil{
-			f.Tag += " validate:"+formatConstraint.Value.String()
+	for _, model := range b.Models {
+		for _, field := range model.Fields {
+			if field.Name == "_id" {
+				field.Tag += ` bson:"` + field.Name + `"`
+			}
+			log.Println(field)
 		}
-
 	}
-
-	return f, nil
+	return b
 }
 
 func main() {
 	cfg, err := config.LoadConfigFromDefaultLocations()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "failed to load config", err.Error())
+		l := log.New(os.Stderr, "", 0)
+		l.Println("failed to load config", err.Error())
 		os.Exit(2)
 	}
 
 	// Attaching the mutation function onto modelgen plugin
 	p := modelgen.Plugin{
-		FieldHook: constraintFieldHook,
+		MutateHook: mutateHook,
 	}
 
 	err = api.Generate(cfg, api.ReplacePlugin(&p))
