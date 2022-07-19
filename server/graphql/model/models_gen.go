@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+type AuthOps struct {
+	Login    *UserLoginOrRegisterResponse `json:"Login"`
+	Register *UserLoginOrRegisterResponse `json:"Register"`
+}
+
 type LoginUserInput struct {
 	UsernameOrEmail string `json:"UsernameOrEmail"`
 	Password        string `json:"password"`
@@ -21,6 +26,12 @@ type User struct {
 	ID        string    `json:"_id" bson:"_id"`
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
+	Password  *string   `json:"password"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+type UserLoginOrRegisterResponse struct {
+	User        *User  `json:"user"`
+	AccessToken string `json:"accessToken"`
 }

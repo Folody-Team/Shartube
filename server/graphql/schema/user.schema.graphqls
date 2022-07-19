@@ -1,13 +1,5 @@
 scalar Time
 
-type User {
-  _id: ID!
-  username: String!
-  email: String!
-  createdAt: Time!
-  updatedAt: Time!
-}
-
 input RegisterUserInput {
   username: String!
   email: String!
@@ -17,4 +9,20 @@ input RegisterUserInput {
 input LoginUserInput {
   UsernameOrEmail: String!
   password: String!
+}
+type User {
+  _id: ID!
+  username: String!
+  email: String!
+  password: String
+  createdAt: Time!
+  updatedAt: Time!
+}
+type UserLoginOrRegisterResponse {
+  user: User!
+  accessToken: String!
+}
+type AuthOps {
+  Login(input: LoginUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
+  Register(input: RegisterUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
 }

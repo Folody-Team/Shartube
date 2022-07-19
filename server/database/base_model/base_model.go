@@ -11,34 +11,40 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 const BaseCURDTimeOut = 60
 
 type BaseModelInitValue struct {
-	client         *mongo.Client
-	collectionName string
+	Client         *mongo.Client
+	CollectionName string
+	Timestamp      bool
+	DeleteAfter    *time.Duration
 }
 
 type BaseModel[dt, rdt any] struct {
 	*BaseModelInitValue
-	timestamp bool
 }
 
 type NewBaseModel[dt any] struct {
 	*BaseModelInitValue
-	data      *dt
-	timestamp bool
+	data *dt
+}
+
+func (m *BaseModelInitValue) ClearDB() {
 }
 
 func (m *BaseModel[dt, rdt]) FindById(ID string) *rdt {
+	m.ClearDB()
 	ObjectID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	dbName := os.Getenv("DB_NAME")
-	collection := m.client.Database(dbName).Collection(m.collectionName)
+	collection := m.Client.Database(dbName).Collection(m.CollectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
 	defer cancel()
 	var dataResult rdt
@@ -50,25 +56,28 @@ func (m *BaseModel[dt, rdt]) FindById(ID string) *rdt {
 
 }
 
-func (m *BaseModel[dt, rdt]) FindOne(input interface{}) *rdt {
+func (m *BaseModel[dt, rdt]) FindOne(input interface{}) (*rdt, error) {
+	m.ClearDB()
 	dbName := os.Getenv("DB_NAME")
-	collection := m.client.Database(dbName).Collection(m.collectionName)
+	collection := m.Client.Database(dbName).Collection(m.CollectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
 	defer cancel()
 	var dataResult rdt
 	err := collection.FindOne(ctx, input).Decode(&dataResult)
 	if err != nil {
 		log.Fatalln(err)
+		return nil, err
 	}
-	return &dataResult
+	return &dataResult, nil
 
 }
 
 func (db *BaseModel[dt, rdt]) Find(input interface{}) ([]*rdt, error) {
+	db.ClearDB()
 	dbName := os.Getenv("DB_NAME")
 	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
 	defer cancel()
-	collection := db.client.Database(dbName).Collection(db.collectionName)
+	collection := db.Client.Database(dbName).Collection(db.CollectionName)
 	cur, err := collection.Find(ctx, input)
 	if err != nil {
 		log.Fatal(err)
@@ -93,21 +102,22 @@ func (db *BaseModel[dt, rdt]) Find(input interface{}) ([]*rdt, error) {
 }
 
 func (m *BaseModel[dt, rdt]) New(input *dt) *NewBaseModel[dt] {
+	m.ClearDB()
 	return &NewBaseModel[dt]{
 		data:               input,
 		BaseModelInitValue: m.BaseModelInitValue,
-		timestamp:          m.timestamp,
 	}
 }
 
 type DataTimestamp struct {
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func (n *NewBaseModel[dt]) Save() (*primitive.ObjectID, error) {
+	n.ClearDB()
 	dbName := os.Getenv("DB_NAME")
-	collection := n.client.Database(dbName).Collection(n.collectionName)
+	collection := n.Client.Database(dbName).Collection(n.CollectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
 	defer cancel()
 
@@ -115,9 +125,20 @@ func (n *NewBaseModel[dt]) Save() (*primitive.ObjectID, error) {
 	var m map[string]string
 	ja, _ := json.Marshal(n.data)
 	json.Unmarshal(ja, &m)
-	if n.timestamp {
+	if n.Timestamp {
 		jb, _ := json.Marshal(DataTimestamp{CreatedAt: time.Now(), UpdatedAt: time.Now()})
 		json.Unmarshal(jb, &m)
+	}
+	if n.DeleteAfter != nil {
+		index := mongo.IndexModel{
+			Keys:    bsonx.Doc{{Key: "created_at", Value: bsonx.Int64(1)}},
+			Options: options.Index().SetExpireAfterSeconds(int32((time.Minute * 5).Seconds())),
+		}
+		_, err := collection.Indexes().CreateOne(context.Background(), index)
+		if err != nil {
+			log.Fatalln(err)
+			return nil, err
+		}
 	}
 	var data interface{}
 	mapstructure.Decode(m, &data)
@@ -129,12 +150,4 @@ func (n *NewBaseModel[dt]) Save() (*primitive.ObjectID, error) {
 	}
 	id := res.InsertedID.(primitive.ObjectID)
 	return &id, nil
-}
-
-func (m *BaseModel[dt, rdt]) GetModel(client *mongo.Client, collectionName string, timestamp bool) {
-	m.BaseModelInitValue = &BaseModelInitValue{
-		client:         client,
-		collectionName: collectionName,
-	}
-	m.timestamp = timestamp
 }
