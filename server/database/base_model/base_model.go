@@ -2,12 +2,10 @@ package base_model
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"os"
 	"time"
 
-	"github.com/mitchellh/mapstructure"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -109,11 +107,6 @@ func (m *BaseModel[dt, rdt]) New(input *dt) *NewBaseModel[dt] {
 	}
 }
 
-type DataTimestamp struct {
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-}
-
 func (n *NewBaseModel[dt]) Save() (*primitive.ObjectID, error) {
 	n.ClearDB()
 	dbName := os.Getenv("DB_NAME")
@@ -122,26 +115,28 @@ func (n *NewBaseModel[dt]) Save() (*primitive.ObjectID, error) {
 	defer cancel()
 
 	// merge data and metadata
-	var m map[string]string
-	ja, _ := json.Marshal(n.data)
-	json.Unmarshal(ja, &m)
-	if n.Timestamp {
-		jb, _ := json.Marshal(DataTimestamp{CreatedAt: time.Now(), UpdatedAt: time.Now()})
-		json.Unmarshal(jb, &m)
-	}
+	MetaDataArr := []string{"createdAt", "updatedAt"}
 	if n.DeleteAfter != nil {
-		index := mongo.IndexModel{
-			Keys:    bsonx.Doc{{Key: "created_at", Value: bsonx.Int64(1)}},
-			Options: options.Index().SetExpireAfterSeconds(int32((time.Minute * 5).Seconds())),
+		seconds := int32(n.DeleteAfter.Seconds())
+		sessionTTL := mongo.IndexModel{
+			Keys:    bson.D{{Key: MetaDataArr[0], Value: 1}},
+			Options: options.Index().SetExpireAfterSeconds(seconds),
 		}
-		_, err := collection.Indexes().CreateOne(context.Background(), index)
+		_, err := collection.Indexes().CreateOne(ctx, sessionTTL)
 		if err != nil {
-			log.Fatalln(err)
 			return nil, err
 		}
 	}
-	var data interface{}
-	mapstructure.Decode(m, &data)
+	data, err := toDoc(n.data)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range MetaDataArr {
+		data = append(data, bsonx.Elem{
+			Key:   v,
+			Value: bsonx.Time(time.Now()),
+		})
+	}
 
 	res, err := collection.InsertOne(ctx, data)
 	if err != nil {
@@ -150,4 +145,14 @@ func (n *NewBaseModel[dt]) Save() (*primitive.ObjectID, error) {
 	}
 	id := res.InsertedID.(primitive.ObjectID)
 	return &id, nil
+}
+
+func toDoc(v interface{}) (doc bsonx.Doc, err error) {
+	data, err := bson.Marshal(v)
+	if err != nil {
+		return
+	}
+
+	err = bson.Unmarshal(data, &doc)
+	return
 }

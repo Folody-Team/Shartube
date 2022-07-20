@@ -5,13 +5,12 @@ package resolver
 
 import (
 	"context"
-	"fmt"
-	"log"
 
 	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
+	"github.com/Folody-Team/Shartube/service"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
@@ -23,6 +22,11 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 	if err != nil {
 		return nil, err
 	}
+	SessionModel, err := session_model.InitSessionModel()
+	if err != nil {
+		return nil, err
+	}
+
 	user, err := UserModel.FindOne(bson.D{
 		{Key: "$or", Value: []interface{}{
 			bson.D{{Key: "email", Value: input.UsernameOrEmail}},
@@ -35,7 +39,6 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 		}
 		return nil, err
 	}
-	fmt.Println(*user.Password)
 	err = bcrypt.CompareHashAndPassword([]byte(*user.Password), []byte(input.Password))
 	if err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
@@ -43,7 +46,24 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 		}
 		return nil, err
 	}
-	return nil, nil
+	user.Password = nil
+	sessionSaveData := &session_model.SaveSessionDataInput{
+		UserID: user.ID,
+	}
+	Session, err := SessionModel.New(sessionSaveData).Save()
+	if err != nil {
+		return nil, err
+	}
+	SessionID := Session.Hex()
+	accessToken, err := service.JwtGenerate(ctx, SessionID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.UserLoginOrRegisterResponse{
+		User:        user,
+		AccessToken: accessToken,
+	}, nil
 }
 
 // Register is the resolver for the Register field.
@@ -78,12 +98,15 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 		return nil, err
 	}
 	SessionID := Session.Hex()
-	// clams := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{})
-	log.Println(SessionID)
+	accessToken, err := service.JwtGenerate(ctx, SessionID)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return &model.UserLoginOrRegisterResponse{
 		User:        user,
-		AccessToken: "aajfklajflkjafkjsljfl",
+		AccessToken: accessToken,
 	}, nil
 }
 
