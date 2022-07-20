@@ -11,13 +11,21 @@ import (
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/resolver"
 	GraphqlLog "github.com/Folody-Team/Shartube/middleware/log"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
 const defaultPort = "8080"
 
 func main() {
+	/*
+	* Commit by phatdev
+	 */
+	// create a new router with mux
+	router := mux.NewRouter()
+
 	port := os.Getenv("PORT")
+
 	if port == "" {
 		port = defaultPort
 	}
@@ -34,8 +42,13 @@ func main() {
 
 	srv.AroundOperations(GraphqlLog.LogMiddleware)
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	/*
+	* Here we add the playground to the server with mux
+	 */
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", srv)
+
+	http.Handle("/", router) // to use mux we need to Handle it with net/http.
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
