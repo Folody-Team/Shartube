@@ -5,6 +5,14 @@ package resolver
 
 import (
 	"context"
+	"regexp"
+
+	"net/http"
+	"net/url"
+
+	"io/ioutil"
+
+	"encoding/json"
 	"log"
 
 	"github.com/Folody-Team/Shartube/database/user_model"
@@ -16,13 +24,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Email response
+type EmailResponse struct {
+	Status string `json:"status"`
+}
+
 // Login is the resolver for the Login field.
 func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input model.LoginUserInput) (*model.UserLoginOrRegisterResponse, error) {
 	UserModel, err := user_model.InitUserModel()
 	if err != nil {
 		return nil, err
 	}
-
 	user, err := UserModel.FindOne(bson.D{
 		{Key: "$or", Value: []interface{}{
 			bson.D{{Key: "email", Value: input.UsernameOrEmail}},
@@ -59,6 +71,40 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 
 // Register is the resolver for the Register field.
 func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, input model.RegisterUserInput) (*model.UserLoginOrRegisterResponse, error) {
+	// contribute by phatdev
+	// add detect email format
+	email_regex := "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+
+	re := regexp.MustCompile(email_regex)
+	matches := re.MatchString(input.Email)
+	if matches == false {
+		return nil, gqlerror.Errorf("email format is incorrect")
+	}
+
+	apiUrl := "https://isitarealemail.com/api/email/validate?email=" + url.QueryEscape(input.Email)
+
+	req, _ := http.NewRequest("GET", apiUrl, nil)
+	res, err := http.DefaultClient.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var response EmailResponse
+	json.Unmarshal(body, &response)
+
+	if response.Status == "invalid" {
+		return nil, gqlerror.Errorf("email is invalid")
+	}
+
 	UserModel, err := user_model.InitUserModel()
 	if err != nil {
 		return nil, err
