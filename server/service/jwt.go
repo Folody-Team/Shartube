@@ -12,7 +12,7 @@ import (
 )
 
 type JwtCustomClaim struct {
-	SessionID string `json:"sessionID"`
+	ID string `json:"id"`
 	jwt.StandardClaims
 }
 
@@ -37,7 +37,7 @@ func getJwtSecret() string {
 
 func JwtGenerate(_ context.Context, SessionID string) (string, error) {
 	claims := &JwtCustomClaim{
-		SessionID: SessionID,
+		ID: SessionID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * constraint.BASE_SESSION_BY_MINUTE_TIME).Unix(),
 			IssuedAt:  time.Now().Unix(),
