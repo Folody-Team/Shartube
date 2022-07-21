@@ -24,6 +24,7 @@ Go to the project directory
 
 ```bash
   cd Shartube
+  cd server
 ```
 
 Start the server
