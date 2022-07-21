@@ -6,13 +6,19 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/service"
 )
 
-type authString string
+type AuthString string
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		SessionModel, err := session_model.InitSessionModel()
+		if err != nil {
+			http.Error(w, "server error", http.StatusInternalServerError)
+			return
+		}
 		auth := r.Header.Get("Authorization")
 		if auth == "" {
 			next.ServeHTTP(w, r)
@@ -20,10 +26,9 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		bearer := "Bearer "
-		auth = strings.Trim(strings.Replace(auth, bearer, "", -1)," ")
+		auth = strings.Trim(strings.Replace(auth, bearer, "", -1), " ")
 
 		validate, err := service.JwtValidate(context.Background(), auth)
-		fmt.Println(validate.Claims.(*service.JwtCustomClaim).SessionID,err)
 		if err != nil || !validate.Valid {
 			http.Error(w, "Invalid token", http.StatusForbidden)
 			return
@@ -31,14 +36,21 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		customClaim, _ := validate.Claims.(*service.JwtCustomClaim)
 
-		ctx := context.WithValue(r.Context(), authString("auth"), customClaim)
+		session, err := SessionModel.FindById(customClaim.SessionID)
+
+		if err != nil {
+			http.Error(w, "server error", http.StatusInternalServerError)
+			return
+		}
+		fmt.Println(session.UserID)
+		ctx := context.WithValue(r.Context(), AuthString("session"), session)
 
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
 }
 
-func CtxValue(ctx context.Context) *service.JwtCustomClaim {
-	raw, _ := ctx.Value(authString("auth")).(*service.JwtCustomClaim)
+func CtxValue(ctx context.Context) *session_model.SaveSessionDataOutput {
+	raw, _ := ctx.Value(AuthString("session")).(*session_model.SaveSessionDataOutput)
 	return raw
 }

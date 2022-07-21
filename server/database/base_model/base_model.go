@@ -34,11 +34,12 @@ type NewBaseModel[dt any] struct {
 func (m *BaseModelInitValue) ClearDB() {
 }
 
-func (m *BaseModel[dt, rdt]) FindById(ID string) *rdt {
+func (m *BaseModel[dt, rdt]) FindById(ID string) (*rdt, error) {
 	m.ClearDB()
 	ObjectID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
 		log.Fatalln(err)
+		return nil, err
 	}
 
 	dbName := os.Getenv("DB_NAME")
@@ -49,8 +50,9 @@ func (m *BaseModel[dt, rdt]) FindById(ID string) *rdt {
 	err = collection.FindOne(ctx, bson.M{"_id": ObjectID}).Decode(&dataResult)
 	if err != nil {
 		log.Fatalln(err)
+		return nil, err
 	}
-	return &dataResult
+	return &dataResult, nil
 
 }
 

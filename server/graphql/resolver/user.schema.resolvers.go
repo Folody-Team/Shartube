@@ -22,7 +22,6 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 	if err != nil {
 		return nil, err
 	}
-	
 
 	user, err := UserModel.FindOne(bson.D{
 		{Key: "$or", Value: []interface{}{
@@ -44,12 +43,12 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 		return nil, err
 	}
 	user.Password = nil
-	
+
 	accessToken, err := helper.GenSessionToken(&session_model.SaveSessionDataInput{
 		UserID: user.ID,
 	})
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 
 	return &model.UserLoginOrRegisterResponse{
@@ -75,14 +74,18 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 		return nil, err
 	}
 	_id := id.Hex()
-	user := UserModel.FindById(string(_id))
+	user, err := UserModel.FindById(string(_id))
+	if err != nil {
+		return nil, err
+	}
+
 	user.Password = nil
 
 	token, err := helper.GenSessionToken(&session_model.SaveSessionDataInput{
 		UserID: _id,
 	})
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
 
 	return &model.UserLoginOrRegisterResponse{
