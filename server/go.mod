@@ -6,13 +6,13 @@ require (
 	github.com/99designs/gqlgen v0.17.12
 	github.com/cosmtrek/air v1.40.4
 	github.com/joho/godotenv v1.4.0
-	github.com/mitchellh/mapstructure v1.3.1
+	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.4.6
 	go.mongodb.org/mongo-driver v1.10.0
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 )
 
-require github.com/gorilla/mux v1.8.0 // indirect
+require github.com/gorilla/mux v1.8.0
 
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
