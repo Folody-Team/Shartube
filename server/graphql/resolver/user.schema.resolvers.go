@@ -71,6 +71,7 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 
 // Register is the resolver for the Register field.
 func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, input model.RegisterUserInput) (*model.UserLoginOrRegisterResponse, error) {
+	// contribute by phatdev
 	// add detect email format
 	email_regex := "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
 
