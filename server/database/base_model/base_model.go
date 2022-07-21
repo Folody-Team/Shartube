@@ -99,6 +99,31 @@ func (db *BaseModel[dt, rdt]) Find(input interface{}) ([]*rdt, error) {
 	return users, nil
 }
 
+func (b *BaseModel[dt, rdt]) DeleteOne(input interface{}) (*mongo.DeleteResult, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	result, err := collection.DeleteOne(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (b *BaseModel[dt, rdt]) DeleteMany(input interface{}) (*mongo.DeleteResult, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	result, err := collection.DeleteMany(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (m *BaseModel[dt, rdt]) New(input *dt) *NewBaseModel[dt] {
 	m.ClearDB()
 	return &NewBaseModel[dt]{

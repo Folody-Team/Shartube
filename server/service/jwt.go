@@ -2,39 +2,49 @@ package service
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/Folody-Team/Shartube/constraint"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/joho/godotenv"
 )
 
 type JwtCustomClaim struct {
-	SessionID string `json:"id"`
+	SessionID string `json:"sessionID"`
 	jwt.StandardClaims
 }
 
-var jwtSecret = []byte(getJwtSecret())
+var jwtKey = []byte(getJwtSecret())
 
 func getJwtSecret() string {
+	defaultSecret := "aSecret"
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+		return defaultSecret
+	}
+
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		return "aSecret"
+		return defaultSecret
 	}
+
 	return secret
 }
 
 func JwtGenerate(_ context.Context, SessionID string) (string, error) {
-	t := jwt.NewWithClaims(jwt.SigningMethodHS256, &JwtCustomClaim{
+	claims := &JwtCustomClaim{
 		SessionID: SessionID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * constraint.BASE_SESSION_BY_MINUTE_TIME).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-	})
-
-	token, err := t.SignedString(jwtSecret)
+	}
+	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token, err := t.SignedString(jwtKey)
 	if err != nil {
 		return "", err
 	}
@@ -43,10 +53,9 @@ func JwtGenerate(_ context.Context, SessionID string) (string, error) {
 }
 
 func JwtValidate(ctx context.Context, token string) (*jwt.Token, error) {
-	return jwt.ParseWithClaims(token, &JwtCustomClaim{}, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("there's a problem with the signing method")
-		}
-		return jwtSecret, nil
+	tk := &JwtCustomClaim{}
+	return jwt.ParseWithClaims(token, tk, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
 	})
+	
 }

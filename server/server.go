@@ -10,6 +10,7 @@ import (
 	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/resolver"
+	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	GraphqlLog "github.com/Folody-Team/Shartube/middleware/log"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -41,7 +42,8 @@ func main() {
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
 	srv.AroundOperations(GraphqlLog.LogMiddleware)
-
+	// middleware
+	router.Use(authMiddleware.AuthMiddleware)
 	/*
 	* Here we add the playground to the server with mux
 	 */

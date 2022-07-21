@@ -10,7 +10,7 @@ import (
 	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
-	"github.com/Folody-Team/Shartube/service"
+	"github.com/Folody-Team/Shartube/helper"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
@@ -22,10 +22,7 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 	if err != nil {
 		return nil, err
 	}
-	SessionModel, err := session_model.InitSessionModel()
-	if err != nil {
-		return nil, err
-	}
+	
 
 	user, err := UserModel.FindOne(bson.D{
 		{Key: "$or", Value: []interface{}{
@@ -47,22 +44,17 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 		return nil, err
 	}
 	user.Password = nil
-	sessionSaveData := &session_model.SaveSessionDataInput{
+	
+	accessToken, err := helper.GenSessionToken(&session_model.SaveSessionDataInput{
 		UserID: user.ID,
-	}
-	Session, err := SessionModel.New(sessionSaveData).Save()
+	})
 	if err != nil {
-		return nil, err
-	}
-	SessionID := Session.Hex()
-	accessToken, err := service.JwtGenerate(ctx, SessionID)
-	if err != nil {
-		return nil, err
+		return nil ,err
 	}
 
 	return &model.UserLoginOrRegisterResponse{
 		User:        user,
-		AccessToken: accessToken,
+		AccessToken: *accessToken,
 	}, nil
 }
 
@@ -73,10 +65,6 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 		return nil, err
 	}
 
-	SessionModel, err := session_model.InitSessionModel()
-	if err != nil {
-		return nil, err
-	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
@@ -90,23 +78,16 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 	user := UserModel.FindById(string(_id))
 	user.Password = nil
 
-	sessionSaveData := &session_model.SaveSessionDataInput{
+	token, err := helper.GenSessionToken(&session_model.SaveSessionDataInput{
 		UserID: _id,
-	}
-	Session, err := SessionModel.New(sessionSaveData).Save()
+	})
 	if err != nil {
-		return nil, err
-	}
-	SessionID := Session.Hex()
-	accessToken, err := service.JwtGenerate(ctx, SessionID)
-
-	if err != nil {
-		return nil, err
+		return nil ,err
 	}
 
 	return &model.UserLoginOrRegisterResponse{
 		User:        user,
-		AccessToken: accessToken,
+		AccessToken: *token,
 	}, nil
 }
 
