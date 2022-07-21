@@ -5,8 +5,8 @@ package resolver
 
 import (
 	"context"
+	"log"
 
-	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
@@ -43,10 +43,10 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 		return nil, err
 	}
 	user.Password = nil
-
-	accessToken, err := helper.GenSessionToken(&session_model.SaveSessionDataInput{
-		UserID: user.ID,
-	})
+	log.Println(user.ID)
+	accessToken, err := helper.GenSessionToken(
+		string(user.ID),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -80,10 +80,11 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 	}
 
 	user.Password = nil
+	log.Println(_id)
 
-	token, err := helper.GenSessionToken(&session_model.SaveSessionDataInput{
-		UserID: _id,
-	})
+	token, err := helper.GenSessionToken(
+		string(_id),
+	)
 	if err != nil {
 		return nil, err
 	}
