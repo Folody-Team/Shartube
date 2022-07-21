@@ -2,7 +2,6 @@ package helper
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/Folody-Team/Shartube/database/base_model"
@@ -33,7 +32,6 @@ func GenSessionToken(userId string) (*string, error) {
 		return nil, err
 	}
 	SessionID := Session.Hex()
-	fmt.Println(SessionModel.FindById(SessionID))
 	ctx, cancel := context.WithTimeout(context.Background(), BaseTimeOut*time.Second)
 	defer cancel()
 	accessToken, err := service.JwtGenerate(ctx, SessionID)
