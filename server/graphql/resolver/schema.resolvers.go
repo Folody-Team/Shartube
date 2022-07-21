@@ -5,9 +5,12 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
+	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 )
 
 // Auth is the resolver for the auth field.
@@ -17,6 +20,8 @@ func (r *mutationResolver) Auth(ctx context.Context) (*model.AuthOps, error) {
 
 // Me is the resolver for the Me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
+	sessionData := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput)
+	fmt.Println(sessionData.UserID)
 	return &model.User{}, nil
 }
 

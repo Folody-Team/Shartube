@@ -18,7 +18,7 @@ func GenSessionToken(input *session_model.SaveSessionDataInput) (*string, error)
 		return nil, err
 	}
 	SessionModel.DeleteMany(bson.M{
-		"userid": input.UserID,
+		"userId": input.UserID,
 	})
 	Session, err := SessionModel.New(input).Save()
 	if err != nil {

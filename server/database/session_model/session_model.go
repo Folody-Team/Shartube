@@ -10,7 +10,7 @@ import (
 )
 
 type SaveSessionDataInput struct {
-	UserID string
+	UserID string `json:"userId" bson:"userId"`
 }
 
 type SaveSessionDataOutput struct {
