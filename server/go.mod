@@ -14,6 +14,8 @@ require (
 
 require github.com/gorilla/mux v1.8.0
 
+require golang.org/x/exp v0.0.0-20220713135740-79cabaa25d75
+
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
