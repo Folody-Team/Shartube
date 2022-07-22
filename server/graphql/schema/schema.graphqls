@@ -6,7 +6,7 @@ directive @goField(
 directive @auth on FIELD_DEFINITION
 
 type Query {
-  auth: AuthQuery!@goField(forceResolver: true)
+    Me: User! @goField(forceResolver: true) @auth
 }
 
 type Mutation {

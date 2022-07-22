@@ -26,6 +26,3 @@ type AuthOps {
   Login(input: LoginUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
   Register(input: RegisterUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
 }
-type AuthQuery {
-  Me: User! @goField(forceResolver: true) @auth
-}

@@ -24,7 +24,8 @@ func main() {
 	 */
 	// create a new router with mux
 	router := mux.NewRouter()
-
+	// middleware
+	router.Use(authMiddleware.AuthMiddleware)
 	port := os.Getenv("PORT")
 
 	if port == "" {
@@ -42,8 +43,7 @@ func main() {
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
 	srv.AroundOperations(GraphqlLog.LogMiddleware)
-	// middleware
-	router.Use(authMiddleware.AuthMiddleware)
+
 	/*
 	* Here we add the playground to the server with mux
 	 */

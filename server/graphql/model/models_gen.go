@@ -11,10 +11,6 @@ type AuthOps struct {
 	Register *UserLoginOrRegisterResponse `json:"Register"`
 }
 
-type AuthQuery struct {
-	Me *User `json:"Me"`
-}
-
 type Comic struct {
 	//  inherit:"CreateComicInputModel"
 	ID string `json:"_id" bson:"_id"`

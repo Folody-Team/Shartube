@@ -39,7 +39,6 @@ type Config struct {
 
 type ResolverRoot interface {
 	AuthOps() AuthOpsResolver
-	AuthQuery() AuthQueryResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -53,10 +52,6 @@ type ComplexityRoot struct {
 	AuthOps struct {
 		Login    func(childComplexity int, input model.LoginUserInput) int
 		Register func(childComplexity int, input model.RegisterUserInput) int
-	}
-
-	AuthQuery struct {
-		Me func(childComplexity int) int
 	}
 
 	Comic struct {
@@ -79,7 +74,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Auth               func(childComplexity int) int
+		Me                 func(childComplexity int) int
 		__resolve__service func(childComplexity int) int
 	}
 
@@ -106,14 +101,11 @@ type AuthOpsResolver interface {
 	Login(ctx context.Context, obj *model.AuthOps, input model.LoginUserInput) (*model.UserLoginOrRegisterResponse, error)
 	Register(ctx context.Context, obj *model.AuthOps, input model.RegisterUserInput) (*model.UserLoginOrRegisterResponse, error)
 }
-type AuthQueryResolver interface {
-	Me(ctx context.Context, obj *model.AuthQuery) (*model.User, error)
-}
 type MutationResolver interface {
 	Auth(ctx context.Context) (*model.AuthOps, error)
 }
 type QueryResolver interface {
-	Auth(ctx context.Context) (*model.AuthQuery, error)
+	Me(ctx context.Context) (*model.User, error)
 }
 
 type executableSchema struct {
@@ -154,13 +146,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AuthOps.Register(childComplexity, args["input"].(model.RegisterUserInput)), true
-
-	case "AuthQuery.Me":
-		if e.complexity.AuthQuery.Me == nil {
-			break
-		}
-
-		return e.complexity.AuthQuery.Me(childComplexity), true
 
 	case "Comic.createdAt":
 		if e.complexity.Comic.CreatedAt == nil {
@@ -211,12 +196,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Auth(childComplexity), true
 
-	case "Query.auth":
-		if e.complexity.Query.Auth == nil {
+	case "Query.Me":
+		if e.complexity.Query.Me == nil {
 			break
 		}
 
-		return e.complexity.Query.Auth(childComplexity), true
+		return e.complexity.Query.Me(childComplexity), true
 
 	case "Query._service":
 		if e.complexity.Query.__resolve__service == nil {
@@ -382,7 +367,7 @@ type Comic @inherits(type: "CreateComicInputModel") {
 directive @auth on FIELD_DEFINITION
 
 type Query {
-  auth: AuthQuery!@goField(forceResolver: true)
+    Me: User! @goField(forceResolver: true) @auth
 }
 
 type Mutation {
@@ -417,9 +402,7 @@ type AuthOps {
   Login(input: LoginUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
   Register(input: RegisterUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
 }
-type AuthQuery {
-  Me: User! @goField(forceResolver: true) @auth
-}`, BuiltIn: false},
+`, BuiltIn: false},
 	{Name: "../../federation/directives.graphql", Input: `
 	scalar _Any
 	scalar _FieldSet
@@ -663,84 +646,6 @@ func (ec *executionContext) fieldContext_AuthOps_Register(ctx context.Context, f
 	if fc.Args, err = ec.field_AuthOps_Register_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _AuthQuery_Me(ctx context.Context, field graphql.CollectedField, obj *model.AuthQuery) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AuthQuery_Me(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.AuthQuery().Me(rctx, obj)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Auth == nil {
-				return nil, errors.New("directive auth is not implemented")
-			}
-			return ec.directives.Auth(ctx, obj, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*model.User); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/Folody-Team/Shartube/graphql/model.User`, tmp)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_AuthQuery_Me(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "AuthQuery",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "_id":
-				return ec.fieldContext_User__id(ctx, field)
-			case "username":
-				return ec.fieldContext_User_username(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "password":
-				return ec.fieldContext_User_password(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_User_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_User_updatedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
-		},
 	}
 	return fc, nil
 }
@@ -1056,8 +961,8 @@ func (ec *executionContext) fieldContext_Mutation_auth(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_auth(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_auth(ctx, field)
+func (ec *executionContext) _Query_Me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_Me(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1069,8 +974,28 @@ func (ec *executionContext) _Query_auth(ctx context.Context, field graphql.Colle
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Auth(rctx)
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Me(rctx)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/Folody-Team/Shartube/graphql/model.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1082,12 +1007,12 @@ func (ec *executionContext) _Query_auth(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.AuthQuery)
+	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNAuthQuery2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐAuthQuery(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_auth(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_Me(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1095,10 +1020,20 @@ func (ec *executionContext) fieldContext_Query_auth(ctx context.Context, field g
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "Me":
-				return ec.fieldContext_AuthQuery_Me(ctx, field)
+			case "_id":
+				return ec.fieldContext_User__id(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "password":
+				return ec.fieldContext_User_password(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type AuthQuery", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -3607,47 +3542,6 @@ func (ec *executionContext) _AuthOps(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
-var authQueryImplementors = []string{"AuthQuery"}
-
-func (ec *executionContext) _AuthQuery(ctx context.Context, sel ast.SelectionSet, obj *model.AuthQuery) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, authQueryImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AuthQuery")
-		case "Me":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._AuthQuery_Me(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var comicImplementors = []string{"Comic"}
 
 func (ec *executionContext) _Comic(ctx context.Context, sel ast.SelectionSet, obj *model.Comic) graphql.Marshaler {
@@ -3808,7 +3702,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "auth":
+		case "Me":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -3817,7 +3711,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_auth(ctx, field)
+				res = ec._Query_Me(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -4327,20 +4221,6 @@ func (ec *executionContext) marshalNAuthOps2ᚖgithubᚗcomᚋFolodyᚑTeamᚋSh
 		return graphql.Null
 	}
 	return ec._AuthOps(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNAuthQuery2githubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐAuthQuery(ctx context.Context, sel ast.SelectionSet, v model.AuthQuery) graphql.Marshaler {
-	return ec._AuthQuery(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNAuthQuery2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐAuthQuery(ctx context.Context, sel ast.SelectionSet, v *model.AuthQuery) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._AuthQuery(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

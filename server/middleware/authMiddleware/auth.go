@@ -37,7 +37,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		customClaim, _ := validate.Claims.(*service.JwtCustomClaim)
-		
 
 		sessionObjectId, err := primitive.ObjectIDFromHex(customClaim.ID)
 		if err != nil {
@@ -49,7 +48,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		session, err := SessionModel.FindOne(bson.M{
 			"_id": sessionObjectId,
 		})
-    log.Println(session)
 		if err != nil {
 			http.Error(w, "server error", http.StatusInternalServerError)
 			return

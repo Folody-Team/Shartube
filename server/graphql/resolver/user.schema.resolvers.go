@@ -12,12 +12,10 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
 	"github.com/Folody-Team/Shartube/helper"
-	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
@@ -135,30 +133,10 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 	}, nil
 }
 
-// Me is the resolver for the Me field.
-func (r *authQueryResolver) Me(ctx context.Context, obj *model.AuthQuery) (*model.User, error) {
-	UserModel, err := user_model.InitUserModel()
-	if err != nil {
-		return nil, err
-	}
-
-	sessionData := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput)
-	user, err := UserModel.FindById(sessionData.UserID.Hex())
-	if err != nil {
-		return nil, err
-	}
-	user.Password = nil
-	return user, nil
-}
-
 // AuthOps returns generated.AuthOpsResolver implementation.
 func (r *Resolver) AuthOps() generated.AuthOpsResolver { return &authOpsResolver{r} }
 
-// AuthQuery returns generated.AuthQueryResolver implementation.
-func (r *Resolver) AuthQuery() generated.AuthQueryResolver { return &authQueryResolver{r} }
-
 type authOpsResolver struct{ *Resolver }
-type authQueryResolver struct{ *Resolver }
 
 // !!! WARNING !!!
 // The code below was going to be deleted when updating resolvers. It has been copied here so you have
