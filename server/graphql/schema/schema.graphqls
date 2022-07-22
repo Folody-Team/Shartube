@@ -4,11 +4,4 @@ directive @goField(
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 
 directive @auth on FIELD_DEFINITION
-
-type Query {
-  Me: User! @goField(forceResolver: true) @auth
-}
-
-type Mutation {
-  auth: AuthOps!@goField(forceResolver: true)
-}
+directive @emailInput on INPUT_FIELD_DEFINITION

@@ -2,7 +2,7 @@ scalar Time
 
 input RegisterUserInput {
   username: String!
-  email: String!
+  email: String! @emailInput
   password: String!
 }
 
@@ -22,7 +22,13 @@ type UserLoginOrRegisterResponse {
   user: User!
   accessToken: String!
 }
-type AuthOps {
-  Login(input: LoginUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
-  Register(input: RegisterUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
+extend type Mutation {
+  Login(input: LoginUserInput!): UserLoginOrRegisterResponse!
+    @goField(forceResolver: true)
+  Register(input: RegisterUserInput!): UserLoginOrRegisterResponse!
+    @goField(forceResolver: true)
+}
+
+extend type Query {
+  Me: User! @goField(forceResolver: true) @auth
 }

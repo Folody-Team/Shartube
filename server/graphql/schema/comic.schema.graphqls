@@ -1,0 +1,16 @@
+scalar ObjectID
+directive @inherits(type: String!) on OBJECT
+
+type CreateComicInput {
+  name: String!
+  description: String
+}
+type CreateComicInputModel @inherits(type: "CreateComicInput") {
+  CreatedBy: ObjectID!
+}
+
+type Comic @inherits(type: "CreateComicInputModel") {
+  _id: ID!
+  createdAt: Time!
+  updatedAt: Time!
+}

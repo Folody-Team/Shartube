@@ -6,9 +6,27 @@ import (
 	"time"
 )
 
-type AuthOps struct {
-	Login    *UserLoginOrRegisterResponse `json:"Login"`
-	Register *UserLoginOrRegisterResponse `json:"Register"`
+type Comic struct {
+	//  inherit:"CreateComicInputModel"
+	ID string `json:"_id" bson:"_id"`
+	//  inherit:"CreateComicInputModel"
+	CreatedAt time.Time `json:"createdAt"`
+	//  inherit:"CreateComicInputModel"
+	UpdatedAt time.Time `json:"updatedAt"`
+	//  inherit:"CreateComicInput"
+	CreatedBy string `json:"CreatedBy"`
+}
+
+type CreateComicInput struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+}
+
+type CreateComicInputModel struct {
+	//  inherit:"CreateComicInput"
+	CreatedBy   string  `json:"CreatedBy"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
 }
 
 type LoginUserInput struct {

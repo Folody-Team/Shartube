@@ -11,12 +11,12 @@ import (
 )
 
 type SaveSessionDataInput struct {
-	UserID primitive.ObjectID
+	UserID primitive.ObjectID `json:"userId"`
 }
 
 type SaveSessionDataOutput struct {
 	ID        string    `json:"_id" bson:"_id"`
-	SaveSessionDataInput
+	UserID primitive.ObjectID `json:"userId"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }

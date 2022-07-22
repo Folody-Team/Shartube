@@ -5,32 +5,21 @@ package resolver
 
 import (
 	"context"
-	"regexp"
-
-	"net/http"
-	"net/url"
-
-	"io/ioutil"
-
-	"encoding/json"
 	"log"
 
+	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
 	"github.com/Folody-Team/Shartube/helper"
+	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Email response
-type EmailResponse struct {
-	Status string `json:"status"`
-}
-
 // Login is the resolver for the Login field.
-func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input model.LoginUserInput) (*model.UserLoginOrRegisterResponse, error) {
+func (r *mutationResolver) Login(ctx context.Context, input model.LoginUserInput) (*model.UserLoginOrRegisterResponse, error) {
 	UserModel, err := user_model.InitUserModel()
 	if err != nil {
 		return nil, err
@@ -70,40 +59,9 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 }
 
 // Register is the resolver for the Register field.
-func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, input model.RegisterUserInput) (*model.UserLoginOrRegisterResponse, error) {
+func (r *mutationResolver) Register(ctx context.Context, input model.RegisterUserInput) (*model.UserLoginOrRegisterResponse, error) {
 	// contribute by phatdev
 	// add detect email format
-	email_regex := "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
-
-	re := regexp.MustCompile(email_regex)
-	matches := re.MatchString(input.Email)
-	if matches == false {
-		return nil, gqlerror.Errorf("email format is incorrect")
-	}
-
-	apiUrl := "https://isitarealemail.com/api/email/validate?email=" + url.QueryEscape(input.Email)
-
-	req, _ := http.NewRequest("GET", apiUrl, nil)
-	res, err := http.DefaultClient.Do(req)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var response EmailResponse
-	json.Unmarshal(body, &response)
-
-	if response.Status == "invalid" {
-		return nil, gqlerror.Errorf("email is invalid")
-	}
 
 	UserModel, err := user_model.InitUserModel()
 	if err != nil {
@@ -141,7 +99,34 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 	}, nil
 }
 
-// AuthOps returns generated.AuthOpsResolver implementation.
-func (r *Resolver) AuthOps() generated.AuthOpsResolver { return &authOpsResolver{r} }
+// Me is the resolver for the Me field.
+func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
+	UserModel, err := user_model.InitUserModel()
+	if err != nil {
+		return nil, err
+	}
 
-type authOpsResolver struct{ *Resolver }
+	sessionData := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput)
+	user, err := UserModel.FindById(sessionData.UserID.Hex())
+	if err != nil {
+		return nil, err
+	}
+	user.Password = nil
+	return user, nil
+}
+
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
