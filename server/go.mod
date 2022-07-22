@@ -17,6 +17,13 @@ require github.com/gorilla/mux v1.8.0
 require golang.org/x/exp v0.0.0-20220713135740-79cabaa25d75
 
 require (
+	github.com/kr/pretty v0.2.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
+	github.com/monaco-io/request v1.0.15 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+)
+
+require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/creack/pty v1.1.11 // indirect

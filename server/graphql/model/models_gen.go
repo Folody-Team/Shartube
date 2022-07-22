@@ -6,11 +6,6 @@ import (
 	"time"
 )
 
-type AuthOps struct {
-	Login    *UserLoginOrRegisterResponse `json:"Login"`
-	Register *UserLoginOrRegisterResponse `json:"Register"`
-}
-
 type Comic struct {
 	//  inherit:"CreateComicInputModel"
 	ID string `json:"_id" bson:"_id"`

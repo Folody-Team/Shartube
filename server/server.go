@@ -39,6 +39,7 @@ func main() {
 	}
 	c := generated.Config{Resolvers: &resolver.Resolver{}}
 	c.Directives.Auth = directives.Auth
+	c.Directives.EmailInput = directives.EmailInput
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
