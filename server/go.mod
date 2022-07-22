@@ -3,7 +3,7 @@ module github.com/Folody-Team/Shartube
 go 1.18
 
 require (
-	github.com/99designs/gqlgen v0.17.12
+	github.com/99designs/gqlgen v0.17.13
 	github.com/cosmtrek/air v1.40.4
 	github.com/joho/godotenv v1.4.0
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
@@ -28,7 +28,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
-	github.com/matryer/moq v0.2.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
