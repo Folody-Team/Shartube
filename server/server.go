@@ -6,12 +6,12 @@ import (
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/resolver"
 	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	GraphqlLog "github.com/Folody-Team/Shartube/middleware/log"
+	"github.com/Folody-Team/Shartube/playground"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -24,7 +24,8 @@ func main() {
 	 */
 	// create a new router with mux
 	router := mux.NewRouter()
-
+	// middleware
+	router.Use(authMiddleware.AuthMiddleware)
 	port := os.Getenv("PORT")
 
 	if port == "" {
@@ -42,12 +43,12 @@ func main() {
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(c))
 
 	srv.AroundOperations(GraphqlLog.LogMiddleware)
-	// middleware
-	router.Use(authMiddleware.AuthMiddleware)
 	/*
 	* Here we add the playground to the server with mux
 	 */
-	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	// handler static/css and js
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	router.Handle("/", playground.Handler("Shartube GraphQL", "/query"))
 	router.Handle("/query", srv)
 
 	http.Handle("/", router) // to use mux we need to Handle it with net/http.

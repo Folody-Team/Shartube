@@ -5,16 +5,13 @@ package resolver
 
 import (
 	"context"
-	"regexp"
-
+	"encoding/json"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
+	"regexp"
 
-	"io/ioutil"
-
-	"encoding/json"
-
-	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
@@ -23,11 +20,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 )
-
-// Email response
-type EmailResponse struct {
-	Status string `json:"status"`
-}
 
 // Login is the resolver for the Login field.
 func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input model.LoginUserInput) (*model.UserLoginOrRegisterResponse, error) {
@@ -55,10 +47,10 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 		return nil, err
 	}
 	user.Password = nil
-
-	accessToken, err := helper.GenSessionToken(&session_model.SaveSessionDataInput{
-		UserID: user.ID,
-	})
+	log.Println(user.ID)
+	accessToken, err := helper.GenSessionToken(
+		string(user.ID),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +69,7 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 
 	re := regexp.MustCompile(email_regex)
 	matches := re.MatchString(input.Email)
-	if matches == false {
+	if !matches {
 		return nil, gqlerror.Errorf("email format is incorrect")
 	}
 
@@ -126,10 +118,11 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 	}
 
 	user.Password = nil
+	log.Println(_id)
 
-	token, err := helper.GenSessionToken(&session_model.SaveSessionDataInput{
-		UserID: _id,
-	})
+	token, err := helper.GenSessionToken(
+		string(_id),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -144,3 +137,13 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 func (r *Resolver) AuthOps() generated.AuthOpsResolver { return &authOpsResolver{r} }
 
 type authOpsResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+type EmailResponse struct {
+	Status string `json:"status"`
+}

@@ -2,12 +2,14 @@ package authMiddleware
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/service"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AuthString string
@@ -36,13 +38,25 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		customClaim, _ := validate.Claims.(*service.JwtCustomClaim)
 
-		session, err := SessionModel.FindById(customClaim.SessionID)
+		sessionObjectId, err := primitive.ObjectIDFromHex(customClaim.ID)
+		if err != nil {
+			log.Fatalln(err)
+			http.Error(w, "server error", http.StatusInternalServerError)
+			return
+		}
 
+		session, err := SessionModel.FindOne(bson.M{
+			"_id": sessionObjectId,
+		})
 		if err != nil {
 			http.Error(w, "server error", http.StatusInternalServerError)
 			return
 		}
-		fmt.Println(session.UserID)
+		if session == nil {
+			http.Error(w, "Invalid token", http.StatusForbidden)
+			return
+		}
+
 		ctx := context.WithValue(r.Context(), AuthString("session"), session)
 
 		r = r.WithContext(ctx)

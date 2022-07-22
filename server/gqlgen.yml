@@ -61,3 +61,6 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  ObjectId:
+    model:
+      - go.mongodb.org/mongo-driver/bson/primitive.ObjectID

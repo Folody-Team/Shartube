@@ -7,15 +7,16 @@ import (
 	"github.com/Folody-Team/Shartube/constraint"
 	"github.com/Folody-Team/Shartube/database/base_model"
 	"github.com/Folody-Team/Shartube/util/getClient"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type SaveSessionDataInput struct {
-	UserID string `json:"userId" bson:"userId"`
+	UserID primitive.ObjectID `json:"userId"`
 }
 
 type SaveSessionDataOutput struct {
-	SaveSessionDataInput
 	ID        string    `json:"_id" bson:"_id"`
+	UserID primitive.ObjectID `json:"userId"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
