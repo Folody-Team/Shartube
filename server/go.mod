@@ -17,13 +17,6 @@ require github.com/gorilla/mux v1.8.0
 require golang.org/x/exp v0.0.0-20220713135740-79cabaa25d75
 
 require (
-	github.com/graphql-go/graphql v0.8.0 // indirect
-	github.com/graphql-go/handler v0.2.3 // indirect
-	github.com/graphql-go/relay v0.0.0-20171208134043-54350098cfe5 // indirect
-	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
-)
-
-require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/creack/pty v1.1.11 // indirect

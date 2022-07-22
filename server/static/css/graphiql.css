@@ -1449,6 +1449,7 @@ li.CodeMirror-hint-active {
   flex: 1;
   font-weight: 700;
   overflow-x: hidden;
+  font-family: sans-serif;
   padding: 10px 0 10px 10px;
   text-align: center;
   text-overflow: ellipsis;
