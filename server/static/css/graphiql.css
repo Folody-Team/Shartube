@@ -1,3 +1,21 @@
+/*
+  *******
+  *****
+  ****
+  **
+  This style is written by the GraphiQL team.
+  And edited by Folody Studio. Thanks for the great work!
+  In this file, you can find the original style and the folody style.
+  The original style is written by the GraphiQL team.
+  And edited by Folody Studio. Thanks for the great work!
+  The folody style is written by Folody Studio.
+  (c) 2016 GraphiQL LLC.
+  (c) 2021 Folody Studio.
+  *
+  *
+  *
+*/
+
 @import url('https://cdn.jsdelivr.net/gh/Folody-Team/patery-scrollbar-css/dark.css');
 
 graphiql-container,
@@ -1791,5 +1809,3 @@ li.CodeMirror-hint-active {
   overflow: hidden;
   text-overflow: ellipsis
 }
-
-/*# sourceMappingURL=graphiql.min.css.map*/
