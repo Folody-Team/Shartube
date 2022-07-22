@@ -12,17 +12,19 @@ import (
 	"net/url"
 	"regexp"
 
+	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
 	"github.com/Folody-Team/Shartube/helper"
+	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // Login is the resolver for the Login field.
-func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input model.LoginUserInput) (*model.UserLoginOrRegisterResponse, error) {
+func (r *mutationResolver) Login(ctx context.Context, input model.LoginUserInput) (*model.UserLoginOrRegisterResponse, error) {
 	UserModel, err := user_model.InitUserModel()
 	if err != nil {
 		return nil, err
@@ -62,7 +64,7 @@ func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input m
 }
 
 // Register is the resolver for the Register field.
-func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, input model.RegisterUserInput) (*model.UserLoginOrRegisterResponse, error) {
+func (r *mutationResolver) Register(ctx context.Context, input model.RegisterUserInput) (*model.UserLoginOrRegisterResponse, error) {
 	// contribute by phatdev
 	// add detect email format
 	email_regex := "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
@@ -133,10 +135,30 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 	}, nil
 }
 
-// AuthOps returns generated.AuthOpsResolver implementation.
-func (r *Resolver) AuthOps() generated.AuthOpsResolver { return &authOpsResolver{r} }
+// Me is the resolver for the Me field.
+func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
+	UserModel, err := user_model.InitUserModel()
+	if err != nil {
+		return nil, err
+	}
 
-type authOpsResolver struct{ *Resolver }
+	sessionData := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput)
+	user, err := UserModel.FindById(sessionData.UserID.Hex())
+	if err != nil {
+		return nil, err
+	}
+	user.Password = nil
+	return user, nil
+}
+
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
 
 // !!! WARNING !!!
 // The code below was going to be deleted when updating resolvers. It has been copied here so you have
