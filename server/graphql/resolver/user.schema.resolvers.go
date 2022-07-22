@@ -5,29 +5,23 @@ package resolver
 
 import (
 	"context"
-	"regexp"
-
+	"encoding/json"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
+	"regexp"
 
-	"io/ioutil"
-
-	"encoding/json"
-	"log"
-
+	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
 	"github.com/Folody-Team/Shartube/helper"
+	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 )
-
-// Email response
-type EmailResponse struct {
-	Status string `json:"status"`
-}
 
 // Login is the resolver for the Login field.
 func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, input model.LoginUserInput) (*model.UserLoginOrRegisterResponse, error) {
@@ -77,7 +71,7 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 
 	re := regexp.MustCompile(email_regex)
 	matches := re.MatchString(input.Email)
-	if matches == false {
+	if !matches {
 		return nil, gqlerror.Errorf("email format is incorrect")
 	}
 
@@ -141,7 +135,37 @@ func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, inpu
 	}, nil
 }
 
+// Me is the resolver for the Me field.
+func (r *authQueryResolver) Me(ctx context.Context, obj *model.AuthQuery) (*model.User, error) {
+	UserModel, err := user_model.InitUserModel()
+	if err != nil {
+		return nil, err
+	}
+
+	sessionData := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput)
+	user, err := UserModel.FindById(sessionData.UserID.Hex())
+	if err != nil {
+		return nil, err
+	}
+	user.Password = nil
+	return user, nil
+}
+
 // AuthOps returns generated.AuthOpsResolver implementation.
 func (r *Resolver) AuthOps() generated.AuthOpsResolver { return &authOpsResolver{r} }
 
+// AuthQuery returns generated.AuthQueryResolver implementation.
+func (r *Resolver) AuthQuery() generated.AuthQueryResolver { return &authQueryResolver{r} }
+
 type authOpsResolver struct{ *Resolver }
+type authQueryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+type EmailResponse struct {
+	Status string `json:"status"`
+}
