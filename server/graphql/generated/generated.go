@@ -399,8 +399,10 @@ type UserLoginOrRegisterResponse {
   accessToken: String!
 }
 type AuthOps {
-  Login(input: LoginUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
-  Register(input: RegisterUserInput!): UserLoginOrRegisterResponse! @goField(forceResolver: true)
+  Login(input: LoginUserInput!): UserLoginOrRegisterResponse!
+    @goField(forceResolver: true)
+  Register(input: RegisterUserInput!): UserLoginOrRegisterResponse!
+    @goField(forceResolver: true)
 }
 `, BuiltIn: false},
 	{Name: "../../federation/directives.graphql", Input: `
