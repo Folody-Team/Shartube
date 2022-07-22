@@ -1,3 +1,4 @@
+scalar ObjectID
 directive @inherits(type: String!) on OBJECT
 
 type CreateComicInput {
@@ -5,7 +6,7 @@ type CreateComicInput {
   description: String
 }
 type CreateComicInputModel @inherits(type: "CreateComicInput") {
-  CreatedBy: ID!
+  CreatedBy: ObjectID!
 }
 
 type Comic @inherits(type: "CreateComicInputModel") {
