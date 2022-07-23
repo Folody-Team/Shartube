@@ -16,6 +16,57 @@ To run this project, you will need to add the following environment variables to
 
 Clone the project
 
+### Frontend
+
+If you want to run web application, please visit here.
+#### **Web application**
+```
+cd client
+```
+Install all dependencies and run dev command.
+
+```
+yarn dev
+```
+
+If you wanna build
+
+```
+yarn build
+```
+
+This is where you want to run your mobile app.
+
+#### **Mobile app**
+
+Firstly
+```
+cd app/mobile
+```
+Make sure you have downloaded all package dependencies
+
+Check it out `package.json`
+
+**Android**
+
+```
+yarn android
+```
+
+**IOS**
+
+```
+yarn ios
+```
+
+**Web**
+
+```
+yarn web
+```
+
+### Backend
+
 ```bash
   git clone https://github.com/Folody-Team/Shartube/
 ```
