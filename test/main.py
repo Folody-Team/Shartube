@@ -1,3 +1,11 @@
+"""
+  It is a main function.
+  It is used to test the module.
+  >>> list all all the modules
+  >>> Enter the name of module...
+  >>> Connect to module.py
+"""
+
 import os
 
 def readFile(path):
