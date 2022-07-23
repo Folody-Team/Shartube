@@ -1,0 +1,10 @@
+{
+  "input": {
+    "username": "admin",
+    "password": "admin",
+    "email": "tuphat3456tt@gmail.com"
+  },
+  "expect": {
+    "error": "invalid_email"
+  }
+}
