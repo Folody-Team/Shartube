@@ -116,6 +116,8 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+<<<<<<< HEAD
+=======
 	case "Comic.createdAt":
 		if e.complexity.Comic.CreatedAt == nil {
 			break
@@ -180,7 +182,82 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
+<<<<<<< HEAD
 		return e.complexity.Mutation.Register(childComplexity, args["input"].(model.RegisterUserInput)), true
+=======
+		return e.complexity.AuthOps.Register(childComplexity, args["input"].(model.RegisterUserInput)), true
+
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
+	case "Comic.createdAt":
+		if e.complexity.Comic.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Comic.CreatedAt(childComplexity), true
+
+	case "Comic._id":
+		if e.complexity.Comic.ID == nil {
+			break
+		}
+
+		return e.complexity.Comic.ID(childComplexity), true
+
+	case "Comic.updatedAt":
+		if e.complexity.Comic.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Comic.UpdatedAt(childComplexity), true
+
+	case "CreateComicInput.description":
+		if e.complexity.CreateComicInput.Description == nil {
+			break
+		}
+
+		return e.complexity.CreateComicInput.Description(childComplexity), true
+
+	case "CreateComicInput.name":
+		if e.complexity.CreateComicInput.Name == nil {
+			break
+		}
+
+		return e.complexity.CreateComicInput.Name(childComplexity), true
+
+	case "CreateComicInputModel.CreatedBy":
+		if e.complexity.CreateComicInputModel.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.CreateComicInputModel.CreatedBy(childComplexity), true
+
+	case "Mutation.Login":
+		if e.complexity.Mutation.Login == nil {
+			break
+		}
+
+<<<<<<< HEAD
+		args, err := ec.field_Mutation_Login_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.LoginUserInput)), true
+
+	case "Mutation.Register":
+		if e.complexity.Mutation.Register == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_Register_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Register(childComplexity, args["input"].(model.RegisterUserInput)), true
+=======
+		return e.complexity.Mutation.Auth(childComplexity), true
+>>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 
 	case "Query.Me":
 		if e.complexity.Query.Me == nil {
@@ -329,15 +406,32 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
+<<<<<<< HEAD
 	{Name: "../schema/comic.schema.graphqls", Input: `scalar ObjectID
 directive @inherits(type: String!) on OBJECT
+=======
+<<<<<<< HEAD
+	{Name: "../schema/comic.schema.graphqls", Input: `scalar ObjectID
+directive @inherits(type: String!) on OBJECT
+=======
+	{Name: "../schema/comic.schema.graphqls", Input: `directive @inherits(type: String!) on OBJECT
+>>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 
 type CreateComicInput {
   name: String!
   description: String
 }
 type CreateComicInputModel @inherits(type: "CreateComicInput") {
+<<<<<<< HEAD
   CreatedBy: ObjectID!
+=======
+<<<<<<< HEAD
+  CreatedBy: ObjectID!
+=======
+  CreatedBy: ID!
+>>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 }
 
 type Comic @inherits(type: "CreateComicInputModel") {
@@ -352,8 +446,23 @@ type Comic @inherits(type: "CreateComicInputModel") {
 ) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 
 directive @auth on FIELD_DEFINITION
+<<<<<<< HEAD
 directive @emailInput on INPUT_FIELD_DEFINITION
+=======
+<<<<<<< HEAD
+directive @emailInput on INPUT_FIELD_DEFINITION`, BuiltIn: false},
+=======
+
+type Query {
+    Me: User! @goField(forceResolver: true) @auth
+}
+
+type Mutation {
+  auth: AuthOps!@goField(forceResolver: true)
+}
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 `, BuiltIn: false},
+>>>>>>> main
 	{Name: "../schema/user.schema.graphqls", Input: `scalar Time
 
 input RegisterUserInput {
@@ -378,17 +487,35 @@ type UserLoginOrRegisterResponse {
   user: User!
   accessToken: String!
 }
+<<<<<<< HEAD
 extend type Mutation {
+=======
+<<<<<<< HEAD
+extend type Mutation {
+=======
+type AuthOps {
+>>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
   Login(input: LoginUserInput!): UserLoginOrRegisterResponse!
     @goField(forceResolver: true)
   Register(input: RegisterUserInput!): UserLoginOrRegisterResponse!
     @goField(forceResolver: true)
 }
+<<<<<<< HEAD
 
 extend type Query {
   Me: User! @goField(forceResolver: true) @auth
 }
+=======
+<<<<<<< HEAD
+
+extend type Query {
+  Me: User! @goField(forceResolver: true) @auth
+}`, BuiltIn: false},
+=======
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 `, BuiltIn: false},
+>>>>>>> main
 	{Name: "../../federation/directives.graphql", Input: `
 	scalar _Any
 	scalar _FieldSet
@@ -431,7 +558,15 @@ func (ec *executionContext) dir_inherits_args(ctx context.Context, rawArgs map[s
 	return args, nil
 }
 
+<<<<<<< HEAD
 func (ec *executionContext) field_Mutation_Login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+=======
+<<<<<<< HEAD
+func (ec *executionContext) field_Mutation_Login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+=======
+func (ec *executionContext) field_AuthOps_Login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+>>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 	var err error
 	args := map[string]interface{}{}
 	var arg0 model.LoginUserInput
@@ -514,6 +649,8 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+<<<<<<< HEAD
+=======
 func (ec *executionContext) _Comic__id(ctx context.Context, field graphql.CollectedField, obj *model.Comic) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comic__id(ctx, field)
 	if err != nil {
@@ -806,7 +943,399 @@ func (ec *executionContext) _Mutation_Login(ctx context.Context, field graphql.C
 	return ec.marshalNUserLoginOrRegisterResponse2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUserLoginOrRegisterResponse(ctx, field.Selections, res)
 }
 
+<<<<<<< HEAD
 func (ec *executionContext) fieldContext_Mutation_Login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+=======
+func (ec *executionContext) fieldContext_AuthOps_Login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AuthOps",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "user":
+				return ec.fieldContext_UserLoginOrRegisterResponse_user(ctx, field)
+			case "accessToken":
+				return ec.fieldContext_UserLoginOrRegisterResponse_accessToken(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserLoginOrRegisterResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AuthOps_Login_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AuthOps_Register(ctx context.Context, field graphql.CollectedField, obj *model.AuthOps) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AuthOps_Register(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.AuthOps().Register(rctx, obj, fc.Args["input"].(model.RegisterUserInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserLoginOrRegisterResponse)
+	fc.Result = res
+	return ec.marshalNUserLoginOrRegisterResponse2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUserLoginOrRegisterResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AuthOps_Register(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AuthOps",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "user":
+				return ec.fieldContext_UserLoginOrRegisterResponse_user(ctx, field)
+			case "accessToken":
+				return ec.fieldContext_UserLoginOrRegisterResponse_accessToken(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserLoginOrRegisterResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_AuthOps_Register_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
+func (ec *executionContext) _Comic__id(ctx context.Context, field graphql.CollectedField, obj *model.Comic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comic__id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comic__id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Comic_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Comic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comic_createdAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comic_createdAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Comic_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Comic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comic_updatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comic_updatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateComicInput_name(ctx context.Context, field graphql.CollectedField, obj *model.CreateComicInput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateComicInput_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateComicInput_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateComicInput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateComicInput_description(ctx context.Context, field graphql.CollectedField, obj *model.CreateComicInput) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateComicInput_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateComicInput_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateComicInput",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateComicInputModel_CreatedBy(ctx context.Context, field graphql.CollectedField, obj *model.CreateComicInputModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateComicInputModel_CreatedBy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNObjectID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateComicInputModel_CreatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateComicInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ObjectID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_Login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_Login(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(model.LoginUserInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserLoginOrRegisterResponse)
+	fc.Result = res
+	return ec.marshalNUserLoginOrRegisterResponse2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUserLoginOrRegisterResponse(ctx, field.Selections, res)
+}
+
+<<<<<<< HEAD
+func (ec *executionContext) fieldContext_Mutation_Login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+=======
+func (ec *executionContext) fieldContext_Mutation_auth(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+>>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3431,6 +3960,111 @@ func (ec *executionContext) unmarshalInputRegisterUserInput(ctx context.Context,
 
 // region    **************************** object.gotpl ****************************
 
+<<<<<<< HEAD
+=======
+var comicImplementors = []string{"Comic"}
+
+func (ec *executionContext) _Comic(ctx context.Context, sel ast.SelectionSet, obj *model.Comic) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, comicImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Comic")
+		case "_id":
+
+			out.Values[i] = ec._Comic__id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+
+			out.Values[i] = ec._Comic_createdAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+
+			out.Values[i] = ec._Comic_updatedAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var createComicInputImplementors = []string{"CreateComicInput"}
+
+func (ec *executionContext) _CreateComicInput(ctx context.Context, sel ast.SelectionSet, obj *model.CreateComicInput) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createComicInputImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateComicInput")
+		case "name":
+
+			out.Values[i] = ec._CreateComicInput_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+
+			out.Values[i] = ec._CreateComicInput_description(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var createComicInputModelImplementors = []string{"CreateComicInputModel"}
+
+func (ec *executionContext) _CreateComicInputModel(ctx context.Context, sel ast.SelectionSet, obj *model.CreateComicInputModel) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, createComicInputModelImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CreateComicInputModel")
+		case "CreatedBy":
+
+			out.Values[i] = ec._CreateComicInputModel_CreatedBy(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 var comicImplementors = []string{"Comic"}
 
 func (ec *executionContext) _Comic(ctx context.Context, sel ast.SelectionSet, obj *model.Comic) graphql.Marshaler {
