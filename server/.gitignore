@@ -23,3 +23,6 @@ go.work
 .env
 
 tmp
+
+# remove all dependencies from the javascript lib
+lib/javascript/*/node_modules/

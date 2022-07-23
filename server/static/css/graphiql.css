@@ -704,10 +704,10 @@ div.CodeMirror-lint-tooltip>*+* {
 
 .CodeMirror-guttermarker-subtle {
   color: #666
-}
+}s
 
 .CodeMirror .CodeMirror-cursor {
-  border-left: 1px solid #000
+  border-left: 1px solid rgb(37, 41, 255)
 }
 
 .CodeMirror div.CodeMirror-secondarycursor {

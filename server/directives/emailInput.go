@@ -52,6 +52,10 @@ func EmailInput(ctx context.Context, obj interface{}, next graphql.Resolver) (re
 
 	resp, err := client.Do(req) // execute the request
 
+	if err != nil {
+		return nil, err // return if error (err is not nil)
+	}
+
 	defer resp.Body.Close() // close the response body
 
 	body, err := ioutil.ReadAll(resp.Body) // read the response body

@@ -64,21 +64,6 @@ type ComplexityRoot struct {
 		CreatedBy func(childComplexity int) int
 	}
 
-	Comic struct {
-		CreatedAt func(childComplexity int) int
-		ID        func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
-	}
-
-	CreateComicInput struct {
-		Description func(childComplexity int) int
-		Name        func(childComplexity int) int
-	}
-
-	CreateComicInputModel struct {
-		CreatedBy func(childComplexity int) int
-	}
-
 	Mutation struct {
 		Login    func(childComplexity int, input model.LoginUserInput) int
 		Register func(childComplexity int, input model.RegisterUserInput) int
@@ -131,6 +116,8 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+<<<<<<< HEAD
+=======
 	case "Comic.createdAt":
 		if e.complexity.Comic.CreatedAt == nil {
 			break
@@ -200,6 +187,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 =======
 		return e.complexity.AuthOps.Register(childComplexity, args["input"].(model.RegisterUserInput)), true
 
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 	case "Comic.createdAt":
 		if e.complexity.Comic.CreatedAt == nil {
 			break
@@ -242,13 +230,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CreateComicInputModel.CreatedBy(childComplexity), true
 
-	case "Mutation.auth":
-		if e.complexity.Mutation.Auth == nil {
+	case "Mutation.Login":
+		if e.complexity.Mutation.Login == nil {
 			break
 		}
 
+<<<<<<< HEAD
+		args, err := ec.field_Mutation_Login_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Login(childComplexity, args["input"].(model.LoginUserInput)), true
+
+	case "Mutation.Register":
+		if e.complexity.Mutation.Register == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_Register_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Register(childComplexity, args["input"].(model.RegisterUserInput)), true
+=======
 		return e.complexity.Mutation.Auth(childComplexity), true
 >>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 
 	case "Query.Me":
 		if e.complexity.Query.Me == nil {
@@ -401,8 +410,13 @@ var sources = []*ast.Source{
 	{Name: "../schema/comic.schema.graphqls", Input: `scalar ObjectID
 directive @inherits(type: String!) on OBJECT
 =======
+<<<<<<< HEAD
+	{Name: "../schema/comic.schema.graphqls", Input: `scalar ObjectID
+directive @inherits(type: String!) on OBJECT
+=======
 	{Name: "../schema/comic.schema.graphqls", Input: `directive @inherits(type: String!) on OBJECT
 >>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 
 type CreateComicInput {
   name: String!
@@ -412,8 +426,12 @@ type CreateComicInputModel @inherits(type: "CreateComicInput") {
 <<<<<<< HEAD
   CreatedBy: ObjectID!
 =======
+<<<<<<< HEAD
+  CreatedBy: ObjectID!
+=======
   CreatedBy: ID!
 >>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 }
 
 type Comic @inherits(type: "CreateComicInputModel") {
@@ -429,6 +447,9 @@ type Comic @inherits(type: "CreateComicInputModel") {
 
 directive @auth on FIELD_DEFINITION
 <<<<<<< HEAD
+directive @emailInput on INPUT_FIELD_DEFINITION
+=======
+<<<<<<< HEAD
 directive @emailInput on INPUT_FIELD_DEFINITION`, BuiltIn: false},
 =======
 
@@ -439,6 +460,7 @@ type Query {
 type Mutation {
   auth: AuthOps!@goField(forceResolver: true)
 }
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 `, BuiltIn: false},
 >>>>>>> main
 	{Name: "../schema/user.schema.graphqls", Input: `scalar Time
@@ -468,8 +490,12 @@ type UserLoginOrRegisterResponse {
 <<<<<<< HEAD
 extend type Mutation {
 =======
+<<<<<<< HEAD
+extend type Mutation {
+=======
 type AuthOps {
 >>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
   Login(input: LoginUserInput!): UserLoginOrRegisterResponse!
     @goField(forceResolver: true)
   Register(input: RegisterUserInput!): UserLoginOrRegisterResponse!
@@ -479,8 +505,15 @@ type AuthOps {
 
 extend type Query {
   Me: User! @goField(forceResolver: true) @auth
+}
+=======
+<<<<<<< HEAD
+
+extend type Query {
+  Me: User! @goField(forceResolver: true) @auth
 }`, BuiltIn: false},
 =======
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 `, BuiltIn: false},
 >>>>>>> main
 	{Name: "../../federation/directives.graphql", Input: `
@@ -528,8 +561,12 @@ func (ec *executionContext) dir_inherits_args(ctx context.Context, rawArgs map[s
 <<<<<<< HEAD
 func (ec *executionContext) field_Mutation_Login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 =======
+<<<<<<< HEAD
+func (ec *executionContext) field_Mutation_Login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+=======
 func (ec *executionContext) field_AuthOps_Login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 >>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 	var err error
 	args := map[string]interface{}{}
 	var arg0 model.LoginUserInput
@@ -612,6 +649,8 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+<<<<<<< HEAD
+=======
 func (ec *executionContext) _Comic__id(ctx context.Context, field graphql.CollectedField, obj *model.Comic) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comic__id(ctx, field)
 	if err != nil {
@@ -998,6 +1037,7 @@ func (ec *executionContext) fieldContext_AuthOps_Register(ctx context.Context, f
 	return fc, nil
 }
 
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 func (ec *executionContext) _Comic__id(ctx context.Context, field graphql.CollectedField, obj *model.Comic) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Comic__id(ctx, field)
 	if err != nil {
@@ -1243,7 +1283,7 @@ func (ec *executionContext) _CreateComicInputModel_CreatedBy(ctx context.Context
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNObjectID2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CreateComicInputModel_CreatedBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1253,14 +1293,14 @@ func (ec *executionContext) fieldContext_CreateComicInputModel_CreatedBy(ctx con
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type ObjectID does not have child fields")
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_auth(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_auth(ctx, field)
+func (ec *executionContext) _Mutation_Login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_Login(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1273,7 +1313,7 @@ func (ec *executionContext) _Mutation_auth(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Auth(rctx)
+		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(model.LoginUserInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1285,13 +1325,17 @@ func (ec *executionContext) _Mutation_auth(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.AuthOps)
+	res := resTmp.(*model.UserLoginOrRegisterResponse)
 	fc.Result = res
-	return ec.marshalNAuthOps2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐAuthOps(ctx, field.Selections, res)
+	return ec.marshalNUserLoginOrRegisterResponse2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUserLoginOrRegisterResponse(ctx, field.Selections, res)
 }
 
+<<<<<<< HEAD
+func (ec *executionContext) fieldContext_Mutation_Login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+=======
 func (ec *executionContext) fieldContext_Mutation_auth(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 >>>>>>> main
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -3916,6 +3960,8 @@ func (ec *executionContext) unmarshalInputRegisterUserInput(ctx context.Context,
 
 // region    **************************** object.gotpl ****************************
 
+<<<<<<< HEAD
+=======
 var comicImplementors = []string{"Comic"}
 
 func (ec *executionContext) _Comic(ctx context.Context, sel ast.SelectionSet, obj *model.Comic) graphql.Marshaler {
@@ -4018,6 +4064,7 @@ func (ec *executionContext) _CreateComicInputModel(ctx context.Context, sel ast.
 	return out
 }
 
+>>>>>>> 0029a9ebdceee27cf4183943d4224b432c4bb635
 var comicImplementors = []string{"Comic"}
 
 func (ec *executionContext) _Comic(ctx context.Context, sel ast.SelectionSet, obj *model.Comic) graphql.Marshaler {
