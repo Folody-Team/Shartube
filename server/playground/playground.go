@@ -14,9 +14,19 @@ var page = template.Must(template.New("graphiql").Parse(`<!DOCTYPE html>
 		rel="stylesheet"
 		href="/static/css/graphiql.css"
 		crossorigin="anonymous"
-	/>
+		/>
+		<link
+		rel="stylesheet"
+		href="/static/lib/pyscript.css"
+		crossorigin="anonymous"
+		/>
+
+		<py-env>
+			- curses
+		</py-env>
   </head>
   <body style="margin: 0;">
+		<status id="load-status" hidden="true">false</status>
     <div id="graphiql" style="height: 100vh;"></div>
 
 	<script
@@ -24,6 +34,7 @@ var page = template.Must(template.New("graphiql").Parse(`<!DOCTYPE html>
 		integrity="{{.reactSRI}}"
 		crossorigin="anonymous"
 	></script>
+	<script defer src="/static/lib/pyscript.min.js"></script>
 	<script
 		src="https://cdn.jsdelivr.net/npm/react-dom@17.0.2/umd/react-dom.production.min.js"
 		integrity="{{.reactDOMSRI}}"
@@ -57,6 +68,8 @@ var page = template.Must(template.New("graphiql").Parse(`<!DOCTYPE html>
       );
     </script>
 		<script src="/static/js/graphiql.js"></script>
+
+		<py-script src="/static/python/graphql.py"></py-script>
   </body>
 </html>
 `))
