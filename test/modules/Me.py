@@ -14,31 +14,34 @@ import requests
 import json
 from ReadFile import readAllFile
 
-
-mutation = """
-  query Me {
-    Me {
-      _id
-      username
-      email
-      password
-      createdAt
-      updatedAt
+def testMeQuery (state):
+  mutation = """
+    query Me {
+      Me {
+        _id
+        username
+        email
+        password
+        createdAt
+        updatedAt
+      }
     }
-  }
-"""
+  """
 
-files = [e for e in readAllFile('./MeCase') if e.endswith('.json')]
+  files = [e for e in readAllFile('./MeCase') if e.endswith('.json')]
 
-content = [txt.read() for txt in [open('./MeCase/' + f) for f in files]]
+  content = [txt.read() for txt in [open('./MeCase/' + f) for f in files]]
 
-for i in range(len(files)):
-  new_content = json.loads(content[i])
-  res = requests.post('http://localhost:8080/query', headers={
-    'Authorization': f'Bearer {new_content["input"]["token"]}'
-  }, json={'query': mutation}).json()
-
-  if res["data"]:
-    print(f"Case {i+1} ✅")
-  else:
-    print(f"Case {i+1} ❌")
+  for i in range(len(files)):
+    new_content = json.loads(content[i])
+    res = requests.post('http://localhost:8080/query', headers={
+      'Authorization': f'Bearer {new_content["input"]["token"]}'
+    }, json={'query': mutation}).json()
+    '''
+      for false case data return is null
+      for true case get token from state["register"]
+    '''
+    if res["data"]:
+      print(f"Case {i+1} ✅")
+    else:
+      print(f"Case {i+1} ❌")
