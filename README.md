@@ -21,7 +21,7 @@ Clone the project
 If you want to run web application, please visit here.
 #### **Web application**
 ```
-cd client
+cd web
 ```
 Install all dependencies and run dev command.
 
