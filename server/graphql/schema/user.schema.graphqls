@@ -10,6 +10,15 @@ input LoginUserInput {
   UsernameOrEmail: String!
   password: String!
 }
+type UserModelInput {
+  _id: ID!
+  username: String!
+  email: String!
+  password: String
+  createdAt: Time!
+  updatedAt: Time!
+  comicIDs: [String!]
+}
 type User {
   _id: ID!
   username: String!
@@ -17,6 +26,8 @@ type User {
   password: String
   createdAt: Time!
   updatedAt: Time!
+  comics: [Comic!] @goField(forceResolver: true)
+  comicIDs: [String!]
 }
 type UserLoginOrRegisterResponse {
   user: User!

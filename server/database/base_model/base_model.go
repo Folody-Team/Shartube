@@ -113,6 +113,56 @@ func (b *BaseModel[dt, rdt]) DeleteOne(input interface{}) (*mongo.DeleteResult, 
 	}
 	return result, nil
 }
+func (b *BaseModel[dt, rdt]) UpdateOne(filter interface{}, value any) (*mongo.UpdateResult, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	result, err := collection.UpdateOne(ctx, filter,value)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (b *BaseModel[dt, rdt]) UpdateMany(filter interface{}, value any) (*mongo.UpdateResult, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	result, err := collection.UpdateMany(ctx, filter,value)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (b *BaseModel[dt, rdt])FindOneAndUpdate(filter interface{}, value any) (*rdt, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	var result rdt
+	 err := collection.FindOneAndUpdate(ctx, filter,value).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+func (b *BaseModel[dt, rdt])FindOneAndDelete(filter interface{}, value any) (*rdt, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	var result rdt
+	 err := collection.FindOneAndDelete(ctx, filter).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
 func (b *BaseModel[dt, rdt]) DeleteMany(input interface{}) (*mongo.DeleteResult, error) {
 	b.ClearDB()
 	dbName := os.Getenv("DB_NAME")

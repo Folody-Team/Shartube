@@ -6,16 +6,21 @@ import (
 	"time"
 )
 
-type Comic struct {
-	//  inherit:"CreateComicInputModel"
-	ID string `json:"_id" bson:"_id"`
-	//  inherit:"CreateComicInputModel"
-	CreatedAt time.Time `json:"createdAt"`
-	//  inherit:"CreateComicInputModel"
-	UpdatedAt time.Time `json:"updatedAt"`
-	//  inherit:"CreateComicInput"
-	CreatedBy string `json:"CreatedBy"`
+type CreateComic interface {
+	IsCreateComic()
 }
+
+type Comic struct {
+	ID          string    `json:"_id" bson:"_id"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+	CreatedBy   *User     `json:"CreatedBy"`
+	CreatedByID string    `json:"CreatedByID"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+}
+
+func (Comic) IsCreateComic() {}
 
 type CreateComicInput struct {
 	Name        string  `json:"name"`
@@ -23,11 +28,12 @@ type CreateComicInput struct {
 }
 
 type CreateComicInputModel struct {
-	//  inherit:"CreateComicInput"
-	CreatedBy   string  `json:"CreatedBy"`
 	Name        string  `json:"name"`
 	Description *string `json:"description"`
+	CreatedByID string  `json:"CreatedByID"`
 }
+
+func (CreateComicInputModel) IsCreateComic() {}
 
 type LoginUserInput struct {
 	UsernameOrEmail string `json:"UsernameOrEmail"`
@@ -47,9 +53,21 @@ type User struct {
 	Password  *string   `json:"password"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+	Comics    []*Comic  `json:"comics"`
+	ComicIDs  []string  `json:"comicIDs"`
 }
 
 type UserLoginOrRegisterResponse struct {
 	User        *User  `json:"user"`
 	AccessToken string `json:"accessToken"`
+}
+
+type UserModelInput struct {
+	ID        string    `json:"_id" bson:"_id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Password  *string   `json:"password"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	ComicIDs  []string  `json:"comicIDs"`
 }
