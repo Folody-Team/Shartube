@@ -10,7 +10,25 @@ type CreateComic interface {
 	IsCreateComic()
 }
 
+type CreateComicSession interface {
+	IsCreateComicSession()
+}
+
 type Comic struct {
+	ID          string          `json:"_id" bson:"_id"`
+	CreatedAt   time.Time       `json:"createdAt"`
+	UpdatedAt   time.Time       `json:"updatedAt"`
+	CreatedBy   *User           `json:"CreatedBy"`
+	CreatedByID string          `json:"CreatedByID"`
+	Name        string          `json:"name"`
+	Description *string         `json:"description"`
+	SessionID   []string        `json:"sessionId"`
+	Session     []*ComicSession `json:"session"`
+}
+
+func (Comic) IsCreateComic() {}
+
+type ComicSession struct {
 	ID          string    `json:"_id" bson:"_id"`
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
@@ -18,9 +36,11 @@ type Comic struct {
 	CreatedByID string    `json:"CreatedByID"`
 	Name        string    `json:"name"`
 	Description *string   `json:"description"`
+	ComicID     string    `json:"ComicId"`
+	Comic       *Comic    `json:"Comic"`
 }
 
-func (Comic) IsCreateComic() {}
+func (ComicSession) IsCreateComic() {}
 
 type CreateComicInput struct {
 	Name        string  `json:"name"`
@@ -34,6 +54,21 @@ type CreateComicInputModel struct {
 }
 
 func (CreateComicInputModel) IsCreateComic() {}
+
+type CreateComicSessionInput struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	ComicID     string  `json:"comicID"`
+}
+
+type CreateComicSessionInputModel struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	CreatedByID string  `json:"CreatedByID"`
+	ComicID     string  `json:"comicID"`
+}
+
+func (CreateComicSessionInputModel) IsCreateComicSession() {}
 
 type LoginUserInput struct {
 	UsernameOrEmail string `json:"UsernameOrEmail"`

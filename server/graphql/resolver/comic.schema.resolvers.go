@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/Folody-Team/Shartube/database/comic_model"
+	"github.com/Folody-Team/Shartube/database/comic_session_model"
 	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
@@ -25,6 +26,23 @@ func (r *comicResolver) CreatedBy(ctx context.Context, obj *model.Comic) (*model
 	return userModel.FindById(obj.CreatedByID)
 }
 
+// Session is the resolver for the session field.
+func (r *comicResolver) Session(ctx context.Context, obj *model.Comic) ([]*model.ComicSession, error) {
+	comicSessionModel, err := comic_session_model.InitComicSessionModel()
+	if err != nil {
+		return nil, err
+	}
+	AllComicSession := []*model.ComicSession{}
+	for _, v := range obj.SessionID {
+		data, err := comicSessionModel.FindById(v)
+		if err != nil {
+			return nil, err
+		}
+		AllComicSession = append(AllComicSession, data)
+	}
+	return AllComicSession, nil
+}
+
 // CreateComic is the resolver for the createComic field.
 func (r *mutationResolver) CreateComic(ctx context.Context, input *model.CreateComicInput) (*model.Comic, error) {
 	comicModel, err := comic_model.InitComicModel()
@@ -33,16 +51,16 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input *model.CreateC
 	}
 
 	userID := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userIDObject, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, err
+	}
 	comicID, err := comicModel.New(&model.CreateComicInputModel{
 		CreatedByID: userID,
 		Name:        input.Name,
 		Description: input.Description,
 	}).Save()
 
-	if err != nil {
-		return nil, err
-	}
-	userIDObject, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -62,11 +80,25 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input *model.CreateC
 	return comicModel.FindById(comicID.Hex())
 }
 
+// Comics is the resolver for the Comics field.
+func (r *queryResolver) Comics(ctx context.Context) ([]*model.Comic, error) {
+	comicModel, err := comic_model.InitComicModel()
+	if err != nil {
+		return nil, err
+	}
+
+	return comicModel.Find(bson.D{})
+}
+
 // Comic returns generated.ComicResolver implementation.
 func (r *Resolver) Comic() generated.ComicResolver { return &comicResolver{r} }
 
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+
 type comicResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }

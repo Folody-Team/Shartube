@@ -16,8 +16,7 @@ type CreateComicInputModel implements CreateComic {
   CreatedByID: String!
 }
 
-
-type Comic implements CreateComic  {
+type Comic implements CreateComic {
   _id: ID!
   createdAt: Time!
   updatedAt: Time!
@@ -25,8 +24,15 @@ type Comic implements CreateComic  {
   CreatedByID: String!
   name: String!
   description: String
+  sessionId: [String!]
+  session: [ComicSession!] @goField(forceResolver: true)
 }
 
 extend type Mutation {
-  createComic(input: CreateComicInput): Comic! @goField(forceResolver: true) @auth
+  createComic(input: CreateComicInput): Comic!
+    @goField(forceResolver: true)
+    @auth
+}
+extend type Query {
+  Comics: [Comic!] @goField(forceResolver: true)
 }

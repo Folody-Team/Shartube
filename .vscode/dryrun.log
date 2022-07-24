@@ -1,6 +1,6 @@
 make --dry-run --always-make --keep-going --print-directory
-make: Entering directory '/home/tritranduc/dev/code/xem-phim-app'
-make: Leaving directory '/home/tritranduc/dev/code/xem-phim-app'
+make: Entering directory '/home/tritranduc/dev/code/Shartube'
+make: Leaving directory '/home/tritranduc/dev/code/Shartube'
  
 make: *** No targets specified and no makefile found.  Stop.
 
