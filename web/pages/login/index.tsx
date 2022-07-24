@@ -41,6 +41,11 @@ export default function login() {
       `} style={{
         width: inputContainWidth+'%'
       }}>
+        <h1 className={`
+          text-[#e4e4e4]
+          text-[2em]
+          mb-[20px]
+        `}>Login</h1>
         <div className="
           w-[100%] 
           mt-[5px]
@@ -48,7 +53,7 @@ export default function login() {
           flex-col
         ">
           <label>Email</label>
-          <input className="bg-[#212328] w-[100] p-[6px] rounded-[6px] outline-none hover:bg-[#2a2d33]"/>
+          <input id="email" className="bg-[#212328] w-[100] p-[6px] px-[10px] rounded-[6px] outline-none hover:bg-[#2a2d33] mt-[8px]" placeholder='Enter email'/>
         </div>
         <div className="
           w-[100%] 
@@ -57,7 +62,7 @@ export default function login() {
           flex-col
         ">
           <label>Password</label>
-          <input className="bg-[#212328] w-[100] p-[6px] rounded-[6px] outline-none hover:bg-[#2a2d33]"/>
+          <input id="password" className="bg-[#212328] w-[100] p-[6px] px-[10px] rounded-[6px] outline-none hover:bg-[#2a2d33] mt-[8px]" placeholder='Enter password' type='password'/>
         </div>
         
         <button className="bg-[#2F4DEE] w-[100%] py-[8px] mt-[20px] rounded-[6px] hover:bg-[#3b58fa]">Login</button>
