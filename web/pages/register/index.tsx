@@ -112,7 +112,7 @@ export default function register() {
           }
 
           
-        }}>Login</button>
+        }}>Register</button>
       </div>
       
     </div>

@@ -38,7 +38,6 @@ func (m *BaseModel[dt, rdt]) FindById(ID string) (*rdt, error) {
 	m.ClearDB()
 	ObjectID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
-		log.Fatalln(err)
 		return nil, err
 	}
 
@@ -49,7 +48,6 @@ func (m *BaseModel[dt, rdt]) FindById(ID string) (*rdt, error) {
 	var dataResult rdt
 	err = collection.FindOne(ctx, bson.M{"_id": ObjectID}).Decode(&dataResult)
 	if err != nil {
-		log.Fatalln(err)
 		return nil, err
 	}
 	return &dataResult, nil
@@ -63,9 +61,9 @@ func (m *BaseModel[dt, rdt]) FindOne(input interface{}) (*rdt, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
 	defer cancel()
 	var dataResult rdt
-	err := collection.FindOne(ctx, input).Decode(&dataResult)
+	res := collection.FindOne(ctx, input)
+	err := res.Decode(&dataResult)
 	if err != nil {
-		log.Fatalln(err)
 		return nil, err
 	}
 	return &dataResult, nil
@@ -112,6 +110,56 @@ func (b *BaseModel[dt, rdt]) DeleteOne(input interface{}) (*mongo.DeleteResult, 
 		return nil, err
 	}
 	return result, nil
+}
+func (b *BaseModel[dt, rdt]) UpdateOne(filter interface{}, value any) (*mongo.UpdateResult, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	result, err := collection.UpdateOne(ctx, filter, value)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (b *BaseModel[dt, rdt]) UpdateMany(filter interface{}, value any) (*mongo.UpdateResult, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	result, err := collection.UpdateMany(ctx, filter, value)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (b *BaseModel[dt, rdt]) FindOneAndUpdate(filter interface{}, value any) (*rdt, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	var result rdt
+	err := collection.FindOneAndUpdate(ctx, filter, value).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+func (b *BaseModel[dt, rdt]) FindOneAndDelete(filter interface{}, value any) (*rdt, error) {
+	b.ClearDB()
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	var result rdt
+	err := collection.FindOneAndDelete(ctx, filter).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 func (b *BaseModel[dt, rdt]) DeleteMany(input interface{}) (*mongo.DeleteResult, error) {
 	b.ClearDB()
