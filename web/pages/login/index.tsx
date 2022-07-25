@@ -11,9 +11,10 @@ export default function login() {
   function widthCaculator(e: Window) {
     const width = Math.floor((e.innerWidth < 768 ? ((93.0989583*e.innerWidth)/100) : ((39.114583333*e.innerWidth)/100)));
     const widthBlock = 1.61803399*width;
-    const widthNew = widthBlock/2;
+    const widthNew = Math.floor(widthBlock/2);
+    const widthNew2 = Math.floor((e.innerWidth-width)/2);
 
-    if (Math.floor(widthNew) !== Math.floor((e.innerWidth-width)/2)) {
+    if ((widthNew - widthNew2 === widthNew - widthNew2) && (widthNew - (widthNew - widthNew2)) === widthNew2) {
       setInputContainWidth(Math.floor((width/e.innerWidth)*100))
     }
   }
