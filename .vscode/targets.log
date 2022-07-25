@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sun Jul 24 17:58:08 2022
+# Make data base, printed on Mon Jul 25 11:56:49 2022
 
 # Variables
 
@@ -49,7 +49,7 @@ VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupp
 # environment
 _ = /usr/bin/code
 # environment
-JOURNAL_STREAM = 8:39328
+JOURNAL_STREAM = 8:36782
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # makefile
@@ -69,9 +69,9 @@ XDG_DATA_DIRS = /usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/d
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
-DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus,guid=aa526b2cce85ec4461334bbc62dcb25a
+DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus,guid=e86c3310c66c2ebaee49399c62de01bd
 # environment
-MANAGERPID = 993
+MANAGERPID = 972
 # environment
 LC_NAME = vi_VN
 # environment
@@ -87,7 +87,7 @@ GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
-SESSION_MANAGER = local/tritranduc-Aspire-4752:@/tmp/.ICE-unix/1300,unix/tritranduc-Aspire-4752:/tmp/.ICE-unix/1300
+SESSION_MANAGER = local/tritranduc-Aspire-4752:@/tmp/.ICE-unix/1280,unix/tritranduc-Aspire-4752:/tmp/.ICE-unix/1280
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -99,7 +99,7 @@ XDG_MENU_PREFIX = gnome-
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = 992b57ba2a534a5885445c65b7f2e903
+INVOCATION_ID = 3ed20ec57a9044778fd57ebb7440c4dc
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -119,7 +119,7 @@ PWD = /home/tritranduc/dev/code/Shartube
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 1261
+SSH_AGENT_PID = 1219
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -181,7 +181,7 @@ LC_TELEPHONE = vi_VN
 # default
 MAKE_COMMAND := make
 # environment
-OLDPWD = /home/tritranduc/dev/code/Shartube/server
+OLDPWD = /home/tritranduc/dev/code/Shartube
 # default
 .VARIABLES := 
 # automatic
@@ -223,11 +223,11 @@ LC_ALL = C
 # environment
 DBUS_STARTER_BUS_TYPE = session
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/387a73ee_4fe9_4f1e_8b7e_a5e3f1fdaf12
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/3469f093_f699_4947_9e16_c9fa6ab3a853
 # automatic
 ^F = $(notdir $^)
 # environment
-GNOME_TERMINAL_SERVICE = :1.96
+GNOME_TERMINAL_SERVICE = :1.108
 # default
 SUFFIXES := 
 # environment
@@ -247,9 +247,9 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 15049
+VSCODE_PID = 7161
 # environment
-DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=aa526b2cce85ec4461334bbc62dcb25a
+DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=e86c3310c66c2ebaee49399c62de01bd
 # variable set hash-table stats:
 # Load=120/1024=12%, Rehash=0, Collisions=19/142=13%
 
@@ -276,9 +276,6 @@ all:
 #  File does not exist.
 #  File has not been updated.
 
- 
-make: *** No rule to make target 'all'.  Stop.
-
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
@@ -298,6 +295,9 @@ makefile:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
+
+ 
+make: *** No rule to make target 'all'.  Stop.
 
 # Not a target:
 GNUmakefile:
@@ -320,6 +320,6 @@ GNUmakefile:
 # strcache performance: lookups = 24 / hit rate = 12%
 # hash-table stats:
 # Load=21/8192=0%, Rehash=0, Collisions=1/24=4%
-# Finished Make data base on Sun Jul 24 17:58:08 2022
+# Finished Make data base on Mon Jul 25 11:56:50 2022
 
  

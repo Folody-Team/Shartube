@@ -93,12 +93,4 @@ func (r *queryResolver) Comics(ctx context.Context) ([]*model.Comic, error) {
 // Comic returns generated.ComicResolver implementation.
 func (r *Resolver) Comic() generated.ComicResolver { return &comicResolver{r} }
 
-// Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
-
-// Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
-
 type comicResolver struct{ *Resolver }
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }

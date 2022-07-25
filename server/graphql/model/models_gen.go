@@ -10,6 +10,10 @@ type CreateComic interface {
 	IsCreateComic()
 }
 
+type CreateComicChap interface {
+	IsCreateComicChap()
+}
+
 type CreateComicSession interface {
 	IsCreateComicSession()
 }
@@ -28,19 +32,50 @@ type Comic struct {
 
 func (Comic) IsCreateComic() {}
 
+type ComicChap struct {
+	ID          string        `json:"_id" bson:"_id"`
+	CreatedAt   time.Time     `json:"createdAt"`
+	UpdatedAt   time.Time     `json:"updatedAt"`
+	CreatedBy   *User         `json:"CreatedBy"`
+	CreatedByID string        `json:"CreatedByID"`
+	Name        string        `json:"name"`
+	Description *string       `json:"description"`
+	SessionID   string        `json:"SessionId"`
+	Session     *ComicSession `json:"Session"`
+}
+
+func (ComicChap) IsCreateComic() {}
+
 type ComicSession struct {
-	ID          string    `json:"_id" bson:"_id"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
-	CreatedBy   *User     `json:"CreatedBy"`
-	CreatedByID string    `json:"CreatedByID"`
-	Name        string    `json:"name"`
-	Description *string   `json:"description"`
-	ComicID     string    `json:"ComicId"`
-	Comic       *Comic    `json:"Comic"`
+	ID          string       `json:"_id" bson:"_id"`
+	CreatedAt   time.Time    `json:"createdAt"`
+	UpdatedAt   time.Time    `json:"updatedAt"`
+	CreatedBy   *User        `json:"CreatedBy"`
+	CreatedByID string       `json:"CreatedByID"`
+	Name        string       `json:"name"`
+	Description *string      `json:"description"`
+	ComicID     string       `json:"ComicId"`
+	Comic       *Comic       `json:"Comic"`
+	Chaps       []*ComicChap `json:"Chaps"`
+	ChapIds     []string     `json:"ChapIds"`
 }
 
 func (ComicSession) IsCreateComic() {}
+
+type CreateComicChapInput struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	SessionID   string  `json:"SessionID"`
+}
+
+type CreateComicChapInputModel struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	CreatedByID string  `json:"CreatedByID"`
+	SessionID   string  `json:"SessionID"`
+}
+
+func (CreateComicChapInputModel) IsCreateComicChap() {}
 
 type CreateComicInput struct {
 	Name        string  `json:"name"`

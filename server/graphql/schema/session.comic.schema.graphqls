@@ -27,6 +27,8 @@ type ComicSession implements CreateComic {
   description: String
   ComicId: String!
   Comic: Comic! @goField(forceResolver: true)
+  Chaps: [ComicChap!] @goField(forceResolver: true)
+  ChapIds: [String!]
 }
 
 extend type Mutation {

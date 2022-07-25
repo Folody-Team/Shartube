@@ -6,6 +6,7 @@ package resolver
 import (
 	"context"
 
+	"github.com/Folody-Team/Shartube/database/comic_chap_model"
 	"github.com/Folody-Team/Shartube/database/comic_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
 	"github.com/Folody-Team/Shartube/database/session_model"
@@ -34,6 +35,23 @@ func (r *comicSessionResolver) Comic(ctx context.Context, obj *model.ComicSessio
 		return nil, err
 	}
 	return comicModel.FindById(obj.ComicID)
+}
+
+// Chaps is the resolver for the Chaps field.
+func (r *comicSessionResolver) Chaps(ctx context.Context, obj *model.ComicSession) ([]*model.ComicChap, error) {
+	comicChapModel, err := comic_chap_model.InitComicChapModel()
+	if err != nil {
+		return nil, err
+	}
+	AllChaps := []*model.ComicChap{}
+	for _, ChapId := range obj.ChapIds {
+		data, err := comicChapModel.FindById(ChapId)
+		if err != nil {
+			return nil, err
+		}
+		AllChaps = append(AllChaps, data)
+	}
+	return AllChaps, nil
 }
 
 // CreateComicSession is the resolver for the CreateComicSession field.
