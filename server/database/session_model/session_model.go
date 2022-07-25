@@ -24,7 +24,7 @@ type SaveSessionDataOutput struct {
 func InitSessionModel() (*base_model.BaseModel[SaveSessionDataInput, SaveSessionDataOutput], error) {
 	client, err := getClient.GetClient()
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 		return nil, err
 	}
 	timeDelete := time.Minute * constraint.BASE_SESSION_BY_MINUTE_TIME

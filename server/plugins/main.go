@@ -24,7 +24,14 @@ func mutateHook(b *modelgen.ModelBuild) *modelgen.ModelBuild {
 				inheritModelIndex := slices.IndexFunc(b.Models, func(o *modelgen.Object) bool {
 					return o.Name == strings.TrimSpace(strings.Replace(strings.Replace(field.Description, "inherit:", "", -1), `"`, "", -1))
 				})
-				model.Fields = append(model.Fields, b.Models[inheritModelIndex].Fields...)
+				for _, inheritField := range b.Models[inheritModelIndex].Fields {
+					isOverwriteField := slices.IndexFunc(model.Fields, func(o *modelgen.Field) bool {
+						return o.Name == inheritField.Name
+					})
+					if isOverwriteField == -1 {
+						model.Fields = append(model.Fields, inheritField)
+					}
+				}
 			}
 
 		}
