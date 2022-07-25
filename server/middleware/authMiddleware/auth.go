@@ -2,6 +2,7 @@ package authMiddleware
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -22,6 +23,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		auth := r.Header.Get("Authorization")
+		fmt.Println(auth)
 		if auth == "" {
 			next.ServeHTTP(w, r)
 			return
@@ -40,7 +42,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		sessionObjectId, err := primitive.ObjectIDFromHex(customClaim.ID)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 			http.Error(w, "server error", http.StatusInternalServerError)
 			return
 		}

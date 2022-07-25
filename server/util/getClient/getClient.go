@@ -14,10 +14,10 @@ import (
 func GetClient() (*mongo.Client, error) {
 	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	dbUrl := ""
-	if len(os.Getenv("DB_PORT")) >= 1{
+	if len(os.Getenv("DB_PORT")) >= 1 {
 		dbUrl += os.ExpandEnv("mongodb://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:$DB_PORT")
 		dbUrl += "/?authSource=admin&readPreference=primary&ssl=false"
-	}else {
+	} else {
 		dbUrl += os.ExpandEnv("mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}")
 		dbUrl += os.ExpandEnv("/${DB_NAME}?retryWrites=true&w=majority")
 	}
@@ -27,7 +27,7 @@ func GetClient() (*mongo.Client, error) {
 	defer cancel()
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 		return nil, err
 	}
 	err = client.Ping(ctx, readpref.Primary())
