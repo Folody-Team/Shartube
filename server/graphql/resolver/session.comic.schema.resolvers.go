@@ -11,9 +11,9 @@ import (
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
 	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
+	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
-	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -55,7 +55,7 @@ func (r *comicSessionResolver) Chaps(ctx context.Context, obj *model.ComicSessio
 }
 
 // CreateComicSession is the resolver for the CreateComicSession field.
-func (r *mutationResolver) CreateComicSession(ctx context.Context, input *model.CreateComicSessionInput) (*model.ComicSession, error) {
+func (r *mutationResolver) CreateComicSession(ctx context.Context, input model.CreateComicSessionInput) (*model.ComicSession, error) {
 	comicSessionModel, err := comic_session_model.InitComicSessionModel()
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (r *mutationResolver) CreateComicSession(ctx context.Context, input *model.
 	if err != nil {
 		return nil, err
 	}
-	userID := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
 	userIDObject, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return nil, err

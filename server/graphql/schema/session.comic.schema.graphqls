@@ -32,7 +32,7 @@ type ComicSession implements CreateComic {
 }
 
 extend type Mutation {
-  CreateComicSession(input: CreateComicSessionInput): ComicSession!
+  CreateComicSession(input: CreateComicSessionInput!): ComicSession!
     @goField(forceResolver: true)
     @auth
 }
