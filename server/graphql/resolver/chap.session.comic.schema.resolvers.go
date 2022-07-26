@@ -5,8 +5,8 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 	"io"
-	"log"
 	"os"
 	"path"
 
@@ -94,13 +94,20 @@ func (r *mutationResolver) CreateComicChap(ctx context.Context, input model.Crea
 
 // AddImageToChap is the resolver for the AddImageToChap field.
 func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.UploadFile, chapID string) (*model.ComicChap, error) {
+	fmt.Printf("chapID: %v\n", chapID)
 	comicChapModel, err := comic_chap_model.InitComicChapModel()
 	if err != nil {
 		return nil, err
 	}
 
 	userID := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
-	comicChapDoc, err := comicChapModel.FindById(chapID)
+	ComicChapObjectId, err := primitive.ObjectIDFromHex(chapID)
+	if err != nil {
+		return nil, err
+	}
+	comicChapDoc, err := comicChapModel.FindOne(bson.D{
+		{Key: "_id", Value: ComicChapObjectId},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -111,14 +118,12 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 		return nil, gqlerror.Errorf("Access Denied")
 	}
 
-	AllImages := []string{}
-
-	AllImages = append(AllImages, comicChapDoc.Images...)
 	allowType := []string{
 		"image/bmp",
 		"image/gif",
 		"image/jpeg", "image/png",
 	}
+	AllImages := comicChapDoc.Images
 	for _, v := range req {
 		// check file type
 		if !util.InSlice(allowType, v.File.ContentType) {
@@ -147,14 +152,19 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 		if err != nil {
 			return nil, err
 		}
-		AllImages = append(AllImages, path.Join("/public/image", fileName))
+		AllImages = append(AllImages, &model.ImageResult{
+			ID:  FileId,
+			URL: path.Join("/public/image", fileName),
+		})
 	}
-	log.Println(AllImages)
-	comicChapModel.UpdateOne(bson.M{
-		"_id": chapID,
+
+	if _, err := comicChapModel.FindOneAndDelete(bson.M{
+		"_id": comicChapDoc.ID,
 	}, bson.M{
 		"Images": AllImages,
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	return comicChapModel.FindById(chapID)
 }

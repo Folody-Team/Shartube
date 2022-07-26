@@ -14,6 +14,10 @@ type CreateComicChapInputModel implements CreateComicChap {
   CreatedByID: String!
   SessionID: String!
 }
+type ImageResult{
+  ID: String!
+  Url: String!
+}
 type ComicChap implements CreateComic {
   _id: ID!
   createdAt: Time!
@@ -24,7 +28,7 @@ type ComicChap implements CreateComic {
   description: String
   SessionId: String!
   Session: ComicSession! @goField(forceResolver: true)
-  Images: [String!]!
+  Images: [ImageResult!]!
 }
 extend type Mutation {
   CreateComicChap(input: CreateComicChapInput!): ComicChap!

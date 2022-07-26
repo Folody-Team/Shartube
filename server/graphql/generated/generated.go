@@ -112,6 +112,11 @@ type ComplexityRoot struct {
 		Name        func(childComplexity int) int
 	}
 
+	ImageResult struct {
+		ID  func(childComplexity int) int
+		URL func(childComplexity int) int
+	}
+
 	Mutation struct {
 		AddImageToChap     func(childComplexity int, req []*model.UploadFile, chapID string) int
 		CreateComic        func(childComplexity int, input model.CreateComicInput) int
@@ -496,6 +501,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CreateComicSessionInputModel.Name(childComplexity), true
 
+	case "ImageResult.ID":
+		if e.complexity.ImageResult.ID == nil {
+			break
+		}
+
+		return e.complexity.ImageResult.ID(childComplexity), true
+
+	case "ImageResult.Url":
+		if e.complexity.ImageResult.URL == nil {
+			break
+		}
+
+		return e.complexity.ImageResult.URL(childComplexity), true
+
 	case "Mutation.AddImageToChap":
 		if e.complexity.Mutation.AddImageToChap == nil {
 			break
@@ -829,6 +848,10 @@ type CreateComicChapInputModel implements CreateComicChap {
   CreatedByID: String!
   SessionID: String!
 }
+type ImageResult{
+  ID: String!
+  Url: String!
+}
 type ComicChap implements CreateComic {
   _id: ID!
   createdAt: Time!
@@ -839,7 +862,7 @@ type ComicChap implements CreateComic {
   description: String
   SessionId: String!
   Session: ComicSession! @goField(forceResolver: true)
-  Images: [String!]!
+  Images: [ImageResult!]!
 }
 extend type Mutation {
   CreateComicChap(input: CreateComicChapInput!): ComicChap!
@@ -2114,9 +2137,9 @@ func (ec *executionContext) _ComicChap_Images(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]string)
+	res := resTmp.([]*model.ImageResult)
 	fc.Result = res
-	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+	return ec.marshalNImageResult2ᚕᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐImageResultᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ComicChap_Images(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2126,7 +2149,13 @@ func (ec *executionContext) fieldContext_ComicChap_Images(ctx context.Context, f
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_ImageResult_ID(ctx, field)
+			case "Url":
+				return ec.fieldContext_ImageResult_Url(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ImageResult", field.Name)
 		},
 	}
 	return fc, nil
@@ -3129,6 +3158,94 @@ func (ec *executionContext) _CreateComicSessionInputModel_comicID(ctx context.Co
 func (ec *executionContext) fieldContext_CreateComicSessionInputModel_comicID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CreateComicSessionInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageResult_ID(ctx context.Context, field graphql.CollectedField, obj *model.ImageResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageResult_ID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageResult_ID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageResult",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageResult_Url(ctx context.Context, field graphql.CollectedField, obj *model.ImageResult) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageResult_Url(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageResult_Url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageResult",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -7503,6 +7620,41 @@ func (ec *executionContext) _CreateComicSessionInputModel(ctx context.Context, s
 	return out
 }
 
+var imageResultImplementors = []string{"ImageResult"}
+
+func (ec *executionContext) _ImageResult(ctx context.Context, sel ast.SelectionSet, obj *model.ImageResult) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, imageResultImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ImageResult")
+		case "ID":
+
+			out.Values[i] = ec._ImageResult_ID(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Url":
+
+			out.Values[i] = ec._ImageResult_Url(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -8392,6 +8544,60 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) marshalNImageResult2ᚕᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐImageResultᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ImageResult) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNImageResult2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐImageResult(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNImageResult2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐImageResult(ctx context.Context, sel ast.SelectionSet, v *model.ImageResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ImageResult(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -8430,38 +8636,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]string, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
-	}
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {

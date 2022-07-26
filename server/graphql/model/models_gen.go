@@ -35,16 +35,16 @@ type Comic struct {
 func (Comic) IsCreateComic() {}
 
 type ComicChap struct {
-	ID          string        `json:"_id" bson:"_id"`
-	CreatedAt   time.Time     `json:"createdAt"`
-	UpdatedAt   time.Time     `json:"updatedAt"`
-	CreatedBy   *User         `json:"CreatedBy"`
-	CreatedByID string        `json:"CreatedByID"`
-	Name        string        `json:"name"`
-	Description *string       `json:"description"`
-	SessionID   string        `json:"SessionId"`
-	Session     *ComicSession `json:"Session"`
-	Images      []string      `json:"Images"`
+	ID          string         `json:"_id" bson:"_id"`
+	CreatedAt   time.Time      `json:"createdAt"`
+	UpdatedAt   time.Time      `json:"updatedAt"`
+	CreatedBy   *User          `json:"CreatedBy"`
+	CreatedByID string         `json:"CreatedByID"`
+	Name        string         `json:"name"`
+	Description *string        `json:"description"`
+	SessionID   string         `json:"SessionId"`
+	Session     *ComicSession  `json:"Session"`
+	Images      []*ImageResult `json:"Images"`
 }
 
 func (ComicChap) IsCreateComic() {}
@@ -107,6 +107,11 @@ type CreateComicSessionInputModel struct {
 }
 
 func (CreateComicSessionInputModel) IsCreateComicSession() {}
+
+type ImageResult struct {
+	ID  string `json:"ID"`
+	URL string `json:"Url"`
+}
 
 type LoginUserInput struct {
 	UsernameOrEmail string `json:"UsernameOrEmail"`
