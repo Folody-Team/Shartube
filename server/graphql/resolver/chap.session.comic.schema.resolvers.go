@@ -5,7 +5,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"path"
@@ -14,9 +13,9 @@ import (
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
 	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
+	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
-	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	"github.com/Folody-Team/Shartube/util"
 	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -48,7 +47,7 @@ func (r *mutationResolver) CreateComicChap(ctx context.Context, input model.Crea
 	if err != nil {
 		return nil, err
 	}
-	userID := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
 	userIDObject, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return nil, err
@@ -94,19 +93,17 @@ func (r *mutationResolver) CreateComicChap(ctx context.Context, input model.Crea
 
 // AddImageToChap is the resolver for the AddImageToChap field.
 func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.UploadFile, chapID string) (*model.ComicChap, error) {
-	fmt.Printf("chapID: %v\n", chapID)
 	comicChapModel, err := comic_chap_model.InitComicChapModel()
 	if err != nil {
 		return nil, err
 	}
 
-	userID := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
-	ComicChapObjectId, err := primitive.ObjectIDFromHex(chapID)
+	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
 	if err != nil {
 		return nil, err
 	}
 	comicChapDoc, err := comicChapModel.FindOne(bson.D{
-		{Key: "_id", Value: ComicChapObjectId},
+		{Key: "_id", Value: chapID},
 	})
 	if err != nil {
 		return nil, err
@@ -117,7 +114,6 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 	if userID != comicChapDoc.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-
 	allowType := []string{
 		"image/bmp",
 		"image/gif",
@@ -166,7 +162,7 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 		return nil, err
 	}
 
-	return comicChapModel.FindById(chapID)
+	return comicChapModel.FindById(comicChapDoc.ID)
 }
 
 // ChapBySession is the resolver for the ChapBySession field.

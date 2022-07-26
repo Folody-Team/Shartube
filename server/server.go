@@ -10,8 +10,8 @@ import (
 	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/resolver"
-	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	GraphqlLog "github.com/Folody-Team/Shartube/middleware/log"
+	"github.com/Folody-Team/Shartube/middleware/passRequest"
 	"github.com/Folody-Team/Shartube/playground"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -28,7 +28,7 @@ func main() {
 	// create a new router with mux
 	router := mux.NewRouter()
 	// middleware
-	router.Use(authMiddleware.AuthMiddleware)
+	router.Use(passRequest.PassMiddleware)
 	port := os.Getenv("PORT")
 
 	if port == "" {
