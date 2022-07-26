@@ -47,7 +47,7 @@ func EmailInput(ctx context.Context, obj interface{}, next graphql.Resolver) (re
 
 	if err != nil {
 		log.Fatal(err)
-		return nil, gqlerror.Errorf("email format is incorrect") // return if the email format is incorrect (err is not nil)
+		return nil, gqlerror.Errorf("err") // return if the email format is incorrect (err is not nil)
 	}
 
 	resp, err := client.Do(req) // execute the request
@@ -55,7 +55,6 @@ func EmailInput(ctx context.Context, obj interface{}, next graphql.Resolver) (re
 	if err != nil {
 		return nil, err // return if error (err is not nil)
 	}
-
 
 	defer resp.Body.Close() // close the response body
 

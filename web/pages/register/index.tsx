@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react'
-import {useMutation} from "@apollo/client";
-import client from "../../graphql";
-import { registerMutation } from '../../graphql/gql/register';
+import {useRegisterMutation, MeQuery, MeDocument} from '../../generated/graphql';
+import {useRouter} from 'next/router';
+import {checkAuth} from '../../utils/checkAuth' 
+
 /**
  * 
  * @returns {JSX.Element}
@@ -18,11 +19,13 @@ export default function register() {
    * 
    * 
    */
-  
-  const [register] = useMutation(registerMutation);
 
+  const router = useRouter();
   
-  const [inputContainWidth, setInputContainWidth] = useState(0)
+  const [register, {data, loading}] = useRegisterMutation();
+  const {data: authData} = checkAuth();
+  
+  const [inputContainWidth, setInputContainWidth] = useState(0);
 
   function widthCaculator(e: Window) {
     const width = Math.floor((e.innerWidth < 768 ? ((93.0989583*e.innerWidth)/100) : ((39.114583333*e.innerWidth)/100)));
@@ -39,6 +42,23 @@ export default function register() {
     })
     widthCaculator(window)
   }, [])
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      if (authData) {
+        router.push('/')
+      }
+    }
+  }, [])
+  useEffect(() => {
+    if (loading == false && data != undefined) {
+       localStorage.setItem('token', data.Register.accessToken);
+        router.push('/')
+    }
+  }, [loading, data])
+
+      
+  
   return (
     <div className="
       bg-[#141518] 
@@ -100,18 +120,25 @@ export default function register() {
           if (username && email && password) {
             register({
               variables: {
-                email: email.value,
-                password: password.value,
-                username: username.value
+                input: {
+                  username: username.value,
+                  email: email.value,
+                  password: password.value
+                }
+              },
+              update(cache, {data}) {
+                if (data?.Register.user && data.Register.accessToken) {
+                  cache.writeQuery<MeQuery>({
+                    query: MeDocument,
+                    data: {
+                      Me: data.Register.user,
+                    }
+                  })
+                }
               }
-            }).then(res => {
-              console.log(res)
-            }).catch(err => {
-              console.log(err)
             })
+            
           }
-
-          
         }}>Register</button>
       </div>
       
