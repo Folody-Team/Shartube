@@ -4,6 +4,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 type CreateComic interface {
@@ -42,6 +44,7 @@ type ComicChap struct {
 	Description *string       `json:"description"`
 	SessionID   string        `json:"SessionId"`
 	Session     *ComicSession `json:"Session"`
+	Images      []string      `json:"Images"`
 }
 
 func (ComicChap) IsCreateComic() {}
@@ -114,6 +117,11 @@ type RegisterUserInput struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type UploadFile struct {
+	ID   int            `json:"id"`
+	File graphql.Upload `json:"file"`
 }
 
 type User struct {

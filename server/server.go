@@ -62,7 +62,21 @@ func main() {
 	* Here we add the playground to the server with mux
 	 */
 	// handler static/css and js
-	router.Use(cors.AllowAll().Handler)
+	router.Use(cors.New(
+		cors.Options{
+			AllowedOrigins: []string{"*"},
+			AllowedMethods: []string{
+				http.MethodHead,
+				http.MethodGet,
+				http.MethodPost,
+				http.MethodPut,
+				http.MethodPatch,
+				http.MethodDelete,
+			},
+			AllowedHeaders:   []string{"*"},
+			AllowCredentials: true,
+		},
+	).Handler)
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	router.Handle("/", playground.Handler("Shartube GraphQL", "/query"))
 	router.Handle("/query", srv)

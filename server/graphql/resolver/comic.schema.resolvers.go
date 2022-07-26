@@ -44,7 +44,7 @@ func (r *comicResolver) Session(ctx context.Context, obj *model.Comic) ([]*model
 }
 
 // CreateComic is the resolver for the createComic field.
-func (r *mutationResolver) CreateComic(ctx context.Context, input *model.CreateComicInput) (*model.Comic, error) {
+func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateComicInput) (*model.Comic, error) {
 	comicModel, err := comic_model.InitComicModel()
 	if err != nil {
 		return nil, err

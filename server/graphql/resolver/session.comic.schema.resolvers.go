@@ -55,7 +55,7 @@ func (r *comicSessionResolver) Chaps(ctx context.Context, obj *model.ComicSessio
 }
 
 // CreateComicSession is the resolver for the CreateComicSession field.
-func (r *mutationResolver) CreateComicSession(ctx context.Context, input *model.CreateComicSessionInput) (*model.ComicSession, error) {
+func (r *mutationResolver) CreateComicSession(ctx context.Context, input model.CreateComicSessionInput) (*model.ComicSession, error) {
 	comicSessionModel, err := comic_session_model.InitComicSessionModel()
 	if err != nil {
 		return nil, err

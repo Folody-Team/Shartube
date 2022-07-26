@@ -78,7 +78,7 @@ func (db *BaseModel[dt, rdt]) Find(input interface{}) ([]*rdt, error) {
 	collection := db.Client.Database(dbName).Collection(db.CollectionName)
 	cur, err := collection.Find(ctx, input)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 	var users []*rdt
@@ -87,13 +87,13 @@ func (db *BaseModel[dt, rdt]) Find(input interface{}) ([]*rdt, error) {
 		var user *rdt
 		err := cur.Decode(&user)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 			return nil, err
 		}
 		users = append(users, user)
 	}
 	if err := cur.Err(); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 	return users, nil
@@ -135,7 +135,7 @@ func (b *BaseModel[dt, rdt]) UpdateMany(filter interface{}, value any) (*mongo.U
 	}
 	return result, nil
 }
-func (b *BaseModel[dt, rdt]) FindOneAndUpdate(filter interface{}, value any) (*rdt, error) {
+func (b *BaseModel[dt, rdt]) FindOneAndUpdate(filter interface{}, value any, opts ...*options.FindOneAndUpdateOptions) (*rdt, error) {
 	b.ClearDB()
 	dbName := os.Getenv("DB_NAME")
 	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
@@ -148,7 +148,7 @@ func (b *BaseModel[dt, rdt]) FindOneAndUpdate(filter interface{}, value any) (*r
 	}
 	return &result, nil
 }
-func (b *BaseModel[dt, rdt]) FindOneAndDelete(filter interface{}, value any) (*rdt, error) {
+func (b *BaseModel[dt, rdt]) FindOneAndDelete(filter interface{}, value any, opts ...*options.FindOneAndDeleteOptions) (*rdt, error) {
 	b.ClearDB()
 	dbName := os.Getenv("DB_NAME")
 	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
@@ -215,7 +215,7 @@ func (n *NewBaseModel[dt]) Save() (*primitive.ObjectID, error) {
 
 	res, err := collection.InsertOne(ctx, data)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 	id := res.InsertedID.(primitive.ObjectID)
