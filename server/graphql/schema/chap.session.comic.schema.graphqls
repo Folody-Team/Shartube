@@ -14,7 +14,7 @@ type CreateComicChapInputModel implements CreateComicChap {
   CreatedByID: String!
   SessionID: String!
 }
-type ImageResult{
+type ImageResult {
   ID: String!
   Url: String!
 }
@@ -30,11 +30,19 @@ type ComicChap implements CreateComic {
   Session: ComicSession! @goField(forceResolver: true)
   Images: [ImageResult!]!
 }
+
+input UpdateComicChapInput {
+  name: String
+  description: String
+}
 extend type Mutation {
   CreateComicChap(input: CreateComicChapInput!): ComicChap!
     @goField(forceResolver: true)
     @auth
   AddImageToChap(req: [UploadFile!]!, chapID: String!): ComicChap!
+    @goField(forceResolver: true)
+    @auth
+  updateComicChap(chapID: String!, input: UpdateComicChapInput!): ComicChap!
     @goField(forceResolver: true)
     @auth
 }

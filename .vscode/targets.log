@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Tue Jul 26 07:43:14 2022
+# Make data base, printed on Wed Jul 27 14:12:00 2022
 
 # Variables
 
@@ -52,9 +52,13 @@ VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupp
 _ = /usr/bin/code
 # environment
 <<<<<<< HEAD
+JOURNAL_STREAM = 8:39174
+=======
+<<<<<<< HEAD
 JOURNAL_STREAM = 8:38372
 =======
 JOURNAL_STREAM = 8:38710
+>>>>>>> origin/test-pending
 >>>>>>> origin/test-pending
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
@@ -75,9 +79,9 @@ XDG_DATA_DIRS = /usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/d
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
-DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus,guid=e7ef1c066096450e2349018462df31fe
+DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus,guid=c0891f65f5fffc14d006b47c62e0e436
 # environment
-MANAGERPID = 973
+MANAGERPID = 963
 # environment
 LC_NAME = vi_VN
 # environment
@@ -93,7 +97,7 @@ GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
-SESSION_MANAGER = local/tritranduc-Aspire-4752:@/tmp/.ICE-unix/1277,unix/tritranduc-Aspire-4752:/tmp/.ICE-unix/1277
+SESSION_MANAGER = local/tritranduc-Aspire-4752:@/tmp/.ICE-unix/1288,unix/tritranduc-Aspire-4752:/tmp/.ICE-unix/1288
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -105,7 +109,7 @@ XDG_MENU_PREFIX = gnome-
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = 6dcabab2086f4d23a7b1dc3c9782eb6a
+INVOCATION_ID = 8999c712025241198cb87bbbc7724086
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -125,7 +129,7 @@ PWD = /home/tritranduc/dev/code/Shartube
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 1231
+SSH_AGENT_PID = 1209
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -187,7 +191,7 @@ LC_TELEPHONE = vi_VN
 # default
 MAKE_COMMAND := make
 # environment
-OLDPWD = /home/tritranduc/dev/code/Shartube/server
+OLDPWD = /home/tritranduc/dev/code/Shartube
 # default
 .VARIABLES := 
 # automatic
@@ -229,11 +233,11 @@ LC_ALL = C
 # environment
 DBUS_STARTER_BUS_TYPE = session
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/a638fd42_4df0_41b7_997a_9465efbaa395
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/0683896c_a58e_4d4d_93b8_eece48fa62b5
 # automatic
 ^F = $(notdir $^)
 # environment
-GNOME_TERMINAL_SERVICE = :1.97
+GNOME_TERMINAL_SERVICE = :1.105
 # default
 SUFFIXES := 
 # environment
@@ -253,9 +257,9 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 6952
+VSCODE_PID = 4543
 # environment
-DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=e7ef1c066096450e2349018462df31fe
+DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=c0891f65f5fffc14d006b47c62e0e436
 # variable set hash-table stats:
 # Load=120/1024=12%, Rehash=0, Collisions=19/142=13%
 
@@ -265,7 +269,7 @@ DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=e7ef1c066096450e2349018
 
 # Directories
 
-# . (device 2053, inode 1722688): 14 files, no impossibilities.
+# . (device 2053, inode 1710541): 14 files, no impossibilities.
 
 # 14 files, no impossibilities in 1 directories.
 
@@ -289,7 +293,6 @@ Makefile:
 #  File does not exist.
 #  File has been updated.
 #  Failed to be updated.
- 
 
 # Not a target:
 makefile:
@@ -325,6 +328,6 @@ GNUmakefile:
 # strcache performance: lookups = 25 / hit rate = 12%
 # hash-table stats:
 # Load=22/8192=0%, Rehash=0, Collisions=1/25=4%
-# Finished Make data base on Tue Jul 26 07:43:16 2022
+# Finished Make data base on Wed Jul 27 14:12:01 2022
 
  

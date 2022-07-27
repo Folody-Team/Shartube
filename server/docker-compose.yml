@@ -1,0 +1,31 @@
+version: '3.6'
+
+services:
+  shartube-db:
+    container_name: shartube-db
+    image: mongo:latest
+    networks:
+      - shartube-net 
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+  shartube-server:
+    container_name: shartube-server
+    networks:
+      - shartube-net
+    depends_on:
+      - shartube-db
+    build: .
+    environment:
+      - DB_HOST=shartube-db
+      - DB_PORT=27017
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - DB_NAME=shartube
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+
+networks:
+  shartube-net:

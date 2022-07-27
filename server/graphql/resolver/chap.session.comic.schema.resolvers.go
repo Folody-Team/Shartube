@@ -165,6 +165,31 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 	return comicChapModel.FindById(comicChapDoc.ID)
 }
 
+// UpdateComicChap is the resolver for the updateComicChap field.
+func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, input model.UpdateComicChapInput) (*model.ComicChap, error) {
+	comicChapModel, err := comic_chap_model.InitComicChapModel()
+	if err != nil {
+		return nil, err
+	}
+	comicChap ,err := comicChapModel.FindById(chapID)
+	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+
+	if err != nil {
+		return nil ,err
+	}
+	if comicChap  == nil {
+		return nil , &gqlerror.Error{
+			Message: "comic chap not found",
+		}
+	}
+	if userID != comicChap.CreatedByID{
+		return nil, gqlerror.Errorf("Access Denied")
+	}
+	return comicChapModel.FindOneAndUpdate(bson.M{
+		"_id":comicChap.ID,
+	},input)
+}
+
 // ChapBySession is the resolver for the ChapBySession field.
 func (r *queryResolver) ChapBySession(ctx context.Context, sessionID string) ([]*model.ComicChap, error) {
 	comicChapModel, err := comic_chap_model.InitComicChapModel()

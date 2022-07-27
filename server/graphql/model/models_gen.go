@@ -124,6 +124,21 @@ type RegisterUserInput struct {
 	Password string `json:"password"`
 }
 
+type UpdateComicChapInput struct {
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+}
+
+type UpdateComicInput struct {
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+}
+
+type UpdateComicSessionInput struct {
+	Name        *string `json:"name"`
+	Description *string `json:"description"`
+}
+
 type UploadFile struct {
 	ID   int            `json:"id"`
 	File graphql.Upload `json:"file"`

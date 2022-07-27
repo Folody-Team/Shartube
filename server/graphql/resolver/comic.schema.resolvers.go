@@ -13,6 +13,7 @@ import (
 	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -78,6 +79,34 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateCo
 	})
 
 	return comicModel.FindById(comicID.Hex())
+}
+
+// UpdateComic is the resolver for the updateComic field.
+func (r *mutationResolver) UpdateComic(ctx context.Context, comicID string, input model.UpdateComicInput) (*model.Comic, error) {
+	comicModel, err := comic_model.InitComicModel()
+	if err != nil {
+		return nil, err
+	}
+	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+
+	comic, err := comicModel.FindById(comicID)
+	if err != nil {
+		return nil, err
+	}
+	if comic == nil {
+		return nil, &gqlerror.Error{
+			Message: "comic not found",
+		}
+	}
+	if comic.CreatedByID != userID {
+		return nil, &gqlerror.Error{
+			Message: "Access Denied",
+		}
+	}
+
+	return comicModel.FindOneAndUpdate(bson.M{
+		"_id": comic.ID,
+	}, input)
 }
 
 // Comics is the resolver for the Comics field.

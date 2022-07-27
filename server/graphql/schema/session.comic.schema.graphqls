@@ -31,10 +31,19 @@ type ComicSession implements CreateComic {
   ChapIds: [String!]
 }
 
+input UpdateComicSessionInput {
+  name: String
+  description: String
+}
+
 extend type Mutation {
   CreateComicSession(input: CreateComicSessionInput!): ComicSession!
     @goField(forceResolver: true)
     @auth
+  updateComicSession(
+    sessionID: String!
+    input: UpdateComicSessionInput
+  ): ComicSession! @goField(forceResolver: true) @auth
 }
 
 extend type Query {
