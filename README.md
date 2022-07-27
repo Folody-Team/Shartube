@@ -12,6 +12,7 @@ To run this project, you will need to add the following environment variables to
 `DB_NAME`
 `JWT_SECRET`
 
+
 ## Run Locally
 
 Clone the project
@@ -19,11 +20,26 @@ Clone the project
 ### Frontend
 
 If you want to run web application, please visit here.
-#### **Web application**
+## **Web application**
 ```
 cd web
 ```
 Install all dependencies and run dev command.
+
+> In this project we are using yarn. Before you do the next steps if you haven't downloaded yarn do the following.
+
+<details open>
+
+  <summary>Install <b>yarn</b></summary>
+  <br/>
+
+  ```
+  npm i -g yarn
+  ```
+
+</details>
+
+<br/>
 
 ```
 yarn dev
@@ -37,7 +53,7 @@ yarn build
 
 This is where you want to run your mobile app.
 
-#### **Mobile app**
+## **Mobile app**
 
 Firstly
 ```
@@ -83,7 +99,7 @@ Start the server
 ```bash
   go run github.com/cosmtrek/air
 ```
-Make sure you installed [**Golang**](https://go.dev/).
+Make sure you installed [**Golang**](https://go.dev/), [**NodeJs**](https://nodejs.org/).
 
 ## Tech Stack
 
