@@ -28,7 +28,7 @@ Install all dependencies and run dev command.
 
 > In this project we are using yarn. Before you do the next steps if you haven't downloaded yarn do the following.
 
-<details open>
+<details close>
 
   <summary>Install <b>yarn</b></summary>
   <br/>
