@@ -6,6 +6,7 @@ import {
 } from "../../generated/graphql";
 import { useRouter } from "next/router";
 import { checkAuth } from "../../utils/checkAuth";
+import { Logo } from "../../components/logo";
 
 /**
  *
@@ -88,7 +89,9 @@ export default function register() {
   return (
     <>
       {authLoading || (!authLoading && authData?.Me) ? (
-        <div>làm loading ui tí nhé anh</div>
+        <div className='w-100 h-[100vh] flex justify-center items-center bg-[#141518]'>
+          <Logo/>
+        </div>
       ) : (
         <div
           className="
