@@ -1,0 +1,8 @@
+mutation Register($input: RegisterUserInput!) {
+  Register(input: $input) {
+    user {
+      ...userInfo
+    }
+    accessToken
+  }
+}
