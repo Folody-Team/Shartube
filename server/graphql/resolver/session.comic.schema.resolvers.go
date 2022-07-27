@@ -103,6 +103,31 @@ func (r *mutationResolver) CreateComicSession(ctx context.Context, input model.C
 	return comicSessionModel.FindById(sessionID.Hex())
 }
 
+// UpdateComicSession is the resolver for the updateComicSession field.
+func (r *mutationResolver) UpdateComicSession(ctx context.Context, sessionID string, input *model.UpdateComicSessionInput) (*model.ComicSession, error) {
+	comicSessionModel, err := comic_session_model.InitComicSessionModel()
+	if err != nil {
+		return nil, err
+	}
+	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+
+	comicSession, err := comicSessionModel.FindById(sessionID)
+	if err != nil {
+		return nil, err
+	}
+	if comicSession == nil {
+		return nil, &gqlerror.Error{
+			Message: "comic session not found",
+		}
+	}
+	if userID != comicSession.CreatedByID {
+		return nil, gqlerror.Errorf("Access Denied")
+	}
+	return comicSessionModel.FindOneAndUpdate(bson.M{
+		"_id": comicSession.ID,
+	}, input)
+}
+
 // SessionByComic is the resolver for the SessionByComic field.
 func (r *queryResolver) SessionByComic(ctx context.Context, comicID string) ([]*model.ComicSession, error) {
 	comicSessionModel, err := comic_session_model.InitComicSessionModel()

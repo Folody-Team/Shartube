@@ -124,6 +124,9 @@ type ComplexityRoot struct {
 		CreateComicSession func(childComplexity int, input model.CreateComicSessionInput) int
 		Login              func(childComplexity int, input model.LoginUserInput) int
 		Register           func(childComplexity int, input model.RegisterUserInput) int
+		UpdateComic        func(childComplexity int, comicID string, input model.UpdateComicInput) int
+		UpdateComicChap    func(childComplexity int, chapID string, input model.UpdateComicChapInput) int
+		UpdateComicSession func(childComplexity int, sessionID string, input *model.UpdateComicSessionInput) int
 	}
 
 	Query struct {
@@ -184,8 +187,11 @@ type ComicSessionResolver interface {
 type MutationResolver interface {
 	CreateComicChap(ctx context.Context, input model.CreateComicChapInput) (*model.ComicChap, error)
 	AddImageToChap(ctx context.Context, req []*model.UploadFile, chapID string) (*model.ComicChap, error)
+	UpdateComicChap(ctx context.Context, chapID string, input model.UpdateComicChapInput) (*model.ComicChap, error)
 	CreateComic(ctx context.Context, input model.CreateComicInput) (*model.Comic, error)
+	UpdateComic(ctx context.Context, comicID string, input model.UpdateComicInput) (*model.Comic, error)
 	CreateComicSession(ctx context.Context, input model.CreateComicSessionInput) (*model.ComicSession, error)
+	UpdateComicSession(ctx context.Context, sessionID string, input *model.UpdateComicSessionInput) (*model.ComicSession, error)
 	Login(ctx context.Context, input model.LoginUserInput) (*model.UserLoginOrRegisterResponse, error)
 	Register(ctx context.Context, input model.RegisterUserInput) (*model.UserLoginOrRegisterResponse, error)
 }
@@ -587,6 +593,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Register(childComplexity, args["input"].(model.RegisterUserInput)), true
 
+	case "Mutation.updateComic":
+		if e.complexity.Mutation.UpdateComic == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateComic_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateComic(childComplexity, args["comicID"].(string), args["input"].(model.UpdateComicInput)), true
+
+	case "Mutation.updateComicChap":
+		if e.complexity.Mutation.UpdateComicChap == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateComicChap_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateComicChap(childComplexity, args["chapID"].(string), args["input"].(model.UpdateComicChapInput)), true
+
+	case "Mutation.updateComicSession":
+		if e.complexity.Mutation.UpdateComicSession == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateComicSession_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateComicSession(childComplexity, args["sessionID"].(string), args["input"].(*model.UpdateComicSessionInput)), true
+
 	case "Query.ChapBySession":
 		if e.complexity.Query.ChapBySession == nil {
 			break
@@ -771,6 +813,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateComicSessionInput,
 		ec.unmarshalInputLoginUserInput,
 		ec.unmarshalInputRegisterUserInput,
+		ec.unmarshalInputUpdateComicChapInput,
+		ec.unmarshalInputUpdateComicInput,
+		ec.unmarshalInputUpdateComicSessionInput,
 		ec.unmarshalInputUploadFile,
 	)
 	first := true
@@ -848,7 +893,7 @@ type CreateComicChapInputModel implements CreateComicChap {
   CreatedByID: String!
   SessionID: String!
 }
-type ImageResult{
+type ImageResult {
   ID: String!
   Url: String!
 }
@@ -864,11 +909,19 @@ type ComicChap implements CreateComic {
   Session: ComicSession! @goField(forceResolver: true)
   Images: [ImageResult!]!
 }
+
+input UpdateComicChapInput {
+  name: String
+  description: String
+}
 extend type Mutation {
   CreateComicChap(input: CreateComicChapInput!): ComicChap!
     @goField(forceResolver: true)
     @auth
   AddImageToChap(req: [UploadFile!]!, chapID: String!): ComicChap!
+    @goField(forceResolver: true)
+    @auth
+  updateComicChap(chapID: String!, input: UpdateComicChapInput!): ComicChap!
     @goField(forceResolver: true)
     @auth
 }
@@ -912,8 +965,16 @@ type Comic implements CreateComic {
   session: [ComicSession!] @goField(forceResolver: true)
 }
 
+input UpdateComicInput {
+  name: String
+  description: String
+}
+
 extend type Mutation {
   createComic(input: CreateComicInput!): Comic!
+    @goField(forceResolver: true)
+    @auth
+  updateComic(comicID: String!, input: UpdateComicInput!): Comic!
     @goField(forceResolver: true)
     @auth
 }
@@ -972,10 +1033,19 @@ type ComicSession implements CreateComic {
   ChapIds: [String!]
 }
 
+input UpdateComicSessionInput {
+  name: String
+  description: String
+}
+
 extend type Mutation {
   CreateComicSession(input: CreateComicSessionInput!): ComicSession!
     @goField(forceResolver: true)
     @auth
+  updateComicSession(
+    sessionID: String!
+    input: UpdateComicSessionInput
+  ): ComicSession! @goField(forceResolver: true) @auth
 }
 
 extend type Query {
@@ -1167,6 +1237,78 @@ func (ec *executionContext) field_Mutation_createComic_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateComicChap_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["chapID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chapID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["chapID"] = arg0
+	var arg1 model.UpdateComicChapInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateComicChapInput2githubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUpdateComicChapInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateComicSession_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["sessionID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sessionID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sessionID"] = arg0
+	var arg1 *model.UpdateComicSessionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalOUpdateComicSessionInput2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUpdateComicSessionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateComic_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["comicID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comicID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["comicID"] = arg0
+	var arg1 model.UpdateComicInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateComicInput2githubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUpdateComicInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -3450,6 +3592,103 @@ func (ec *executionContext) fieldContext_Mutation_AddImageToChap(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateComicChap(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateComicChap(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateComicChap(rctx, fc.Args["chapID"].(string), fc.Args["input"].(model.UpdateComicChapInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.ComicChap); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/Folody-Team/Shartube/graphql/model.ComicChap`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ComicChap)
+	fc.Result = res
+	return ec.marshalNComicChap2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComicChap(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateComicChap(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_ComicChap__id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ComicChap_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ComicChap_updatedAt(ctx, field)
+			case "CreatedBy":
+				return ec.fieldContext_ComicChap_CreatedBy(ctx, field)
+			case "CreatedByID":
+				return ec.fieldContext_ComicChap_CreatedByID(ctx, field)
+			case "name":
+				return ec.fieldContext_ComicChap_name(ctx, field)
+			case "description":
+				return ec.fieldContext_ComicChap_description(ctx, field)
+			case "SessionId":
+				return ec.fieldContext_ComicChap_SessionId(ctx, field)
+			case "Session":
+				return ec.fieldContext_ComicChap_Session(ctx, field)
+			case "Images":
+				return ec.fieldContext_ComicChap_Images(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ComicChap", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateComicChap_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createComic(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createComic(ctx, field)
 	if err != nil {
@@ -3539,6 +3778,101 @@ func (ec *executionContext) fieldContext_Mutation_createComic(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createComic_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateComic(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateComic(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateComic(rctx, fc.Args["comicID"].(string), fc.Args["input"].(model.UpdateComicInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.Comic); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/Folody-Team/Shartube/graphql/model.Comic`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Comic)
+	fc.Result = res
+	return ec.marshalNComic2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComic(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateComic(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_Comic__id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Comic_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Comic_updatedAt(ctx, field)
+			case "CreatedBy":
+				return ec.fieldContext_Comic_CreatedBy(ctx, field)
+			case "CreatedByID":
+				return ec.fieldContext_Comic_CreatedByID(ctx, field)
+			case "name":
+				return ec.fieldContext_Comic_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Comic_description(ctx, field)
+			case "sessionId":
+				return ec.fieldContext_Comic_sessionId(ctx, field)
+			case "session":
+				return ec.fieldContext_Comic_session(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Comic", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateComic_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3638,6 +3972,105 @@ func (ec *executionContext) fieldContext_Mutation_CreateComicSession(ctx context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_CreateComicSession_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateComicSession(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateComicSession(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().UpdateComicSession(rctx, fc.Args["sessionID"].(string), fc.Args["input"].(*model.UpdateComicSessionInput))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.ComicSession); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/Folody-Team/Shartube/graphql/model.ComicSession`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ComicSession)
+	fc.Result = res
+	return ec.marshalNComicSession2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComicSession(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateComicSession(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_ComicSession__id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ComicSession_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ComicSession_updatedAt(ctx, field)
+			case "CreatedBy":
+				return ec.fieldContext_ComicSession_CreatedBy(ctx, field)
+			case "CreatedByID":
+				return ec.fieldContext_ComicSession_CreatedByID(ctx, field)
+			case "name":
+				return ec.fieldContext_ComicSession_name(ctx, field)
+			case "description":
+				return ec.fieldContext_ComicSession_description(ctx, field)
+			case "ComicId":
+				return ec.fieldContext_ComicSession_ComicId(ctx, field)
+			case "Comic":
+				return ec.fieldContext_ComicSession_Comic(ctx, field)
+			case "Chaps":
+				return ec.fieldContext_ComicSession_Chaps(ctx, field)
+			case "ChapIds":
+				return ec.fieldContext_ComicSession_ChapIds(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ComicSession", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateComicSession_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -7042,6 +7475,114 @@ func (ec *executionContext) unmarshalInputRegisterUserInput(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateComicChapInput(ctx context.Context, obj interface{}) (model.UpdateComicChapInput, error) {
+	var it model.UpdateComicChapInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateComicInput(ctx context.Context, obj interface{}) (model.UpdateComicInput, error) {
+	var it model.UpdateComicInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateComicSessionInput(ctx context.Context, obj interface{}) (model.UpdateComicSessionInput, error) {
+	var it model.UpdateComicSessionInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "description"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUploadFile(ctx context.Context, obj interface{}) (model.UploadFile, error) {
 	var it model.UploadFile
 	asMap := map[string]interface{}{}
@@ -7692,6 +8233,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateComicChap":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateComicChap(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createComic":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -7701,10 +8251,28 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateComic":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateComic(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "CreateComicSession":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_CreateComicSession(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateComicSession":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateComicSession(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -8653,6 +9221,16 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
+func (ec *executionContext) unmarshalNUpdateComicChapInput2githubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUpdateComicChapInput(ctx context.Context, v interface{}) (model.UpdateComicChapInput, error) {
+	res, err := ec.unmarshalInputUpdateComicChapInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpdateComicInput2githubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUpdateComicInput(ctx context.Context, v interface{}) (model.UpdateComicInput, error) {
+	res, err := ec.unmarshalInputUpdateComicInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
 	res, err := graphql.UnmarshalUpload(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -9219,6 +9797,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOUpdateComicSessionInput2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUpdateComicSessionInput(ctx context.Context, v interface{}) (*model.UpdateComicSessionInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateComicSessionInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {

@@ -28,8 +28,16 @@ type Comic implements CreateComic {
   session: [ComicSession!] @goField(forceResolver: true)
 }
 
+input UpdateComicInput {
+  name: String
+  description: String
+}
+
 extend type Mutation {
   createComic(input: CreateComicInput!): Comic!
+    @goField(forceResolver: true)
+    @auth
+  updateComic(comicID: String!, input: UpdateComicInput!): Comic!
     @goField(forceResolver: true)
     @auth
 }
