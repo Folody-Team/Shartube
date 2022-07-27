@@ -24,8 +24,6 @@ If you want to run web application, please visit here.
 ```
 cd web
 ```
-Install all dependencies and run dev command.
-
 > In this project we are using yarn. Before you do the next steps if you haven't downloaded yarn do the following.
 
 <details close>
@@ -38,6 +36,8 @@ Install all dependencies and run dev command.
   ```
 
 </details>
+
+Install all dependencies and run dev command.
 
 <br/>
 
