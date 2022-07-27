@@ -51,7 +51,11 @@ VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupp
 # environment
 _ = /usr/bin/code
 # environment
+<<<<<<< HEAD
 JOURNAL_STREAM = 8:38372
+=======
+JOURNAL_STREAM = 8:38710
+>>>>>>> origin/test-pending
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # makefile
