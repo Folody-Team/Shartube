@@ -33,7 +33,7 @@ func GetClient() (*mongo.Client, error) {
 	err = client.Ping(ctx, readpref.Primary())
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 	return client, nil

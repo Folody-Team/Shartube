@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Wed Jul 27 08:57:17 2022
+# Make data base, printed on Tue Jul 26 07:43:14 2022
 
 # Variables
 
@@ -71,9 +71,9 @@ XDG_DATA_DIRS = /usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/d
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
-DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus,guid=14e698455b8ea009176ab8ad62e09a32
+DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus,guid=e7ef1c066096450e2349018462df31fe
 # environment
-MANAGERPID = 987
+MANAGERPID = 973
 # environment
 LC_NAME = vi_VN
 # environment
@@ -89,7 +89,7 @@ GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
-SESSION_MANAGER = local/tritranduc-Aspire-4752:@/tmp/.ICE-unix/1294,unix/tritranduc-Aspire-4752:/tmp/.ICE-unix/1294
+SESSION_MANAGER = local/tritranduc-Aspire-4752:@/tmp/.ICE-unix/1277,unix/tritranduc-Aspire-4752:/tmp/.ICE-unix/1277
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -101,7 +101,7 @@ XDG_MENU_PREFIX = gnome-
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = 3098308d2ce2401f9fa4752da58114bd
+INVOCATION_ID = 6dcabab2086f4d23a7b1dc3c9782eb6a
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -121,7 +121,7 @@ PWD = /home/tritranduc/dev/code/Shartube
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 1222
+SSH_AGENT_PID = 1231
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -183,7 +183,7 @@ LC_TELEPHONE = vi_VN
 # default
 MAKE_COMMAND := make
 # environment
-OLDPWD = /home/tritranduc/dev/code/Shartube
+OLDPWD = /home/tritranduc/dev/code/Shartube/server
 # default
 .VARIABLES := 
 # automatic
@@ -225,11 +225,11 @@ LC_ALL = C
 # environment
 DBUS_STARTER_BUS_TYPE = session
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/94834abb_a1fe_4f78_a2de_579763689a03
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/a638fd42_4df0_41b7_997a_9465efbaa395
 # automatic
 ^F = $(notdir $^)
 # environment
-GNOME_TERMINAL_SERVICE = :1.95
+GNOME_TERMINAL_SERVICE = :1.97
 # default
 SUFFIXES := 
 # environment
@@ -249,9 +249,9 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 5251
+VSCODE_PID = 6952
 # environment
-DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=14e698455b8ea009176ab8ad62e09a32
+DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=e7ef1c066096450e2349018462df31fe
 # variable set hash-table stats:
 # Load=120/1024=12%, Rehash=0, Collisions=19/142=13%
 
@@ -278,6 +278,7 @@ all:
 #  File does not exist.
 #  File has not been updated.
 
+ 
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
@@ -320,6 +321,6 @@ GNUmakefile:
 # strcache performance: lookups = 25 / hit rate = 12%
 # hash-table stats:
 # Load=22/8192=0%, Rehash=0, Collisions=1/25=4%
-# Finished Make data base on Wed Jul 27 08:57:17 2022
+# Finished Make data base on Tue Jul 26 07:43:16 2022
 
  

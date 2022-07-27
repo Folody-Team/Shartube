@@ -29,10 +29,10 @@ type Comic implements CreateComic {
 }
 
 extend type Mutation {
-  createComic(input: CreateComicInput): Comic!
+  createComic(input: CreateComicInput!): Comic!
     @goField(forceResolver: true)
     @auth
 }
 extend type Query {
-  Comics: [Comic!] @goField(forceResolver: true)
+  Comics: [Comic!]! @goField(forceResolver: true)
 }
