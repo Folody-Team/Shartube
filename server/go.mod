@@ -20,6 +20,7 @@ require (
 )
 
 require (
+	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
@@ -32,7 +33,8 @@ require (
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/gorilla/websocket v1.5.0
+	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
