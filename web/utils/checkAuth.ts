@@ -1,24 +1,27 @@
-import { clientUser } from '../graphql'
-import { MeQuery, MeDocument } from '../generated/graphql'
-import { useEffect, useState } from 'react';
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { useMeQuery } from "../generated/graphql";
 
 /**
- * 
- * @returns 
+ *
+ * @returns
  */
 
-
 export const checkAuth = () => {
-  const [data, setData] = useState({} as MeQuery)
-
+  const router = useRouter();
+  const { data, loading } = useMeQuery();
   useEffect(() => {
-    clientUser.query({ query: MeDocument }).then(res => {
-      setData(res.data);
-    })
-  }, [])
-  
-
+    const isInLoginOrRegisterPage =
+      router.route == "/login" ||
+      router.route == "/register" ||
+      router.route == "/forgot-password" ||
+      router.route == "/change-password";
+    if (!loading && data?.Me && isInLoginOrRegisterPage) {
+      router.replace("/");
+    }
+  }, [data, loading, router]);
   return {
     data,
-  }
-}
+    loading,
+  };
+};

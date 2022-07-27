@@ -1,32 +1,30 @@
-import type { NextPage } from 'next'
-import {useEffect, useState} from 'react'
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
-import {checkAuth} from '../utils/checkAuth'
-import {useRouter} from 'next/router'
+import type { NextPage } from "next";
+import { useEffect, useState } from "react";
+import Head from "next/head";
+import styles from "../styles/Home.module.css";
+import { checkAuth } from "../utils/checkAuth";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
-  const router = useRouter()
-  const [authData, setAuthData] = useState('');
-  const {data} = checkAuth();
+  const router = useRouter();
+  const { data } = checkAuth();
 
-  useEffect(() => {
-    console.log(data)
-    window.addEventListener('DOMContentLoaded', () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        if (data) {
-          
-          setAuthData(data.Me.username);
-        }
-        
-      } else {
-        router.push('/register');
-      }
-    })
-    
-  }, [router]);
-      
+  // useEffect(() => {
+  //   console.log(data)
+  //   window.addEventListener('DOMContentLoaded', () => {
+  //     const token = localStorage.getItem('token');
+  //     if (token) {
+  //       if (data) {
+
+  //         setAuthData(data.Me.username);
+  //       }
+
+  //     } else {
+  //       router.push('/register');
+  //     }
+  //   })
+
+  // }, [router]);
 
   return (
     <div className={styles.container}>
@@ -37,10 +35,12 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <div>Hello, <span>{authData}</span></div>
+        <div>
+          Hello, <span>{data?.Me.username}</span>
+        </div>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

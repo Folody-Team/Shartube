@@ -1,4 +1,6 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make: *** No rule to make target 'all'.  Stop.
+
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -6,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon Jul 25 11:56:49 2022
+# Make data base, printed on Wed Jul 27 08:57:17 2022
 
 # Variables
 
@@ -49,7 +51,7 @@ VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupp
 # environment
 _ = /usr/bin/code
 # environment
-JOURNAL_STREAM = 8:36782
+JOURNAL_STREAM = 8:38372
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # makefile
@@ -69,9 +71,9 @@ XDG_DATA_DIRS = /usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/d
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
-DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus,guid=e86c3310c66c2ebaee49399c62de01bd
+DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus,guid=14e698455b8ea009176ab8ad62e09a32
 # environment
-MANAGERPID = 972
+MANAGERPID = 987
 # environment
 LC_NAME = vi_VN
 # environment
@@ -87,7 +89,7 @@ GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
-SESSION_MANAGER = local/tritranduc-Aspire-4752:@/tmp/.ICE-unix/1280,unix/tritranduc-Aspire-4752:/tmp/.ICE-unix/1280
+SESSION_MANAGER = local/tritranduc-Aspire-4752:@/tmp/.ICE-unix/1294,unix/tritranduc-Aspire-4752:/tmp/.ICE-unix/1294
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -99,7 +101,7 @@ XDG_MENU_PREFIX = gnome-
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = 3ed20ec57a9044778fd57ebb7440c4dc
+INVOCATION_ID = 3098308d2ce2401f9fa4752da58114bd
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -119,7 +121,7 @@ PWD = /home/tritranduc/dev/code/Shartube
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 1219
+SSH_AGENT_PID = 1222
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -223,11 +225,11 @@ LC_ALL = C
 # environment
 DBUS_STARTER_BUS_TYPE = session
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/3469f093_f699_4947_9e16_c9fa6ab3a853
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/94834abb_a1fe_4f78_a2de_579763689a03
 # automatic
 ^F = $(notdir $^)
 # environment
-GNOME_TERMINAL_SERVICE = :1.108
+GNOME_TERMINAL_SERVICE = :1.95
 # default
 SUFFIXES := 
 # environment
@@ -247,9 +249,9 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 7161
+VSCODE_PID = 5251
 # environment
-DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=e86c3310c66c2ebaee49399c62de01bd
+DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=14e698455b8ea009176ab8ad62e09a32
 # variable set hash-table stats:
 # Load=120/1024=12%, Rehash=0, Collisions=19/142=13%
 
@@ -259,9 +261,9 @@ DBUS_STARTER_ADDRESS = unix:path=/run/user/1000/bus,guid=e86c3310c66c2ebaee49399
 
 # Directories
 
-# . (device 2053, inode 1722688): 13 files, no impossibilities.
+# . (device 2053, inode 1722688): 14 files, no impossibilities.
 
-# 13 files, no impossibilities in 1 directories.
+# 14 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -282,6 +284,7 @@ Makefile:
 #  File does not exist.
 #  File has been updated.
 #  Failed to be updated.
+ 
 
 # Not a target:
 makefile:
@@ -295,9 +298,6 @@ makefile:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-
- 
-make: *** No rule to make target 'all'.  Stop.
 
 # Not a target:
 GNUmakefile:
@@ -314,12 +314,12 @@ GNUmakefile:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 21 / storage = 180 B / avg = 8 B
-# current buf: size = 8162 B / used = 180 B / count = 21 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 22 / storage = 191 B / avg = 8 B
+# current buf: size = 8162 B / used = 191 B / count = 22 / avg = 8 B
 
-# strcache performance: lookups = 24 / hit rate = 12%
+# strcache performance: lookups = 25 / hit rate = 12%
 # hash-table stats:
-# Load=21/8192=0%, Rehash=0, Collisions=1/24=4%
-# Finished Make data base on Mon Jul 25 11:56:50 2022
+# Load=22/8192=0%, Rehash=0, Collisions=1/25=4%
+# Finished Make data base on Wed Jul 27 08:57:17 2022
 
  
