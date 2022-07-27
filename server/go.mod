@@ -14,7 +14,10 @@ require (
 
 require github.com/gorilla/mux v1.8.0
 
-require golang.org/x/exp v0.0.0-20220713135740-79cabaa25d75
+require (
+	github.com/google/uuid v1.3.0
+	golang.org/x/exp v0.0.0-20220713135740-79cabaa25d75
+)
 
 require (
 	github.com/felixge/httpsnoop v1.0.1 // indirect

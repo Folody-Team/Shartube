@@ -5,15 +5,14 @@ package resolver
 
 import (
 	"context"
-	"log"
 
 	"github.com/Folody-Team/Shartube/database/comic_model"
 	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
+	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
 	"github.com/Folody-Team/Shartube/helper"
-	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
@@ -45,7 +44,6 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginUserInput
 		return nil, err
 	}
 	user.Password = nil
-	log.Println(user.ID)
 	accessToken, err := helper.GenSessionToken(
 		string(user.ID),
 	)
@@ -85,7 +83,6 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterUse
 	}
 
 	user.Password = nil
-	log.Println(_id)
 
 	token, err := helper.GenSessionToken(
 		string(_id),
@@ -107,7 +104,7 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		return nil, err
 	}
 
-	sessionData := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput)
+	sessionData := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput)
 	user, err := UserModel.FindById(sessionData.UserID.Hex())
 	if err != nil {
 		return nil, err

@@ -46,8 +46,8 @@ func EmailInput(ctx context.Context, obj interface{}, next graphql.Resolver) (re
 	req, err := http.NewRequest(http.MethodGet, apiUrl, nil) // create a new request
 
 	if err != nil {
-		log.Fatal(err)
-		return nil, gqlerror.Errorf("err") // return if the email format is incorrect (err is not nil)
+		log.Println(err)
+		return nil, gqlerror.Errorf("email format is incorrect") // return if the email format is incorrect (err is not nil)
 	}
 
 	resp, err := client.Do(req) // execute the request

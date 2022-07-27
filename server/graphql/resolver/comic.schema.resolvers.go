@@ -10,9 +10,9 @@ import (
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
 	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/database/user_model"
+	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
-	"github.com/Folody-Team/Shartube/middleware/authMiddleware"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -44,13 +44,13 @@ func (r *comicResolver) Session(ctx context.Context, obj *model.Comic) ([]*model
 }
 
 // CreateComic is the resolver for the createComic field.
-func (r *mutationResolver) CreateComic(ctx context.Context, input *model.CreateComicInput) (*model.Comic, error) {
+func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateComicInput) (*model.Comic, error) {
 	comicModel, err := comic_model.InitComicModel()
 	if err != nil {
 		return nil, err
 	}
 
-	userID := ctx.Value(authMiddleware.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
 	userIDObject, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return nil, err
