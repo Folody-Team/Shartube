@@ -1,8 +1,0 @@
-{
-  "extends": "../tsconfig.test.base",
-  "files": [],
-  "include": ["**/__tests__/**/*"],
-  "references": [
-    { "path": "./" },
-  ]
-}
