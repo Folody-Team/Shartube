@@ -32,9 +32,9 @@ services:
       - shartube-comic-server
     environment:
       - COMIC_SERVER_HOST=http://shartube-comic-server:8080/query
-    build: ../graphql-gateway
+    build: ./graphql-gateway
     env_file:
-      - ../graphql-gateway/.env
+      - ./graphql-gateway/.env
     ports:
       - "8080:2100"
 
