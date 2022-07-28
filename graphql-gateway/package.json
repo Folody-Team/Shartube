@@ -1,0 +1,18 @@
+{
+  "engines": {
+    "node": ">=12.13.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node dist/index.js"
+  },
+  "dependencies": {
+    "@apollo/gateway": "^2.0.5",
+    "apollo-server": "^3.10.0",
+    "graphql": "^16.5.0"
+  },
+  "name": "graphql-gateway",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT"
+}
