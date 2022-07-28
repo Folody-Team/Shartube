@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"lib": ["deno.window"],
+		"strict": true
+	},
+	"lint": {
+		"files": {
+			"include": ["src/"],
+			"exclude": ["src/testdata/"]
+		},
+		"rules": {
+			"tags": ["recommended"],
+			"include": ["ban-untagged-todo"],
+			"exclude": ["no-unused-vars"]
+		}
+	}
+}
