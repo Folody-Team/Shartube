@@ -21,7 +21,6 @@ services:
       - DB_PORT=27017
       - DB_USERNAME=root
       - DB_PASSWORD=root
-      - DB_NAME=shartube
     env_file:
       - ./comic/.env
   shartube-graphql-gateway:

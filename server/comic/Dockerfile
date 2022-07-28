@@ -14,5 +14,6 @@ FROM alpine:3.14
 WORKDIR /home/container
 
 COPY --from=golang-remover /home/container ./
+ENV DB_NAME=shartube_comic
 EXPOSE 8080
 CMD [ "/home/container/main.exe" ]
