@@ -9,13 +9,13 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=root
-  shartube-server:
-    container_name: shartube-server
+  shartube-comic-server:
+    container_name: shartube-comic-server
     networks:
       - shartube-net
     depends_on:
       - shartube-db
-    build: .
+    build: ./comic
     environment:
       - DB_HOST=shartube-db
       - DB_PORT=27017
@@ -23,9 +23,20 @@ services:
       - DB_PASSWORD=root
       - DB_NAME=shartube
     env_file:
-      - .env
+      - ./comic/.env
+  shartube-graphql-gateway:
+    container_name: shartube-graphql-gateway
+    networks:
+      - shartube-net
+    depends_on:
+      - shartube-comic-server
+    environment:
+      - COMIC_SERVER_HOST=http://shartube-comic-server:8080/query
+    build: ../graphql-gateway
+    env_file:
+      - ../graphql-gateway/.env
     ports:
-      - "8080:8080"
+      - "8080:2100"
 
 networks:
   shartube-net:
