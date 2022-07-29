@@ -30,6 +30,7 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 	}
 	bearer := "Bearer "
 	auth = strings.Trim(strings.Replace(auth, bearer, "", -1), " ")
+	// send token to user service and 
 	validate, err := service.JwtValidate(context.Background(), auth)
 	if err != nil || !validate.Valid {
 		return nil, &gqlerror.Error{

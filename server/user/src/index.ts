@@ -1,30 +1,41 @@
-import { Server, Handler } from "https://deno.land/std/http/mod.ts";
-import { makeExecutableSchema } from "https://deno.land/x/graphql_tools/mod.ts";
-import { GraphQLHTTP } from "https://deno.land/x/gql/mod.ts";
-import { typeDefs } from "./typeDefs/index.ts";
-import { resolvers } from "./resolvers/index.ts";
-import { config } from 'https://deno.land/x/dotenv/mod.ts'
-import {join as PathJoin} from 'https://deno.land/std/path/mod.ts'
+import { join as PathJoin } from "https://deno.land/std@0.149.0/path/mod.ts"
+import { config } from "https://deno.land/x/dotenv@v3.2.0/mod.ts"
+import { Application, Router } from 'https://deno.land/x/oak@v10.0.0/mod.ts'
+import {
+  applyGraphQL
+} from "https://deno.land/x/oak_graphql@0.6.4/mod.ts"
+import { resolvers } from './resolvers/index.ts'
+import { typeDefs } from './typeDefs/index.ts'
 
 config({
-  path: PathJoin(import.meta.url,".env")
+	path: PathJoin(import.meta.url, '.env'),
 })
 
+const app = new Application()
 
-const handler: Handler = async (req) => {
-  const { pathname } = new URL(req.url);
+app.use(async (ctx, next) => {
+	await next()
+	const rt = ctx.response.headers.get('X-Response-Time')
+	console.log(`${ctx.request.method} ${ctx.request.url} - ${rt}`)
+})
+app.use(async (ctx, next) => {
+	const start = Date.now()
+	await next()
+	const ms = Date.now() - start
+	ctx.response.headers.set('X-Response-Time', `${ms}ms`)
+})
 
-  return pathname === "/graphql"
-    ? await GraphQLHTTP<Request>({
-        schema: makeExecutableSchema({ resolvers, typeDefs }),
-        graphiql: true,
-      })(req)
-    : new Response("Not Found", { status: 404 });
-};
-const server = new Server({
-  port: 8080,
-  handler,
-});
-server.listenAndServe().then(() => {
-  console.log("Server start at http://localhost:8080");
-});
+const GraphQLService = await applyGraphQL<Router>({
+	Router,
+	typeDefs: typeDefs,
+	resolvers: resolvers,
+	context: (ctx) => {
+		// this line is for passing a user context for the auth
+		return { request: ctx.request }
+	},
+})
+
+app.use(GraphQLService.routes(), GraphQLService.allowedMethods())
+
+console.log('Server start at http://localhost:8080')
+await app.listen({ port: 8080 })

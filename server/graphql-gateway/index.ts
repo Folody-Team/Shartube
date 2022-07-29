@@ -10,9 +10,13 @@ import('dotenv').then(modules => modules.config({
         {
           name: "comic",
           url: process.env.COMIC_SERVER_HOST,
-        }
-      ]
-    })
+        },
+        {
+          name: "user",
+          url: process.env.USER_SERVER_HOST,
+        },
+      ],
+    }),
   });
 
   const server = new ApolloServer({

@@ -1,5 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 import { MongoClient, ObjectId } from 'https://deno.land/x/mongo@v0.31.0/mod.ts'
+import * as bcrypt from 'https://deno.land/x/bcrypt@v0.4.0/mod.ts'
+import { GenToken } from '../util/Token.ts'
+import { GQLError } from 'https://deno.land/x/oak_graphql@0.6.4/mod.ts'
 
 const DB_NAME = Deno.env.get('DB_NAME') || 'users'
 
@@ -37,8 +40,10 @@ interface IResolvers {
 		Login: (
 			a: any,
 			input: {
-				UsernameOrEmail: string
-				password: string
+				input: {
+					UsernameOrEmail: string
+					password: string
+				}
 			}
 		) => PromiseOrType<UserLoginOrRegisterResponse>
 		Register: (
@@ -58,17 +63,43 @@ type PromiseOrType<type> = Promise<type> | type
 
 export const resolvers: IResolvers = {
 	Mutation: {
-		Login(_, args) {
-			console.log(args)
+		async Login(_, args) {
+			const db = client.database(DB_NAME)
+			const users = db.collection<User>('users')
+			const user =
+				(await users.findOne({
+					email: args.input.UsernameOrEmail,
+				})) ||
+				(await users.findOne({
+					username: args.input.UsernameOrEmail,
+				}))
+			if (!user) {
+				throw new GQLError({
+					type: 'email or password or user name is incorrect',
+				})
+			}
+			const IsValidPassword = await bcrypt.compare(
+				args.input.password,
+				user.password
+			)
+			if (!IsValidPassword) {
+				throw new GQLError({
+					type: 'email or password or user name is incorrect',
+				})
+			}
+			user.password = ''
+			return {
+				accessToken: await GenToken(client, user._id, DB_NAME),
+				user: user,
+			}
 		},
 		async Register(_, args) {
 			// email validate
 			const db = client.database(DB_NAME)
 			const users = db.collection<User>('users')
 			const insertId = await users.insertOne({
-				username: args.input.username,
-				password: args.input.password,
-				email: args.input.email,
+				...args.input,
+				password: await bcrypt.hash(args.input.password),
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			})
@@ -76,9 +107,13 @@ export const resolvers: IResolvers = {
 				_id: insertId,
 			})
 			if (!returnValue) {
-				throw new Error("have the error")
+				throw new GQLError({ type: 'Server Error' })
 			}
-			returnValue.password = ""
+			returnValue.password = ''
+			return {
+				accessToken: await GenToken(client, returnValue._id, DB_NAME),
+				user: returnValue,
+			}
 		},
 	},
 }

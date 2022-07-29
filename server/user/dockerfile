@@ -1,0 +1,9 @@
+FROM denoland/deno:bin-1.24.0
+EXPOSE 8080
+WORKDIR /app
+USER deno
+COPY . .
+RUN deno cache main.ts
+ENV DB_NAME=users
+RUN mkdir -p /var/tmp/log
+CMD ["run", "--allow-all", "main.ts"]
