@@ -3,6 +3,13 @@ import { makeExecutableSchema } from "https://deno.land/x/graphql_tools/mod.ts";
 import { GraphQLHTTP } from "https://deno.land/x/gql/mod.ts";
 import { typeDefs } from "./typeDefs/index.ts";
 import { resolvers } from "./resolvers/index.ts";
+import { config } from 'https://deno.land/x/dotenv/mod.ts'
+import {join as PathJoin} from 'https://deno.land/std/path/mod.ts'
+
+config({
+  path: PathJoin(import.meta.url,".env")
+})
+
 
 const handler: Handler = async (req) => {
   const { pathname } = new URL(req.url);

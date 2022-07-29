@@ -9,7 +9,7 @@ require (
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.4.7
 	go.mongodb.org/mongo-driver v1.10.0
-	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
+	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 )
 
 require github.com/gorilla/mux v1.8.0

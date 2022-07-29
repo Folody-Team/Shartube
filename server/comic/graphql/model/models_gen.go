@@ -113,17 +113,6 @@ type ImageResult struct {
 	URL string `json:"Url"`
 }
 
-type LoginUserInput struct {
-	UsernameOrEmail string `json:"UsernameOrEmail"`
-	Password        string `json:"password"`
-}
-
-type RegisterUserInput struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 type UpdateComicChapInput struct {
 	Name        *string `json:"name"`
 	Description *string `json:"description"`
@@ -145,27 +134,7 @@ type UploadFile struct {
 }
 
 type User struct {
-	ID        string    `json:"_id" bson:"_id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Password  *string   `json:"password"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-	Comics    []*Comic  `json:"comics"`
-	ComicIDs  []string  `json:"comicIDs"`
-}
-
-type UserLoginOrRegisterResponse struct {
-	User        *User  `json:"user"`
-	AccessToken string `json:"accessToken"`
-}
-
-type UserModelInput struct {
-	ID        string    `json:"_id" bson:"_id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Password  *string   `json:"password"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-	ComicIDs  []string  `json:"comicIDs"`
+	ID       string   `json:"_id" bson:"_id"`
+	Comics   []*Comic `json:"comics"`
+	ComicIDs []string `json:"comicIDs"`
 }

@@ -171,23 +171,23 @@ func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, i
 	if err != nil {
 		return nil, err
 	}
-	comicChap ,err := comicChapModel.FindById(chapID)
+	comicChap, err := comicChapModel.FindById(chapID)
 	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
 
 	if err != nil {
-		return nil ,err
+		return nil, err
 	}
-	if comicChap  == nil {
-		return nil , &gqlerror.Error{
+	if comicChap == nil {
+		return nil, &gqlerror.Error{
 			Message: "comic chap not found",
 		}
 	}
-	if userID != comicChap.CreatedByID{
+	if userID != comicChap.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
 	return comicChapModel.FindOneAndUpdate(bson.M{
-		"_id":comicChap.ID,
-	},input)
+		"_id": comicChap.ID,
+	}, input)
 }
 
 // ChapBySession is the resolver for the ChapBySession field.
