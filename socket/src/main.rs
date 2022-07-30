@@ -3,9 +3,16 @@ extern crate ws;
 use ws::listen;
 
 fn main() {
-    listen("127.0.0.1:3012", |out| {
+    const ADDR: &str = "localhost:1555";
+    // Start listening for WebSocket connections.
+    println!("Listening on {}", ADDR);
+    
+    listen(ADDR, |out| {
         move |msg| {
-           out.send(msg)
+            println!("Got message: {}", msg);
+            out.send("Success!")
        }
     }).unwrap();
+
+  
 }
