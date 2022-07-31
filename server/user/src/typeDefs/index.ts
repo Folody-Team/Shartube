@@ -1,16 +1,18 @@
 import { gql } from 'https://deno.land/x/oak_graphql/mod.ts'
 
-export const typeDefs = (gql as any)`
-	type Query{
-        _empty: String
-    }
-    type Mutation {
-        _empty: String
-    }
+export const TypeDefsString = `
+	type _Service {
+		sdl: String
+	}
+	type Query {
+		_service: _Service!
+	}
+	type Mutation {
+		_empty: String
+	}
 	scalar Time
-	directive @key(
-		fields: String!
-	) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | OBJECT
+	scalar _FieldSet
+	directive @key(fields: _FieldSet!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
 	input RegisterUserInput {
 		username: String!
 		email: String!
@@ -39,4 +41,7 @@ export const typeDefs = (gql as any)`
 	extend type Query {
 		Me: User!
 	}
+`
+export const typeDefs = gql`
+	${TypeDefsString}
 `

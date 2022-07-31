@@ -11,15 +11,16 @@ const gateway = new ApolloGateway({
   supergraphSdl: new IntrospectAndCompose({
     subgraphs: [
       {
-        name: "user",
-        url: process.env.USER_SERVER_HOST,
-      },
-      {
         name: "comic",
         url: process.env.COMIC_SERVER_HOST,
       },
+      {
+        name: "user",
+        url: process.env.USER_SERVER_HOST,
+      },
     ],
     subgraphHealthCheck: true,
+    
   }),
 });
 

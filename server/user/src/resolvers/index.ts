@@ -7,6 +7,7 @@ import { GenToken } from '../util/Token.ts'
 
 import { join as PathJoin } from 'https://deno.land/std@0.149.0/path/mod.ts'
 import { config } from 'https://deno.land/x/dotenv@v3.2.0/mod.ts'
+import { TypeDefsString } from '../typeDefs/index.ts'
 
 config({
 	path: PathJoin(import.meta.url, './../../.env'),
@@ -45,6 +46,11 @@ interface UserLoginOrRegisterResponse {
 	accessToken: string
 }
 interface IResolvers {
+	Query: {
+		_service: (root: any) => {
+			sdl: string
+		}
+	}
 	Mutation: {
 		Login: (
 			a: any,
@@ -71,6 +77,13 @@ interface IResolvers {
 type PromiseOrType<type> = Promise<type> | type
 
 export const resolvers: IResolvers = {
+	Query: {
+		_service: () => {
+			const stringResult = TypeDefsString
+			console.log(stringResult)
+			return { sdl: stringResult }
+		},
+	},
 	Mutation: {
 		async Login(_, args) {
 			const db = client.database(DB_NAME)
