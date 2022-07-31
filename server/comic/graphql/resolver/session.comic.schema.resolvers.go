@@ -9,11 +9,10 @@ import (
 	"github.com/Folody-Team/Shartube/database/comic_chap_model"
 	"github.com/Folody-Team/Shartube/database/comic_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
-	"github.com/Folody-Team/Shartube/database/session_model"
-	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
+	"github.com/Folody-Team/Shartube/util"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,11 +20,7 @@ import (
 
 // CreatedBy is the resolver for the CreatedBy field.
 func (r *comicSessionResolver) CreatedBy(ctx context.Context, obj *model.ComicSession) (*model.User, error) {
-	userModel, err := user_model.InitUserModel()
-	if err != nil {
-		return nil, err
-	}
-	return userModel.FindById(obj.CreatedByID)
+	return util.GetUserByID(obj.CreatedByID)
 }
 
 // Comic is the resolver for the Comic field.
@@ -64,7 +59,7 @@ func (r *mutationResolver) CreateComicSession(ctx context.Context, input model.C
 	if err != nil {
 		return nil, err
 	}
-	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
 	userIDObject, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return nil, err
@@ -109,7 +104,7 @@ func (r *mutationResolver) UpdateComicSession(ctx context.Context, sessionID str
 	if err != nil {
 		return nil, err
 	}
-	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
 
 	comicSession, err := comicSessionModel.FindById(sessionID)
 	if err != nil {

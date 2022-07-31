@@ -2,26 +2,37 @@ package directives
 
 import (
 	"context"
-	"log"
+	"encoding/json"
+	"net/url"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/Folody-Team/Shartube/database/session_model"
 	"github.com/Folody-Team/Shartube/middleware/passRequest"
-	"github.com/Folody-Team/Shartube/service"
+	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 	"github.com/vektah/gqlparser/v2/gqlerror"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AuthString string
 
+type SessionDataReturn struct {
+	ID        string    `json:"_id"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	UserID    string    `json:"userID"`
+}
+
+type WsRequest struct {
+	Url     string       `json:"url"`
+	Header  *interface{} `json:"header"`
+	Payload any          `json:"payload"`
+}
+
 func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{}, error) {
 	request := passRequest.CtxValue(ctx)
-	SessionModel, err := session_model.InitSessionModel()
-	if err != nil {
-		return nil, err
-	}
+
 	auth := request.Header.Get("Authorization")
 	if auth == "" {
 		return nil, &gqlerror.Error{
@@ -30,34 +41,45 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 	}
 	bearer := "Bearer "
 	auth = strings.Trim(strings.Replace(auth, bearer, "", -1), " ")
-	// send token to user service and 
-	validate, err := service.JwtValidate(context.Background(), auth)
-	if err != nil || !validate.Valid {
+	u := url.URL{
+		Scheme: "ws",
+		Host:   os.Getenv("WS_HOST") + ":" + os.Getenv("WS_PORT"),
+		Path:   "/",
+	}
+	connect, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	payload := struct {
+		Token string `json:"token"`
+		ID    string `json:"id"`
+	}{
+		Token: auth,
+		ID:    uuid.New().String(),
+	}
+	requestData := WsRequest{
+		Url:     "user/decodeToken",
+		Header:  nil,
+		Payload: &payload,
+	}
+	SendByte, err := json.Marshal(requestData)
+	if err != nil {
+		return nil, err
+	}
+
+	err = connect.WriteMessage(websocket.TextMessage, SendByte)
+	if err != nil {
 		return nil, &gqlerror.Error{
 			Message: "Access Denied",
 		}
 	}
-	customClaim, _ := validate.Claims.(*service.JwtCustomClaim)
 
-	sessionObjectId, err := primitive.ObjectIDFromHex(customClaim.ID)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-
-	session, err := SessionModel.FindOne(bson.M{
-		"_id": sessionObjectId,
+	NewCtx := context.WithValue(ctx, AuthString("session"), &SessionDataReturn{
+		ID: "hljlejlkajlfkaj",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID: "akljflkajfkljakl",
 	})
-	if err != nil {
-		return nil, err
-	}
-	if session == nil {
-		return nil, &gqlerror.Error{
-			Message: "Access Denied",
-		}
-	}
-
-	NewCtx := context.WithValue(ctx, AuthString("session"), session)
 
 	return next(NewCtx)
 }

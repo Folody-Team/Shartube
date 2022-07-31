@@ -1,31 +1,37 @@
-import {ApolloServer} from "apollo-server";
-import {ApolloGateway, IntrospectAndCompose} from "@apollo/gateway";
-import('dotenv').then(modules => modules.config({
-  path: (require('path')).join(__dirname, './.env')
-})).then(() => {
-  const port = process.env.PORT;
-  const gateway = new ApolloGateway({
-    supergraphSdl: new IntrospectAndCompose({
-      subgraphs: [
-        {
-          name: "comic",
-          url: process.env.COMIC_SERVER_HOST,
-        },
-        {
-          name: "user",
-          url: process.env.USER_SERVER_HOST,
-        },
-      ],
-    }),
-  });
+import { ApolloServer } from "apollo-server";
+import { ApolloGateway, IntrospectAndCompose } from "@apollo/gateway";
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({
+  path: path.join(__dirname, "./.env"),
+});
 
-  const server = new ApolloServer({
-    gateway,
-  });
+const port = process.env.PORT;
+const gateway = new ApolloGateway({
+  supergraphSdl: new IntrospectAndCompose({
+    subgraphs: [
+      {
+        name: "user",
+        url: process.env.USER_SERVER_HOST,
+      },
+      {
+        name: "comic",
+        url: process.env.COMIC_SERVER_HOST,
+      },
+    ],
+    subgraphHealthCheck: true,
+  }),
+});
 
-  server.listen({port}).then(({ url }) => {
+const server = new ApolloServer({
+  gateway,
+});
+
+server
+  .listen({ port })
+  .then(({ url }) => {
     console.log(`🚀 Gateway ready at ${url}`);
-  }).catch((err) => {
+  })
+  .catch((err) => {
     console.error(err);
   });
-});
