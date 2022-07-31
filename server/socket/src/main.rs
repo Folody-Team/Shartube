@@ -1,11 +1,25 @@
 extern crate ws;
 
+mod handler;
+
+use std::thread;
 use ws::listen;
 
+const ADDR: &str = "localhost:1555";
+
 fn main() {
-    listen("127.0.0.1:3012", |out| {
-        move |msg| {
-           out.send(msg)
-       }
-    }).unwrap();
+    handler::handler();
+    // Start listening for WebSocket connections.
+    println!("Listening on {}", ADDR);
+
+    // create a thread to listen for websocket connections.
+    let server = thread::spawn(move || {
+        listen(ADDR, |out| { 
+            handler::Server {
+                ws: out,
+            }
+        }).unwrap();
+    });
+
+    server.join().unwrap();
 }
