@@ -1,4 +1,4 @@
-FROM node:lts-gallium as ts-compiler
+FROM node:gallium-slim as ts-compiler
 WORKDIR /home/app
 
 COPY . .
@@ -6,7 +6,7 @@ COPY . .
 RUN yarn install
 RUN yarn run build
 
-FROM node:lts-gallium as ts-remover
+FROM node:gallium-slim as ts-remover
 WORKDIR /home/app
 
 COPY --from=ts-compiler /home/app/package.json ./
@@ -14,7 +14,7 @@ COPY --from=ts-compiler /home/app/dist ./
 
 RUN yarn install --production
 
-FROM node:lts-gallium
+FROM node:gallium-slim
 WORKDIR /home/app
 COPY --from=ts-remover /home/app ./
 ENV PORT=2100
