@@ -41,6 +41,7 @@ const GraphQLService = await applyGraphQL<Router>({
 	},
 })
 
+
 app.use(GraphQLService.routes(), GraphQLService.allowedMethods())
 
 console.log('Server start at http://localhost:8080')
