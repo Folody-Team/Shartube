@@ -13,7 +13,6 @@ config({
 	path: PathJoin(import.meta.url, './../../.env'),
 })
 const DB_NAME = Deno.env.get('DB_NAME') || 'users'
-console.log(Deno.env.toObject())
 
 const client = new MongoClient()
 if (Deno.env.get('DB_PORT')) {
@@ -116,6 +115,7 @@ export const resolvers: IResolvers = {
 		},
 		async Register(_, args) {
 			const isEmailValid = await emailChecker(args.input.email)
+			console.log(args)
 			if (!isEmailValid) {
 				throw new GQLError({ type: 'email invalid' })
 			}

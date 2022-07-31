@@ -77,6 +77,8 @@ services:
       - shartube-net
     build: ./socket
     restart: always
+    expose:
+      - 3012
 
 networks:
   shartube-net:

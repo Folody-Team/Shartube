@@ -3,6 +3,7 @@ package directives
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -28,6 +29,7 @@ type WsRequest struct {
 	Url     string       `json:"url"`
 	Header  *interface{} `json:"header"`
 	Payload any          `json:"payload"`
+	From    string       `json:"from"`
 }
 
 func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{}, error) {
@@ -41,6 +43,7 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 	}
 	bearer := "Bearer "
 	auth = strings.Trim(strings.Replace(auth, bearer, "", -1), " ")
+	log.Println(auth)
 	u := url.URL{
 		Scheme: "ws",
 		Host:   os.Getenv("WS_HOST") + ":" + os.Getenv("WS_PORT"),
@@ -61,6 +64,7 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 		Url:     "user/decodeToken",
 		Header:  nil,
 		Payload: &payload,
+		From:    "comic/auth",
 	}
 	SendByte, err := json.Marshal(requestData)
 	if err != nil {
@@ -75,10 +79,10 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 	}
 
 	NewCtx := context.WithValue(ctx, AuthString("session"), &SessionDataReturn{
-		ID: "hljlejlkajlfkaj",
+		ID:        "hljlejlkajlfkaj",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		UserID: "akljflkajfkljakl",
+		UserID:    "akljflkajfkljakl",
 	})
 
 	return next(NewCtx)
