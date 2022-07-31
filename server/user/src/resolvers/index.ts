@@ -80,7 +80,6 @@ export const resolvers: IResolvers = {
 	Query: {
 		_service: () => {
 			const stringResult = TypeDefsString
-			console.log(stringResult)
 			return { sdl: stringResult }
 		},
 	},
