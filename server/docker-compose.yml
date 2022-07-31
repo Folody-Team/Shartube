@@ -1,15 +1,17 @@
-version: '3.6'
+version: "3.6"
 
 services:
   shartube-db:
     container_name: shartube-db
     image: mongo:latest
     networks:
-      - shartube-net 
+      - shartube-net
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=root
-
+    depends_on:
+      - shartube-ws-server
+    restart: always
 
   shartube-comic-server:
     container_name: shartube-comic-server
@@ -24,9 +26,14 @@ services:
       - DB_PORT=27017
       - DB_USERNAME=root
       - DB_PASSWORD=root
+      - WS_HOST=shartube-ws-server
+      - WS_PORT=3012
     env_file:
       - ./comic/.env
-
+    restart: always
+    expose:
+      - 8080
+      
 
   shartube-user-server:
     container_name: shartube-user-server
@@ -40,9 +47,13 @@ services:
       - DB_PORT=27017
       - DB_USERNAME=root
       - DB_PASSWORD=root
+      - WS_HOST=shartube-ws-server
+      - WS_PORT=3012
     env_file:
       - ./user/.env
-
+    restart: always
+    expose:
+      - 8080
 
   shartube-graphql-gateway:
     container_name: shartube-graphql-gateway
@@ -59,6 +70,14 @@ services:
       - ./graphql-gateway/.env
     ports:
       - "8080:2100"
+    restart: always
+
+  shartube-ws-server:
+    container_name: shartube-ws-server
+    networks:
+      - shartube-net
+    build: ./socket
+    restart: always
 
 networks:
   shartube-net:

@@ -138,3 +138,5 @@ type User struct {
 	Comics   []*Comic `json:"comics"`
 	ComicIDs []string `json:"comicIDs"`
 }
+
+func (User) IsEntity() {}

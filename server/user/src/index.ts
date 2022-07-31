@@ -1,9 +1,7 @@
-import { join as PathJoin } from "https://deno.land/std@0.149.0/path/mod.ts"
-import { config } from "https://deno.land/x/dotenv@v3.2.0/mod.ts"
-import { Application, Router } from 'https://deno.land/x/oak@v10.0.0/mod.ts'
-import {
-  applyGraphQL
-} from "https://deno.land/x/oak_graphql@0.6.4/mod.ts"
+import { join as PathJoin } from 'https://deno.land/std@0.149.0/path/mod.ts'
+import { config } from 'https://deno.land/x/dotenv@v3.2.0/mod.ts'
+import { Application, Router } from 'https://deno.land/x/oak/mod.ts'
+import { applyGraphQL } from 'https://deno.land/x/oak_graphql/mod.ts'
 import { resolvers } from './resolvers/index.ts'
 import { typeDefs } from './typeDefs/index.ts'
 
@@ -25,6 +23,14 @@ app.use(async (ctx, next) => {
 	ctx.response.headers.set('X-Response-Time', `${ms}ms`)
 })
 
+const ws = new WebSocket(
+	`ws://${Deno.env.get('WS_HOST')}:${Deno.env.get('WS_PORT')}`
+)
+
+ws.onopen = () => console.log('connect to ws success')
+ws.onmessage = (message: MessageEvent<any>) => {
+	console.log(message.data)
+}
 const GraphQLService = await applyGraphQL<Router>({
 	Router,
 	typeDefs: typeDefs,
@@ -34,6 +40,7 @@ const GraphQLService = await applyGraphQL<Router>({
 		return { request: ctx.request }
 	},
 })
+
 
 app.use(GraphQLService.routes(), GraphQLService.allowedMethods())
 

@@ -8,23 +8,17 @@ import (
 
 	"github.com/Folody-Team/Shartube/database/comic_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
-	"github.com/Folody-Team/Shartube/database/session_model"
-	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
+	"github.com/Folody-Team/Shartube/util"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CreatedBy is the resolver for the CreatedBy field.
 func (r *comicResolver) CreatedBy(ctx context.Context, obj *model.Comic) (*model.User, error) {
-	userModel, err := user_model.InitUserModel()
-	if err != nil {
-		return nil, err
-	}
-	return userModel.FindById(obj.CreatedByID)
+	return util.GetUserByID(obj.CreatedByID)
 }
 
 // Session is the resolver for the session field.
@@ -51,8 +45,7 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateCo
 		return nil, err
 	}
 
-	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
-	userIDObject, err := primitive.ObjectIDFromHex(userID)
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
 	if err != nil {
 		return nil, err
 	}
@@ -65,18 +58,18 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateCo
 	if err != nil {
 		return nil, err
 	}
-	userModel, err := user_model.InitUserModel()
-	if err != nil {
-		return nil, err
-	}
+	// userModel, err := user_model.InitUserModel()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	userModel.UpdateOne(bson.M{
-		"_id": userIDObject,
-	}, bson.M{
-		"$push": bson.M{
-			"ComicIDs": comicID,
-		},
-	})
+	// userModel.UpdateOne(bson.M{
+	// 	"_id": userIDObject,
+	// }, bson.M{
+	// 	"$push": bson.M{
+	// 		"ComicIDs": comicID,
+	// 	},
+	// })
 
 	return comicModel.FindById(comicID.Hex())
 }
@@ -87,7 +80,7 @@ func (r *mutationResolver) UpdateComic(ctx context.Context, comicID string, inpu
 	if err != nil {
 		return nil, err
 	}
-	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
 
 	comic, err := comicModel.FindById(comicID)
 	if err != nil {

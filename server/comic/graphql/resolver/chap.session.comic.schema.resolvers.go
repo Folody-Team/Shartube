@@ -11,8 +11,6 @@ import (
 
 	"github.com/Folody-Team/Shartube/database/comic_chap_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
-	"github.com/Folody-Team/Shartube/database/session_model"
-	"github.com/Folody-Team/Shartube/database/user_model"
 	"github.com/Folody-Team/Shartube/directives"
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
@@ -25,11 +23,7 @@ import (
 
 // CreatedBy is the resolver for the CreatedBy field.
 func (r *comicChapResolver) CreatedBy(ctx context.Context, obj *model.ComicChap) (*model.User, error) {
-	userModel, err := user_model.InitUserModel()
-	if err != nil {
-		return nil, err
-	}
-	return userModel.FindById(obj.CreatedByID)
+	return util.GetUserByID(obj.CreatedByID)
 }
 
 // Session is the resolver for the Session field.
@@ -47,7 +41,7 @@ func (r *mutationResolver) CreateComicChap(ctx context.Context, input model.Crea
 	if err != nil {
 		return nil, err
 	}
-	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
 	userIDObject, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return nil, err
@@ -98,7 +92,7 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 		return nil, err
 	}
 
-	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +166,7 @@ func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, i
 		return nil, err
 	}
 	comicChap, err := comicChapModel.FindById(chapID)
-	userID := ctx.Value(directives.AuthString("session")).(*session_model.SaveSessionDataOutput).UserID.Hex()
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
 
 	if err != nil {
 		return nil, err
