@@ -46,8 +46,9 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 	u := url.URL{
 		Scheme: "ws",
 		Host:   os.Getenv("WS_HOST") + ":" + os.Getenv("WS_PORT"),
-		Path:   "/ws",
+		Path:   "/",
 	}
+	log.Println(u.String())
 	connect, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
 		log.Println(err)

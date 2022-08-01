@@ -5,7 +5,7 @@ mod handler;
 use std::thread;
 use ws::listen;
 
-const ADDR: &str = "localhost:3012";
+const ADDR: &str = "shartube-ws-server:3012";
 
 fn main() {
     handler::handler();

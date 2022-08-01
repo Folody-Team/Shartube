@@ -79,8 +79,6 @@ services:
     restart: always
     expose:
       - 3012
-    ports:
-      - "3012:3012"
 
 networks:
   shartube-net:

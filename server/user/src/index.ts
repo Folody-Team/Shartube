@@ -29,7 +29,10 @@ const ws = new WebSocket(
 
 ws.onopen = () => console.log('connect to ws success')
 ws.onmessage = (message: MessageEvent<any>) => {
-	console.log(message.data)
+	const data = JSON.parse(message.data)
+	if (data.url == 'user/decodeToken') {
+		console.log(data)
+	}
 }
 const GraphQLService = await applyGraphQL<Router>({
 	Router,
@@ -40,7 +43,6 @@ const GraphQLService = await applyGraphQL<Router>({
 		return { request: ctx.request }
 	},
 })
-
 
 app.use(GraphQLService.routes(), GraphQLService.allowedMethods())
 
