@@ -1,5 +1,9 @@
 import { ApolloServer } from "apollo-server";
-import { ApolloGateway, IntrospectAndCompose } from "@apollo/gateway";
+import {
+  ApolloGateway,
+  IntrospectAndCompose,
+  RemoteGraphQLDataSource,
+} from "@apollo/gateway";
 import dotenv from "dotenv";
 import path from "path";
 dotenv.config({
@@ -20,12 +24,24 @@ const gateway = new ApolloGateway({
       },
     ],
     subgraphHealthCheck: true,
-    
   }),
+  buildService(definition) {
+    const { url, name } = definition;
+    return new RemoteGraphQLDataSource({
+      url,
+      willSendRequest({ request, context }) {
+        // pass the headers to the remote server
+        request.http?.headers.set("Authorization", context.token || "");
+      },
+    });
+  },
 });
 
 const server = new ApolloServer({
   gateway,
+  context: ({ req, res }) => {
+    return { req, res, token: req.headers.authorization };
+  },
 });
 
 server

@@ -36,7 +36,6 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 	request := passRequest.CtxValue(ctx)
 
 	auth := request.Header.Get("Authorization")
-	log.Println(auth)
 	if auth == "" {
 		return nil, &gqlerror.Error{
 			Message: "Access Denied",
@@ -47,12 +46,14 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 	u := url.URL{
 		Scheme: "ws",
 		Host:   os.Getenv("WS_HOST") + ":" + os.Getenv("WS_PORT"),
-		Path:   "/",
+		Path:   "/ws",
 	}
 	connect, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
+	log.Println(auth)
 	payload := struct {
 		Token string `json:"token"`
 		ID    string `json:"id"`
