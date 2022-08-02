@@ -8,12 +8,13 @@ import (
 
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
-	"github.com/Folody-Team/Shartube/util"
 )
 
 // FindUserByID is the resolver for the findUserByID field.
 func (r *entityResolver) FindUserByID(ctx context.Context, id string) (*model.User, error) {
-	return util.GetUserByID(id)
+	return &model.User{
+		ID: id,
+	}, nil
 }
 
 // Entity returns generated.EntityResolver implementation.

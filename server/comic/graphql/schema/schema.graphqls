@@ -1,5 +1,8 @@
 scalar Upload
 scalar Time
+directive @shareable on OBJECT | FIELD_DEFINITION
+
+
 directive @goField(
   forceResolver: Boolean
   name: String

@@ -51,6 +51,7 @@ type DirectiveRoot struct {
 	Auth       func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	EmailInput func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 	Inherits   func(ctx context.Context, obj interface{}, next graphql.Resolver, typeArg string) (res interface{}, err error)
+	Shareable  func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -860,6 +861,9 @@ extend type Query {
 `, BuiltIn: false},
 	{Name: "../schema/schema.graphqls", Input: `scalar Upload
 scalar Time
+directive @shareable on OBJECT | FIELD_DEFINITION
+
+
 directive @goField(
   forceResolver: Boolean
   name: String
@@ -930,10 +934,10 @@ extend type Query {
     @goField(forceResolver: true)
 }
 `, BuiltIn: false},
-	{Name: "../schema/user.schema.graphqls", Input: `extend type User @key(fields: "_id") {
+	{Name: "../schema/user.schema.graphqls", Input: `extend type User @key(fields: "_id")  {
   _id: ID! @external
-  comics: [Comic!] @goField(forceResolver: true)
-  comicIDs: [String!]
+  comics: [Comic] @goField(forceResolver: true)
+  comicIDs: [String]
 }
 `, BuiltIn: false},
 	{Name: "../../federation/directives.graphql", Input: `
@@ -4472,7 +4476,7 @@ func (ec *executionContext) _User_comics(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.Comic)
 	fc.Result = res
-	return ec.marshalOComic2ᚕᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComicᚄ(ctx, field.Selections, res)
+	return ec.marshalOComic2ᚕᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComic(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_comics(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4531,9 +4535,9 @@ func (ec *executionContext) _User_comicIDs(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]string)
+	res := resTmp.([]*string)
 	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+	return ec.marshalOString2ᚕᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_comicIDs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8593,7 +8597,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOComic2ᚕᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComicᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Comic) graphql.Marshaler {
+func (ec *executionContext) marshalOComic2ᚕᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComic(ctx context.Context, sel ast.SelectionSet, v []*model.Comic) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -8620,7 +8624,7 @@ func (ec *executionContext) marshalOComic2ᚕᚖgithubᚗcomᚋFolodyᚑTeamᚋS
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNComic2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComic(ctx, sel, v[i])
+			ret[i] = ec.marshalOComic2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComic(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8631,13 +8635,14 @@ func (ec *executionContext) marshalOComic2ᚕᚖgithubᚗcomᚋFolodyᚑTeamᚋS
 	}
 	wg.Wait()
 
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
 	return ret
+}
+
+func (ec *executionContext) marshalOComic2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComic(ctx context.Context, sel ast.SelectionSet, v *model.Comic) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Comic(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOComicChap2ᚕᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComicChapᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ComicChap) graphql.Marshaler {
@@ -8777,6 +8782,38 @@ func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel
 		if e == graphql.Null {
 			return graphql.Null
 		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOString2ᚕᚖstring(ctx context.Context, v interface{}) ([]*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOString2ᚖstring(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕᚖstring(ctx context.Context, sel ast.SelectionSet, v []*string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalOString2ᚖstring(ctx, sel, v[i])
 	}
 
 	return ret

@@ -30,6 +30,20 @@ type WsRequest struct {
 	Header  *interface{} `json:"header"`
 	Payload any          `json:"payload"`
 	From    string       `json:"from"`
+	Type    string       `json:"message"`
+}
+
+type PayloadReturn struct {
+	SessionData *SessionDataReturn `json:"sessionData"`
+	ID          string             `json:"id"`
+}
+
+type ReturnData struct {
+	Url     string        `json:"url"`
+	Header  *interface{}  `json:"header"`
+	Payload PayloadReturn `json:"payload"`
+	Type    string        `json:"type"`
+	Error   *string        `json:"error"`
 }
 
 func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{}, error) {
@@ -48,44 +62,60 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 		Host:   os.Getenv("WS_HOST") + ":" + os.Getenv("WS_PORT"),
 		Path:   "/",
 	}
-	log.Println(u.String())
-	connect, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	log.Println(auth)
+	requestId := uuid.New().String()
 	payload := struct {
 		Token string `json:"token"`
 		ID    string `json:"id"`
 	}{
 		Token: auth,
-		ID:    uuid.New().String(),
+		ID:    requestId,
 	}
 	requestData := WsRequest{
 		Url:     "user/decodeToken",
 		Header:  nil,
 		Payload: &payload,
 		From:    "comic/auth",
+		Type:    "message",
 	}
-	SendByte, err := json.Marshal(requestData)
+	requestDataBytes, err := json.Marshal(requestData)
 	if err != nil {
 		return nil, err
 	}
-
-	err = connect.WriteMessage(websocket.TextMessage, SendByte)
+	ws, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		return nil, &gqlerror.Error{
-			Message: "Access Denied",
+		return nil, err
+	}
+	defer ws.Close()
+	ws.WriteMessage(websocket.TextMessage, requestDataBytes)
+
+	for {
+		_, message, err := ws.ReadMessage()
+		if err != nil {
+			return nil, err
+		}
+		var data ReturnData
+		err = json.Unmarshal(message, &data)
+		if err != nil {
+			return nil, err
+		}
+		if data.Type == "rep" {
+			if data.Payload.ID == requestId {
+				log.Println("Auth:", data.Payload.SessionData)
+				if data.Error != nil {
+					return nil, &gqlerror.Error{
+						Message: "Access Denied",
+					}
+				}
+				if data.Payload.SessionData != nil {
+					return next(context.WithValue(ctx, AuthString("session"), data.Payload.SessionData))
+				}
+
+				return nil, &gqlerror.Error{
+					Message: "Access Denied",
+				}
+
+			}
 		}
 	}
 
-	NewCtx := context.WithValue(ctx, AuthString("session"), &SessionDataReturn{
-		ID:        "hljlejlkajlfkaj",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		UserID:    "akljflkajfkljakl",
-	})
-
-	return next(NewCtx)
 }

@@ -3,7 +3,7 @@ version: "3.6"
 services:
   shartube-db:
     container_name: shartube-db
-    image: mongo:latest
+    image: mongo
     networks:
       - shartube-net
     environment:
@@ -28,6 +28,7 @@ services:
       - DB_PASSWORD=root
       - WS_HOST=shartube-ws-server
       - WS_PORT=3012
+      - UserHost=http://shartube-user-server:8080
     env_file:
       - ./comic/.env
     restart: always
@@ -54,6 +55,8 @@ services:
     restart: always
     expose:
       - 8080
+
+
   shartube-graphql-gateway:
     container_name: shartube-graphql-gateway
     networks:
@@ -79,6 +82,8 @@ services:
     restart: always
     expose:
       - 3012
+    environment:
+      - HOST=shartube-ws-server
 
 networks:
   shartube-net:

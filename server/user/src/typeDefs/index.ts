@@ -12,6 +12,8 @@ export const TypeDefsString = `
 	}
 	scalar Time
 	scalar _FieldSet
+	scalar _Any
+	
 	directive @key(fields: _FieldSet!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
 	input RegisterUserInput {
 		username: String!
@@ -34,11 +36,13 @@ export const TypeDefsString = `
 		user: User!
 		accessToken: String!
 	}
+	union _Entity = UserLoginOrRegisterResponse | User 
 	extend type Mutation {
 		Login(input: LoginUserInput!): UserLoginOrRegisterResponse!
 		Register(input: RegisterUserInput!): UserLoginOrRegisterResponse!
 	}
 	extend type Query {
+		_entities(representations: [_Any!]!): [_Entity]!
 		Me: User!
 	}
 `

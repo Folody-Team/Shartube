@@ -19,11 +19,14 @@ func (r *userResolver) Comics(ctx context.Context, obj *model.User) ([]*model.Co
 	}
 	AllComic := []*model.Comic{}
 	for _, v := range obj.ComicIDs {
-		data, err := comicModel.FindById(v)
-		if err != nil {
-			return nil, err
+		if v != nil {
+			data, err := comicModel.FindById(*v)
+			if err != nil {
+				return nil, err
+			}
+			AllComic = append(AllComic, data)
 		}
-		AllComic = append(AllComic, data)
+
 	}
 	return AllComic, nil
 }

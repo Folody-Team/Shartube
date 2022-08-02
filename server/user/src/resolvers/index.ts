@@ -3,36 +3,90 @@ import * as bcrypt from 'https://deno.land/x/bcrypt@v0.4.0/mod.ts'
 import { MongoClient, ObjectId } from 'https://deno.land/x/mongo/mod.ts'
 import { GQLError } from 'https://deno.land/x/oak_graphql@0.6.4/mod.ts'
 import { emailChecker } from '../function/emailChecker.ts'
-import { GenToken } from '../util/Token.ts'
+import { GenToken, DecodeToken } from '../util/Token.ts'
 
 import { join as PathJoin } from 'https://deno.land/std@0.149.0/path/mod.ts'
 import { config } from 'https://deno.land/x/dotenv@v3.2.0/mod.ts'
 import { TypeDefsString } from '../typeDefs/index.ts'
+import client from '../util/client.ts'
 
 config({
 	path: PathJoin(import.meta.url, './../../.env'),
 })
 const DB_NAME = Deno.env.get('DB_NAME') || 'users'
 
-const client = new MongoClient()
-if (Deno.env.get('DB_PORT')) {
-	await client.connect(
-		`mongodb://${Deno.env.get('DB_USERNAME') || 'root'}:${
-			Deno.env.get('DB_PASSWORD') || 'root'
-		}@${Deno.env.get('DB_HOST') || 'localhost'}:${Number(
-			Deno.env.get('DB_PORT') || 27017
-		)}/?authSource=admin&readPreference=primary&ssl=false`
-	)
-} else {
-	await client.connect(
-		`mongodb+srv://${Deno.env.get('DB_USERNAME') || 'root'}:${
-			Deno.env.get('DB_PASSWORD') || 'root'
-		}@${
-			Deno.env.get('DB_HOST') || 'localhost'
-		}/${DB_NAME}?retryWrites=true&w=majority`
-	)
+const ws = new WebSocket(
+	`ws://${Deno.env.get('WS_HOST')}:${Deno.env.get('WS_PORT')}`
+)
+
+ws.onopen = () => console.log('connect to ws success')
+ws.onmessage = async (message: MessageEvent<any>) => {
+	const data = JSON.parse(message.data)
+	if (data.url == 'user/decodeToken') {
+		let result
+		try {
+			const decodeData = await DecodeToken(data.payload.token, client, DB_NAME)
+			result = {
+				url: data.from,
+				header: null,
+				payload: {
+					sessionData: decodeData,
+					id: data.payload.id,
+				},
+				type: 'rep',
+				error: null,
+			}
+		} catch (error) {
+			result = {
+				url: data.from,
+				header: null,
+				payload: {
+					sessionData: null,
+					id: data.payload.id,
+				},
+				type: 'rep',
+				error: error.message,
+			}
+		}
+
+		ws.send(JSON.stringify(result))
+	}
+	if (data.url == 'user/GetUserById') {
+		let result
+		try {
+			const db = client.database(DB_NAME)
+			const users = db.collection<User>('users')
+			const user = await users.findOne({
+				_id: new ObjectId(data.payload.userID),
+			})
+			result = {
+				url: data.from,
+				header: null,
+				payload: {
+					user: user,
+					id: data.payload.id,
+				},
+				type: 'rep',
+				error: null,
+			}
+		} catch (error) {
+			result = {
+				url: data.from,
+				header: null,
+				payload: {
+					user: null,
+					id: data.payload.id,
+				},
+				type: 'rep',
+				error: error.message,
+			}
+		}
+
+		ws.send(JSON.stringify(result))
+	}
 }
-interface User {
+
+export interface User {
 	_id: ObjectId
 	username: string
 	email: string
@@ -71,10 +125,12 @@ interface IResolvers {
 			}
 		) => PromiseOrType<UserLoginOrRegisterResponse>
 	}
+	User: {
+		__resolveReference: (reference: any) => PromiseOrType<User | undefined>
+	}
 }
 
 type PromiseOrType<type> = Promise<type> | type
-
 export const resolvers: IResolvers = {
 	Query: {
 		_service: () => {
@@ -114,11 +170,11 @@ export const resolvers: IResolvers = {
 			}
 		},
 		async Register(_, args) {
-			const isEmailValid = await emailChecker(args.input.email)
-			console.log(args)
-			if (!isEmailValid) {
-				throw new GQLError({ type: 'email invalid' })
-			}
+			// const isEmailValid = await emailChecker(args.input.email)
+			console.log(args.input.email)
+			// if (!isEmailValid) {
+			// throw new GQLError({ type: 'email invalid' })
+			// }
 			const db = client.database(DB_NAME)
 			const users = db.collection<User>('users')
 			const insertId = await users.insertOne({
@@ -138,6 +194,17 @@ export const resolvers: IResolvers = {
 				accessToken: await GenToken(client, returnValue._id, DB_NAME),
 				user: returnValue,
 			}
+		},
+	},
+	User: {
+		__resolveReference: async (reference) => {
+			console.log(reference)
+			const db = client.database(DB_NAME)
+			const users = db.collection<User>('users')
+			const user = await users.findOne({
+				_id: new ObjectId(reference._id),
+			})
+			return user
 		},
 	},
 }

@@ -5,6 +5,7 @@ package resolver
 
 import (
 	"context"
+	"log"
 
 	"github.com/Folody-Team/Shartube/database/comic_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
@@ -18,6 +19,7 @@ import (
 
 // CreatedBy is the resolver for the CreatedBy field.
 func (r *comicResolver) CreatedBy(ctx context.Context, obj *model.Comic) (*model.User, error) {
+	log.Println(obj.CreatedByID)
 	return util.GetUserByID(obj.CreatedByID)
 }
 

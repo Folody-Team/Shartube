@@ -134,9 +134,9 @@ type UploadFile struct {
 }
 
 type User struct {
-	ID       string   `json:"_id" bson:"_id"`
-	Comics   []*Comic `json:"comics"`
-	ComicIDs []string `json:"comicIDs"`
+	ID       string    `json:"_id" bson:"_id"`
+	Comics   []*Comic  `json:"comics"`
+	ComicIDs []*string `json:"comicIDs"`
 }
 
 func (User) IsEntity() {}
