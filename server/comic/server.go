@@ -71,9 +71,13 @@ func main() {
 	router.Handle("/query", srv)
 	// to use mux we need to Handle it with net/http.
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(
-		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
-		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
-	)(router)))
+	log.Printf("connect to https://localhost:%s/ for GraphQL playground", port)
+	log.Fatal(http.ListenAndServeTLS(
+		":"+port,
+		"./secure/cert/ca-cert.pem",
+		"./secure/key/key.pem",
+		handlers.CORS(
+			handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		)(router)))
 }
