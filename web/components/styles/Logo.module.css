@@ -1,0 +1,17 @@
+.Logo{
+  animation: 0.5s ease-in-out fadeIn;
+}
+.Logo * {
+  box-shadow: 0 0rem 15px #5770ffb9;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -1,0 +1,21 @@
+scalar Upload
+scalar Time
+directive @shareable on OBJECT | FIELD_DEFINITION
+
+
+directive @goField(
+  forceResolver: Boolean
+  name: String
+) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION | OBJECT
+directive @goModel(
+  model: String
+  models: [String!]
+) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
+
+directive @goTag(
+  key: String!
+  value: String
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+directive @auth on FIELD_DEFINITION
+directive @emailInput on INPUT_FIELD_DEFINITION

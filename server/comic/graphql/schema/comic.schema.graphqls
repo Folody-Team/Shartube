@@ -1,0 +1,46 @@
+directive @inherits(type: String!) on OBJECT
+
+interface CreateComic {
+  name: String!
+  description: String
+}
+
+input CreateComicInput {
+  name: String!
+  description: String
+}
+
+type CreateComicInputModel implements CreateComic {
+  name: String!
+  description: String
+  CreatedByID: String!
+}
+
+type Comic implements CreateComic {
+  _id: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  CreatedBy: User @goField(forceResolver: true)
+  CreatedByID: String!
+  name: String!
+  description: String
+  sessionId: [String!]
+  session: [ComicSession!] @goField(forceResolver: true)
+}
+
+input UpdateComicInput {
+  name: String
+  description: String
+}
+
+extend type Mutation {
+  createComic(input: CreateComicInput!): Comic!
+    @goField(forceResolver: true)
+    @auth
+  updateComic(comicID: String!, input: UpdateComicInput!): Comic!
+    @goField(forceResolver: true)
+    @auth
+}
+extend type Query {
+  Comics: [Comic!]! @goField(forceResolver: true)
+}
