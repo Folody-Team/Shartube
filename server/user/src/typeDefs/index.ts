@@ -36,7 +36,7 @@ export const TypeDefsString = `
 		user: User!
 		accessToken: String!
 	}
-	union _Entity = UserLoginOrRegisterResponse | User 
+	union _Entity =  User 
 	extend type Mutation {
 		Login(input: LoginUserInput!): UserLoginOrRegisterResponse!
 		Register(input: RegisterUserInput!): UserLoginOrRegisterResponse!
