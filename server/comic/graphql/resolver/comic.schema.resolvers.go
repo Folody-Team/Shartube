@@ -5,6 +5,7 @@ package resolver
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
 	"github.com/Folody-Team/Shartube/database/comic_model"
@@ -13,6 +14,7 @@ import (
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
 	"github.com/Folody-Team/Shartube/util"
+	"github.com/sacOO7/gowebsocket"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -72,7 +74,36 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateCo
 	// 		"ComicIDs": comicID,
 	// 	},
 	// })
+	// get data from comic model
+	comic, err := comicModel.FindById(comicID.Hex())
+	socket := gowebsocket.New("ws://localhost:8080/")
 
+	socket.OnConnected = func(socket gowebsocket.Socket) {
+		log.Println("Connected to server")
+	}
+
+	socket.OnTextMessage = func(message string, socket gowebsocket.Socket) {
+		log.Println("Got messages " + message)
+	}
+
+	socket.Connect()
+
+	if err != nil {
+		return nil, err
+	}
+
+	comicObjectData := bson.M{
+		"_id":  comicID.Hex(),
+		"data": comic,
+	}
+	comicObject, err := json.Marshal(comicObjectData)
+	if err != nil {
+		return nil, err
+	}
+	comicObjectString := string(comicObject)
+	socket.SendText(comicObjectString)
+
+	socket.Close()
 	return comicModel.FindById(comicID.Hex())
 }
 

@@ -22,6 +22,7 @@ require (
 require (
 	github.com/felixge/httpsnoop v1.0.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/sacOO7/go-logger v0.0.0-20180719173527-9ac9add5a50d // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
 
@@ -44,6 +45,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rs/cors v1.8.2
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/sacOO7/gowebsocket v0.0.0-20210515122958-9396f1a71e23
 	github.com/urfave/cli/v2 v2.8.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect
