@@ -16,22 +16,14 @@ import (
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
 	"github.com/Folody-Team/Shartube/util"
+	"github.com/Folody-Team/Shartube/util/deleteUtil"
 	"github.com/sacOO7/gowebsocket"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-type WsRequest struct {
-	Url     string       `json:"url"`
-	Header  *interface{} `json:"header"`
-	Payload any          `json:"payload"`
-	From    string       `json:"from"`
-	Type    string       `json:"message"`
-}
-
 // CreatedBy is the resolver for the CreatedBy field.
 func (r *comicResolver) CreatedBy(ctx context.Context, obj *model.Comic) (*model.User, error) {
-
 	return util.GetUserByID(obj.CreatedByID)
 }
 
@@ -156,6 +148,40 @@ func (r *mutationResolver) UpdateComic(ctx context.Context, comicID string, inpu
 	}, input)
 }
 
+// DeleteComic is the resolver for the DeleteComic field.
+func (r *mutationResolver) DeleteComic(ctx context.Context, comicID string) (*model.DeleteResult, error) {
+	ComicModel, err := comic_model.InitComicModel()
+	if err != nil {
+		return nil, err
+	}
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
+	ComicData, err := ComicModel.FindOne(bson.M{
+		"_id": comicID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if ComicData == nil {
+		return nil, &gqlerror.Error{
+			Message: "comic not found",
+		}
+	}
+	if ComicData.CreatedByID != userID {
+		return nil, &gqlerror.Error{
+			Message: "Access Denied",
+		}
+	}
+	success, err := deleteUtil.DeleteComic(comicID)
+	if err != nil {
+		return nil, err
+	}
+	// send to user service to pull comic
+	return &model.DeleteResult{
+		Success: success,
+		ID:      ComicData.ID,
+	}, nil
+}
+
 // Comics is the resolver for the Comics field.
 func (r *queryResolver) Comics(ctx context.Context) ([]*model.Comic, error) {
 	comicModel, err := comic_model.InitComicModel()
@@ -170,3 +196,17 @@ func (r *queryResolver) Comics(ctx context.Context) ([]*model.Comic, error) {
 func (r *Resolver) Comic() generated.ComicResolver { return &comicResolver{r} }
 
 type comicResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+type WsRequest struct {
+	Url     string       `json:"url"`
+	Header  *interface{} `json:"header"`
+	Payload any          `json:"payload"`
+	From    string       `json:"from"`
+	Type    string       `json:"message"`
+}

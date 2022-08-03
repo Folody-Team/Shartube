@@ -15,6 +15,7 @@ import (
 	"github.com/Folody-Team/Shartube/graphql/generated"
 	"github.com/Folody-Team/Shartube/graphql/model"
 	"github.com/Folody-Team/Shartube/util"
+	"github.com/Folody-Team/Shartube/util/deleteUtil"
 	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
@@ -74,7 +75,6 @@ func (r *mutationResolver) CreateComicChap(ctx context.Context, input model.Crea
 	if err != nil {
 		return nil, err
 	}
-
 	comicSessionModel.UpdateOne(bson.M{
 		"_id": ComicSessionObjectId,
 	}, bson.M{
@@ -148,7 +148,7 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 		})
 	}
 
-	if _, err := comicChapModel.FindOneAndDelete(bson.M{
+	if _, err := comicChapModel.FindOneAndUpdate(bson.M{
 		"_id": comicChapDoc.ID,
 	}, bson.M{
 		"Images": AllImages,
@@ -182,6 +182,35 @@ func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, i
 	return comicChapModel.FindOneAndUpdate(bson.M{
 		"_id": comicChap.ID,
 	}, input)
+}
+
+// DeleteComicChap is the resolver for the DeleteComicChap field.
+func (r *mutationResolver) DeleteComicChap(ctx context.Context, chapID string) (*model.DeleteResult, error) {
+	comicChapModel, err := comic_chap_model.InitComicChapModel()
+	if err != nil {
+		return nil, err
+	}
+	comicChap, err := comicChapModel.FindById(chapID)
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
+	if err != nil {
+		return nil, err
+	}
+	if comicChap == nil {
+		return nil, &gqlerror.Error{
+			Message: "comic chap not found",
+		}
+	}
+	if userID != comicChap.CreatedByID {
+		return nil, gqlerror.Errorf("Access Denied")
+	}
+	success, err := deleteUtil.DeleteChap(comicChap.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &model.DeleteResult{
+		Success: success,
+		ID:      comicChap.ID,
+	}, nil
 }
 
 // ChapBySession is the resolver for the ChapBySession field.
