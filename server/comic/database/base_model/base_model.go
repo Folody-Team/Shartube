@@ -148,7 +148,7 @@ func (b *BaseModel[dt, rdt]) FindOneAndUpdate(filter interface{}, value any, opt
 	}
 	return &result, nil
 }
-func (b *BaseModel[dt, rdt]) FindOneAndDelete(filter interface{}, value any, opts ...*options.FindOneAndDeleteOptions) (*rdt, error) {
+func (b *BaseModel[dt, rdt]) FindOneAndDelete(filter interface{}, opts ...*options.FindOneAndDeleteOptions) (*rdt, error) {
 	b.ClearDB()
 	dbName := os.Getenv("DB_NAME")
 	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
