@@ -1,0 +1,8 @@
+FROM denoland/deno:alpine
+EXPOSE 8080
+WORKDIR /app
+COPY . .
+RUN deno cache ./src/index.ts
+ENV DB_NAME=users
+RUN mkdir -p /var/tmp/log
+CMD ["deno","run", "-A","--unstable", "./src/index.ts"]
