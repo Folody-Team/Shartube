@@ -28,7 +28,6 @@ services:
       - DB_PASSWORD=root
       - WS_HOST=shartube-ws-server
       - WS_PORT=3012
-      - UserHost=http://shartube-user-server:8080
     env_file:
       - ./comic/.env
     restart: always

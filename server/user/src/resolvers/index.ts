@@ -103,6 +103,7 @@ interface IResolvers {
 		_service: (root: any) => {
 			sdl: string
 		}
+		_entities: (root: any, args: any) => Promise<any[]>
 	}
 	Mutation: {
 		Login: (
@@ -136,6 +137,18 @@ export const resolvers: IResolvers = {
 		_service: () => {
 			const stringResult = TypeDefsString
 			return { sdl: stringResult }
+		},
+		_entities: async (root: any, args: any) => {
+			const returnValue = []
+			for (const data of args.representations) {
+				const TypeObj = root[data.__typename as string]
+				const result = await TypeObj.__resolveReference(data)
+				returnValue.push({
+					...data,
+					...result,
+				})
+			}
+			return returnValue
 		},
 	},
 	Mutation: {
@@ -198,7 +211,6 @@ export const resolvers: IResolvers = {
 	},
 	User: {
 		__resolveReference: async (reference) => {
-			console.log(reference)
 			const db = client.database(DB_NAME)
 			const users = db.collection<User>('users')
 			const user = await users.findOne({
