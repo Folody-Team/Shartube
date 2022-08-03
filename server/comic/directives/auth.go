@@ -3,7 +3,6 @@ package directives
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -43,7 +42,7 @@ type ReturnData struct {
 	Header  *interface{}  `json:"header"`
 	Payload PayloadReturn `json:"payload"`
 	Type    string        `json:"type"`
-	Error   *string        `json:"error"`
+	Error   *string       `json:"error"`
 }
 
 func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{}, error) {
@@ -100,7 +99,6 @@ func Auth(ctx context.Context, _ interface{}, next graphql.Resolver) (interface{
 		}
 		if data.Type == "rep" {
 			if data.Payload.ID == requestId {
-				log.Println("Auth:", data.Payload.SessionData)
 				if data.Error != nil {
 					return nil, &gqlerror.Error{
 						Message: "Access Denied",

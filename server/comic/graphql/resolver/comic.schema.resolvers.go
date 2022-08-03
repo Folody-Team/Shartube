@@ -7,6 +7,8 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"net/url"
+	"os"
 
 	"github.com/Folody-Team/Shartube/database/comic_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
@@ -19,9 +21,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+type WsRequest struct {
+	Url     string       `json:"url"`
+	Header  *interface{} `json:"header"`
+	Payload any          `json:"payload"`
+	From    string       `json:"from"`
+	Type    string       `json:"message"`
+}
+
 // CreatedBy is the resolver for the CreatedBy field.
 func (r *comicResolver) CreatedBy(ctx context.Context, obj *model.Comic) (*model.User, error) {
-	log.Println(obj.CreatedByID)
+
 	return util.GetUserByID(obj.CreatedByID)
 }
 
@@ -75,8 +85,12 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateCo
 	// 	},
 	// })
 	// get data from comic model
-	comic, err := comicModel.FindById(comicID.Hex())
-	socket := gowebsocket.New("ws://localhost:8080/")
+	u := url.URL{
+		Scheme: "ws",
+		Host:   os.Getenv("WS_HOST") + ":" + os.Getenv("WS_PORT"),
+		Path:   "/",
+	}
+	socket := gowebsocket.New(u.String())
 
 	socket.OnConnected = func(socket gowebsocket.Socket) {
 		log.Println("Connected to server")
@@ -92,10 +106,17 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateCo
 		return nil, err
 	}
 
-	comicObjectData := bson.M{
-		"_id":  comicID.Hex(),
-		"data": comic,
+	comicObjectData := WsRequest{
+		Url:    "user/updateUserComic",
+		Header: nil,
+		Payload: bson.M{
+			"_id":    comicID.Hex(),
+			"UserID": userID,
+		},
+		From: "comic/createComic",
+		Type: "message",
 	}
+
 	comicObject, err := json.Marshal(comicObjectData)
 	if err != nil {
 		return nil, err

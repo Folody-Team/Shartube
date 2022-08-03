@@ -5,6 +5,9 @@ package resolver
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
+	"os"
 
 	"github.com/Folody-Team/Shartube/database/comic_model"
 	"github.com/Folody-Team/Shartube/graphql/generated"
@@ -13,12 +16,26 @@ import (
 
 // Comics is the resolver for the comics field.
 func (r *userResolver) Comics(ctx context.Context, obj *model.User) ([]*model.Comic, error) {
+	userHost := os.Getenv("UserHost")
+	// make http request to userHost
+	getUserPath := "/user/comics?id="
+	getUserUrl := "http://" + userHost + ":8080" + getUserPath + obj.ID
+	resp, err := http.Get(getUserUrl)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var comicIDs []*string
+	err = json.NewDecoder(resp.Body).Decode(&comicIDs)
+	if err != nil {
+		return nil, err
+	}
 	comicModel, err := comic_model.InitComicModel()
 	if err != nil {
 		return nil, err
 	}
 	AllComic := []*model.Comic{}
-	for _, v := range obj.ComicIDs {
+	for _, v := range comicIDs {
 		if v != nil {
 			data, err := comicModel.FindById(*v)
 			if err != nil {

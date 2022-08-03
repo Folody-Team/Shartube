@@ -27,7 +27,7 @@ app.use(async (ctx, next) => {
 
 // endpoint for get user info by id
 app.use(async (ctx, next) => {
-	if (ctx.request.url.pathname == '/user/GetUserById') {
+	if (ctx.request.url.pathname == '/user/comics') {
 		const id = ctx.request.url.searchParams.get('id')
 		if (!id) {
 			ctx.response.status = 400
@@ -39,7 +39,7 @@ app.use(async (ctx, next) => {
 		const user = await users.findOne({
 			_id: new ObjectId(id),
 		})
-		ctx.response.body = user
+		ctx.response.body = user?.comicIDs
 	}
 	await next()
 })

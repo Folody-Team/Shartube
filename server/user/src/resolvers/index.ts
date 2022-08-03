@@ -84,6 +84,47 @@ ws.onmessage = async (message: MessageEvent<any>) => {
 
 		ws.send(JSON.stringify(result))
 	}
+	if (data.url == 'user/updateUserComic') {
+		let result
+		try {
+			const db = client.database(DB_NAME)
+			const users = db.collection<User>('users')
+			await users.updateOne(
+				{
+					_id: new ObjectId(data.payload.UserID),
+				},
+				{
+					$push: {
+						comicIDs: new ObjectId(data.payload._id),
+					},
+				}
+			)
+			result = {
+				url: data.from,
+				header: null,
+				payload: {
+					user: await users.findOne({
+						_id: new ObjectId(data.payload.UserID),
+					}),
+					id: data.payload.id,
+				},
+				type: 'rep',
+				error: null,
+			}
+		} catch (error) {
+			result = {
+				url: data.from,
+				header: null,
+				payload: {
+					user: null,
+					id: data.payload.id,
+				},
+				type: 'rep',
+				error: error.message,
+			}
+		}
+		ws.send(JSON.stringify(result))
+	}
 }
 
 export interface User {
@@ -93,6 +134,7 @@ export interface User {
 	password: string
 	createdAt: Date
 	updatedAt: Date
+	comicIDs: ObjectId[]
 }
 interface UserLoginOrRegisterResponse {
 	user: User
@@ -195,6 +237,7 @@ export const resolvers: IResolvers = {
 				password: await bcrypt.hash(args.input.password),
 				createdAt: new Date(),
 				updatedAt: new Date(),
+				comicIDs: [],
 			})
 			const returnValue = await users.findOne({
 				_id: insertId,
