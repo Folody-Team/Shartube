@@ -18,7 +18,7 @@ export async function emailChecker(email: string) {
 		let status: boolean
 		const req = await fetch(url)
 		const res = await req.json()
-		if (res.status === 'value') {
+		if (res.status === 'valid') {
 			status = true
 		} else {
 			status = false
