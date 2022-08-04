@@ -26,7 +26,7 @@ func (r *comicSessionResolver) CreatedBy(ctx context.Context, obj *model.ComicSe
 
 // Comic is the resolver for the Comic field.
 func (r *comicSessionResolver) Comic(ctx context.Context, obj *model.ComicSession) (*model.Comic, error) {
-	comicModel, err := comic_model.InitComicModel()
+	comicModel, err := comic_model.InitComicModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (r *comicSessionResolver) Comic(ctx context.Context, obj *model.ComicSessio
 
 // Chaps is the resolver for the Chaps field.
 func (r *comicSessionResolver) Chaps(ctx context.Context, obj *model.ComicSession) ([]*model.ComicChap, error) {
-	comicChapModel, err := comic_chap_model.InitComicChapModel()
+	comicChapModel, err := comic_chap_model.InitComicChapModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -52,11 +52,11 @@ func (r *comicSessionResolver) Chaps(ctx context.Context, obj *model.ComicSessio
 
 // CreateComicSession is the resolver for the CreateComicSession field.
 func (r *mutationResolver) CreateComicSession(ctx context.Context, input model.CreateComicSessionInput) (*model.ComicSession, error) {
-	comicSessionModel, err := comic_session_model.InitComicSessionModel()
+	comicSessionModel, err := comic_session_model.InitComicSessionModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
-	comicModel, err := comic_model.InitComicModel()
+	comicModel, err := comic_model.InitComicModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (r *mutationResolver) CreateComicSession(ctx context.Context, input model.C
 
 // UpdateComicSession is the resolver for the updateComicSession field.
 func (r *mutationResolver) UpdateComicSession(ctx context.Context, sessionID string, input *model.UpdateComicSessionInput) (*model.ComicSession, error) {
-	comicSessionModel, err := comic_session_model.InitComicSessionModel()
+	comicSessionModel, err := comic_session_model.InitComicSessionModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (r *mutationResolver) UpdateComicSession(ctx context.Context, sessionID str
 
 // DeleteComicSession is the resolver for the DeleteComicSession field.
 func (r *mutationResolver) DeleteComicSession(ctx context.Context, sessionID string) (*model.DeleteResult, error) {
-	ComicSessionModel, err := comic_session_model.InitComicSessionModel()
+	ComicSessionModel, err := comic_session_model.InitComicSessionModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (r *mutationResolver) DeleteComicSession(ctx context.Context, sessionID str
 	if userID != comicSession.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	success, err := deleteUtil.DeleteSession(comicSession.ID)
+	success, err := deleteUtil.DeleteSession(sessionID, r.Client,true)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +155,7 @@ func (r *mutationResolver) DeleteComicSession(ctx context.Context, sessionID str
 
 // SessionByComic is the resolver for the SessionByComic field.
 func (r *queryResolver) SessionByComic(ctx context.Context, comicID string) ([]*model.ComicSession, error) {
-	comicSessionModel, err := comic_session_model.InitComicSessionModel()
+	comicSessionModel, err := comic_session_model.InitComicSessionModel(r.Client)
 	if err != nil {
 		return nil, err
 	}

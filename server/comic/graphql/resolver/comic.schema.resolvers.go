@@ -29,7 +29,7 @@ func (r *comicResolver) CreatedBy(ctx context.Context, obj *model.Comic) (*model
 
 // Session is the resolver for the session field.
 func (r *comicResolver) Session(ctx context.Context, obj *model.Comic) ([]*model.ComicSession, error) {
-	comicSessionModel, err := comic_session_model.InitComicSessionModel()
+	comicSessionModel, err := comic_session_model.InitComicSessionModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (r *comicResolver) Session(ctx context.Context, obj *model.Comic) ([]*model
 
 // CreateComic is the resolver for the createComic field.
 func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateComicInput) (*model.Comic, error) {
-	comicModel, err := comic_model.InitComicModel()
+	comicModel, err := comic_model.InitComicModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateCo
 
 // UpdateComic is the resolver for the updateComic field.
 func (r *mutationResolver) UpdateComic(ctx context.Context, comicID string, input model.UpdateComicInput) (*model.Comic, error) {
-	comicModel, err := comic_model.InitComicModel()
+	comicModel, err := comic_model.InitComicModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -150,14 +150,12 @@ func (r *mutationResolver) UpdateComic(ctx context.Context, comicID string, inpu
 
 // DeleteComic is the resolver for the DeleteComic field.
 func (r *mutationResolver) DeleteComic(ctx context.Context, comicID string) (*model.DeleteResult, error) {
-	ComicModel, err := comic_model.InitComicModel()
+	ComicModel, err := comic_model.InitComicModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
 	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
-	ComicData, err := ComicModel.FindOne(bson.M{
-		"_id": comicID,
-	})
+	ComicData, err := ComicModel.FindById(comicID)
 	if err != nil {
 		return nil, err
 	}
@@ -171,10 +169,51 @@ func (r *mutationResolver) DeleteComic(ctx context.Context, comicID string) (*mo
 			Message: "Access Denied",
 		}
 	}
-	success, err := deleteUtil.DeleteComic(comicID)
+	success, err := deleteUtil.DeleteComic(comicID, r.Client)
 	if err != nil {
 		return nil, err
 	}
+	u := url.URL{
+		Scheme: "ws",
+		Host:   os.Getenv("WS_HOST") + ":" + os.Getenv("WS_PORT"),
+		Path:   "/",
+	}
+	socket := gowebsocket.New(u.String())
+
+	socket.OnConnected = func(socket gowebsocket.Socket) {
+		log.Println("Connected to server")
+	}
+
+	socket.OnTextMessage = func(message string, socket gowebsocket.Socket) {
+		log.Println("Got messages " + message)
+	}
+
+	socket.Connect()
+
+	if err != nil {
+		return nil, err
+	}
+
+	comicObjectData := WsRequest{
+		Url:    "user/DeleteComic",
+		Header: nil,
+		Payload: bson.M{
+			"_id":    comicID,
+			"UserID": userID,
+		},
+		From: "comic/createComic",
+		Type: "message",
+	}
+
+	comicObject, err := json.Marshal(comicObjectData)
+	if err != nil {
+		return nil, err
+	}
+	comicObjectString := string(comicObject)
+	socket.SendText(comicObjectString)
+
+	socket.Close()
+
 	// send to user service to pull comic
 	return &model.DeleteResult{
 		Success: success,
@@ -184,7 +223,7 @@ func (r *mutationResolver) DeleteComic(ctx context.Context, comicID string) (*mo
 
 // Comics is the resolver for the Comics field.
 func (r *queryResolver) Comics(ctx context.Context) ([]*model.Comic, error) {
-	comicModel, err := comic_model.InitComicModel()
+	comicModel, err := comic_model.InitComicModel(r.Client)
 	if err != nil {
 		return nil, err
 	}

@@ -12,6 +12,7 @@ import (
 	GraphqlLog "github.com/Folody-Team/Shartube/middleware/log"
 	"github.com/Folody-Team/Shartube/middleware/passRequest"
 	"github.com/Folody-Team/Shartube/playground"
+	"github.com/Folody-Team/Shartube/util/getClient"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
@@ -26,6 +27,10 @@ func main() {
 	 */
 	// create a new router with mux
 	router := mux.NewRouter()
+	client, err := getClient.GetClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 	// middleware
 	router.Use(passRequest.PassMiddleware)
 	port := os.Getenv("PORT")
@@ -34,12 +39,14 @@ func main() {
 		port = defaultPort
 	}
 
-	err := godotenv.Load(".env")
+	err = godotenv.Load(".env")
 
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
-	c := generated.Config{Resolvers: &resolver.Resolver{}}
+	c := generated.Config{Resolvers: &resolver.Resolver{
+		Client: client,
+	}}
 	c.Directives.Auth = directives.Auth
 	c.Directives.EmailInput = directives.EmailInput
 
