@@ -1,5 +1,12 @@
-# Shartube
-### Online sharing platform
+<p align="center"><a href="#"><img src="https://cdn.folody.xyz/Group_6.svg" height="120"/></a></p>
+
+<br/>
+<h1 align="center">Shartube</h1>
+<p align="center">Online sharing platform</p>
+
+# What is Shartube
+
+Shartue is a social networking platform that allows users to share stories and videos, and users can interact with each other by messaging and emotional interactions.
 
 ## Environment Variables
 
@@ -115,3 +122,10 @@ For support, [join our Discord server](https://discord.gg/BbKvjwsYwM).
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
+
+## Stargazers
+[![Stargazers](https://reporoster.com/stars/Folody-Team/Shartube)](https://github.com/Folody-Team/Shartube/stargazers)
+
+
+<p align="center"><a href="#"><img src="http://randojs.com/images/backToTopButton.png" alt="Back to top" height="29"/></a></p>
+
