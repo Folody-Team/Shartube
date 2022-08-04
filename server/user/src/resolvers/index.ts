@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import * as bcrypt from 'https://deno.land/x/bcrypt@v0.4.0/mod.ts'
-import { MongoClient, ObjectId } from 'https://deno.land/x/mongo/mod.ts'
+import { ObjectId } from 'https://deno.land/x/mongo/mod.ts'
 import { GQLError } from 'https://deno.land/x/oak_graphql@0.6.4/mod.ts'
 import { emailChecker } from '../function/emailChecker.ts'
 import { GenToken, DecodeToken } from '../util/Token.ts'
@@ -95,6 +95,47 @@ ws.onmessage = async (message: MessageEvent<any>) => {
 				},
 				{
 					$push: {
+						comicIDs: new ObjectId(data.payload._id),
+					},
+				}
+			)
+			result = {
+				url: data.from,
+				header: null,
+				payload: {
+					user: await users.findOne({
+						_id: new ObjectId(data.payload.UserID),
+					}),
+					id: data.payload.id,
+				},
+				type: 'rep',
+				error: null,
+			}
+		} catch (error) {
+			result = {
+				url: data.from,
+				header: null,
+				payload: {
+					user: null,
+					id: data.payload.id,
+				},
+				type: 'rep',
+				error: error.message,
+			}
+		}
+		ws.send(JSON.stringify(result))
+	}
+	if (data.url == 'user/DeleteComic') {
+		let result
+		try {
+			const db = client.database(DB_NAME)
+			const users = db.collection<User>('users')
+			await users.updateOne(
+				{
+					_id: new ObjectId(data.payload.UserID),
+				},
+				{
+					$pull: {
 						comicIDs: new ObjectId(data.payload._id),
 					},
 				}

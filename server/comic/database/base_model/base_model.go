@@ -161,6 +161,25 @@ func (b *BaseModel[dt, rdt]) FindOneAndDelete(filter interface{}, opts ...*optio
 	}
 	return &result, nil
 }
+func (b *BaseModel[dt, rdt]) FindOneAndDeleteById(id string, opts ...*options.FindOneAndDeleteOptions) (*rdt, error) {
+	b.ClearDB()
+	ObjectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	dbName := os.Getenv("DB_NAME")
+	ctx, cancel := context.WithTimeout(context.Background(), BaseCURDTimeOut*time.Second)
+	defer cancel()
+	collection := b.Client.Database(dbName).Collection(b.CollectionName)
+	var result rdt
+	err = collection.FindOneAndDelete(ctx, bson.M{
+		"_id": ObjectId,
+	}).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
 func (b *BaseModel[dt, rdt]) DeleteMany(input interface{}) (*mongo.DeleteResult, error) {
 	b.ClearDB()
 	dbName := os.Getenv("DB_NAME")

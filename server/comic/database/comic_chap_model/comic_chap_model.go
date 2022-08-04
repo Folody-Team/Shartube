@@ -1,20 +1,13 @@
 package comic_chap_model
 
-
 import (
-	"log"
-
 	"github.com/Folody-Team/Shartube/database/base_model"
 	"github.com/Folody-Team/Shartube/graphql/model"
-	"github.com/Folody-Team/Shartube/util/getClient"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func InitComicChapModel() (*base_model.BaseModel[model.CreateComicChapInputModel, model.ComicChap], error) {
-	client, err := getClient.GetClient()
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
+func InitComicChapModel(client *mongo.Client) (*base_model.BaseModel[model.CreateComicChapInputModel, model.ComicChap], error) {
+
 	var UserModel = base_model.BaseModel[model.CreateComicChapInputModel, model.ComicChap]{
 		BaseModelInitValue: &base_model.BaseModelInitValue{
 			Client:         client,

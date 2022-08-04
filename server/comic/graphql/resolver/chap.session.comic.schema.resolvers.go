@@ -29,7 +29,7 @@ func (r *comicChapResolver) CreatedBy(ctx context.Context, obj *model.ComicChap)
 
 // Session is the resolver for the Session field.
 func (r *comicChapResolver) Session(ctx context.Context, obj *model.ComicChap) (*model.ComicSession, error) {
-	comicSessionModel, err := comic_session_model.InitComicSessionModel()
+	comicSessionModel, err := comic_session_model.InitComicSessionModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (r *comicChapResolver) Session(ctx context.Context, obj *model.ComicChap) (
 
 // CreateComicChap is the resolver for the CreateComicChap field.
 func (r *mutationResolver) CreateComicChap(ctx context.Context, input model.CreateComicChapInput) (*model.ComicChap, error) {
-	comicSessionModel, err := comic_session_model.InitComicSessionModel()
+	comicSessionModel, err := comic_session_model.InitComicSessionModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (r *mutationResolver) CreateComicChap(ctx context.Context, input model.Crea
 	if userID != comicSessionDoc.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	comicChapModel, err := comic_chap_model.InitComicChapModel()
+	comicChapModel, err := comic_chap_model.InitComicChapModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (r *mutationResolver) CreateComicChap(ctx context.Context, input model.Crea
 
 // AddImageToChap is the resolver for the AddImageToChap field.
 func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.UploadFile, chapID string) (*model.ComicChap, error) {
-	comicChapModel, err := comic_chap_model.InitComicChapModel()
+	comicChapModel, err := comic_chap_model.InitComicChapModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 
 // UpdateComicChap is the resolver for the updateComicChap field.
 func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, input model.UpdateComicChapInput) (*model.ComicChap, error) {
-	comicChapModel, err := comic_chap_model.InitComicChapModel()
+	comicChapModel, err := comic_chap_model.InitComicChapModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, i
 
 // DeleteComicChap is the resolver for the DeleteComicChap field.
 func (r *mutationResolver) DeleteComicChap(ctx context.Context, chapID string) (*model.DeleteResult, error) {
-	comicChapModel, err := comic_chap_model.InitComicChapModel()
+	comicChapModel, err := comic_chap_model.InitComicChapModel(r.Client)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +203,7 @@ func (r *mutationResolver) DeleteComicChap(ctx context.Context, chapID string) (
 	if userID != comicChap.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	success, err := deleteUtil.DeleteChap(comicChap.ID)
+	success, err := deleteUtil.DeleteChap(comicChap.ID, r.Client,true)
 	if err != nil {
 		return nil, err
 	}
@@ -215,7 +215,7 @@ func (r *mutationResolver) DeleteComicChap(ctx context.Context, chapID string) (
 
 // ChapBySession is the resolver for the ChapBySession field.
 func (r *queryResolver) ChapBySession(ctx context.Context, sessionID string) ([]*model.ComicChap, error) {
-	comicChapModel, err := comic_chap_model.InitComicChapModel()
+	comicChapModel, err := comic_chap_model.InitComicChapModel(r.Client)
 	if err != nil {
 		return nil, err
 	}

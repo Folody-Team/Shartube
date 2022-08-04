@@ -30,7 +30,7 @@ func (r *userResolver) Comics(ctx context.Context, obj *model.User) ([]*model.Co
 	if err != nil {
 		return nil, err
 	}
-	comicModel, err := comic_model.InitComicModel()
+	comicModel, err := comic_model.InitComicModel(r.Client)
 	if err != nil {
 		return nil, err
 	}

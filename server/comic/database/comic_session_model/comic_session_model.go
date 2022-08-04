@@ -1,20 +1,13 @@
 package comic_session_model
 
-
 import (
-	"log"
-
 	"github.com/Folody-Team/Shartube/database/base_model"
 	"github.com/Folody-Team/Shartube/graphql/model"
-	"github.com/Folody-Team/Shartube/util/getClient"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func InitComicSessionModel() (*base_model.BaseModel[model.CreateComicSessionInputModel, model.ComicSession], error) {
-	client, err := getClient.GetClient()
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
+func InitComicSessionModel(client *mongo.Client) (*base_model.BaseModel[model.CreateComicSessionInputModel, model.ComicSession], error) {
+
 	var UserModel = base_model.BaseModel[model.CreateComicSessionInputModel, model.ComicSession]{
 		BaseModelInitValue: &base_model.BaseModelInitValue{
 			Client:         client,

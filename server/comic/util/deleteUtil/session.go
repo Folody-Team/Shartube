@@ -1,50 +1,64 @@
 package deleteUtil
 
 import (
-	"github.com/Folody-Team/Shartube/database/comic_chap_model"
 	"github.com/Folody-Team/Shartube/database/comic_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func DeleteSession(id string) (bool, error) {
-	ComicSessionModel, err := comic_session_model.InitComicSessionModel()
+func DeleteSession(id string, client *mongo.Client, update bool) (bool, error) {
+	ComicSessionModel, err := comic_session_model.InitComicSessionModel(client)
 	if err != nil {
 		return false, err
 	}
-	ComicChapModel, err := comic_chap_model.InitComicChapModel()
+	ComicModel, err := comic_model.InitComicModel(client)
 	if err != nil {
 		return false, err
 	}
-	ComicModel, err := comic_model.InitComicModel()
+	comicSession, err := ComicSessionModel.FindById(id)
+	if err != nil {
+		return false, err
+	}
+	if comicSession == nil {
+		return false, nil
+	}
+	ComicSessionObjectId, err := primitive.ObjectIDFromHex(comicSession.ID)
 	if err != nil {
 		return false, err
 	}
 
-	comicSession, err := ComicSessionModel.FindOneAndDelete(bson.M{
-		"_id": id,
+	_, err = ComicSessionModel.DeleteOne(bson.M{
+		"_id": ComicSessionObjectId,
 	})
 	if err != nil {
 		return false, err
 	}
-
 	for _, v := range comicSession.ChapIds {
-		_, err = ComicChapModel.FindOneAndDelete(bson.M{
-			"_id": v,
-		})
+		_, err = DeleteChap(v, client, false)
 		if err != nil {
 			return false, err
 		}
+
 	}
-	_, err = ComicModel.FindOneAndUpdate(bson.M{
-		"_id": comicSession.ComicID,
-	}, bson.M{
-		"$pull": bson.M{
-			"sessionId": comicSession.ID,
-		},
-	})
-	if err != nil {
-		return false, nil
+
+	if update {
+		ComicObjectId, err := primitive.ObjectIDFromHex(comicSession.ComicID)
+		if err != nil {
+			return false, err
+		}
+
+		_, err = ComicModel.UpdateOne(bson.M{
+			"_id": ComicObjectId,
+		}, bson.M{
+			"$pull": bson.M{
+				"sessionId": ComicSessionObjectId,
+			},
+		})
+		if err != nil {
+			return false, nil
+		}
 	}
 
 	return true, nil
