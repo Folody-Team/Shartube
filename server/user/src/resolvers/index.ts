@@ -273,6 +273,21 @@ export const resolvers: IResolvers = {
 			// }
 			const db = client.database(DB_NAME)
 			const users = db.collection<User>('users')
+
+			const user =
+                (await users.findOne({
+                    email: args.input.email,
+                })) ||
+                (await users.findOne({
+                    username: args.input.username,
+                }))
+			
+            if (user) {
+                throw new GQLError({
+                    type: 'username is already taken',
+                })
+            }
+
 			const insertId = await users.insertOne({
 				...args.input,
 				password: await bcrypt.hash(args.input.password),
