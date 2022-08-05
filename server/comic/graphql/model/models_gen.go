@@ -108,6 +108,11 @@ type CreateComicSessionInputModel struct {
 
 func (CreateComicSessionInputModel) IsCreateComicSession() {}
 
+type DeleteResult struct {
+	Success bool   `json:"success"`
+	ID      string `json:"id"`
+}
+
 type ImageResult struct {
 	ID  string `json:"ID"`
 	URL string `json:"Url"`

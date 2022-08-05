@@ -33,11 +33,19 @@ input UpdateComicInput {
   description: String
 }
 
+type DeleteResult {
+  success: Boolean!
+  id: String!
+}
+
 extend type Mutation {
   createComic(input: CreateComicInput!): Comic!
     @goField(forceResolver: true)
     @auth
   updateComic(comicID: String!, input: UpdateComicInput!): Comic!
+    @goField(forceResolver: true)
+    @auth
+  DeleteComic(comicID: String!): DeleteResult!
     @goField(forceResolver: true)
     @auth
 }

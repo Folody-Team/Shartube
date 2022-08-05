@@ -44,6 +44,9 @@ extend type Mutation {
     sessionID: String!
     input: UpdateComicSessionInput
   ): ComicSession! @goField(forceResolver: true) @auth
+  DeleteComicSession(sessionID: String!): DeleteResult!
+    @goField(forceResolver: true)
+    @auth
 }
 
 extend type Query {
