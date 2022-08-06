@@ -13,50 +13,6 @@ services:
       - shartube-ws-server
     restart: always
 
-  shartube-comic-server:
-    container_name: shartube-comic-server
-    networks:
-      - shartube-net
-    depends_on:
-      - shartube-db
-      - shartube-user-server
-    build: ./comic
-    environment:
-      - DB_HOST=shartube-db
-      - DB_PORT=27017
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
-      - WS_HOST=shartube-ws-server
-      - WS_PORT=3012
-      - UserHost=shartube-user-server
-    env_file:
-      - ./comic/.env
-    restart: always
-    expose:
-      - 8080
-      
-
-  shartube-user-server:
-    container_name: shartube-user-server
-    networks:
-      - shartube-net
-    depends_on:
-      - shartube-db
-    build: ./user
-    environment:
-      - DB_HOST=shartube-db
-      - DB_PORT=27017
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
-      - WS_HOST=shartube-ws-server
-      - WS_PORT=3012
-    env_file:
-      - ./user/.env
-    restart: always
-    expose:
-      - 8080
-
-
   shartube-graphql-gateway:
     container_name: shartube-graphql-gateway
     networks:
@@ -84,6 +40,48 @@ services:
       - 3012
     environment:
       - HOST=shartube-ws-server
+
+  shartube-comic-server:
+    container_name: shartube-comic-server
+    networks:
+      - shartube-net
+    depends_on:
+      - shartube-db
+      - shartube-user-server
+    build: ./comic
+    environment:
+      - DB_HOST=shartube-db
+      - DB_PORT=27017
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - WS_HOST=shartube-ws-server
+      - WS_PORT=3012
+      - UserHost=shartube-user-server
+    env_file:
+      - ./comic/.env
+    restart: always
+    expose:
+      - 8080
+
+  shartube-user-server:
+    container_name: shartube-user-server
+    networks:
+      - shartube-net
+    depends_on:
+      - shartube-db
+    build: ./user
+    environment:
+      - DB_HOST=shartube-db
+      - DB_PORT=27017
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - WS_HOST=shartube-ws-server
+      - WS_PORT=3012
+    env_file:
+      - ./user/.env
+    restart: always
+    expose:
+      - 8080
 
 networks:
   shartube-net:
