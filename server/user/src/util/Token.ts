@@ -40,10 +40,13 @@ export async function GenToken(
 			},
 		],
 	})
+	await session.deleteMany({
+		userID: new ObjectId(userID),
+	})
 	const sessionID = await session.insertOne({
 		createdAt: new Date(expTime),
 		updatedAt: new Date(),
-		userID: userID,
+		userID: new ObjectId(userID),
 	})
 	const exp = getNumericDate(expTime)
 	const jwt = await create(
