@@ -1,0 +1,55 @@
+interface CreateComicSession {
+  name: String!
+  description: String
+  comicID: String!
+}
+
+input CreateComicSessionInput {
+  name: String!
+  description: String
+  comicID: String!
+}
+
+type CreateComicSessionInputModel implements CreateComicSession {
+  name: String!
+  description: String
+  CreatedByID: String!
+  comicID: String!
+}
+
+type ComicSession implements CreateComic {
+  _id: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  CreatedBy: User @goField(forceResolver: true)
+  CreatedByID: String!
+  name: String!
+  description: String
+  ComicId: String!
+  Comic: Comic! @goField(forceResolver: true)
+  Chaps: [ComicChap!] @goField(forceResolver: true)
+  ChapIds: [String!]
+}
+
+input UpdateComicSessionInput {
+  name: String
+  description: String
+}
+
+extend type Mutation {
+  CreateComicSession(input: CreateComicSessionInput!): ComicSession!
+    @goField(forceResolver: true)
+    @auth
+  updateComicSession(
+    sessionID: String!
+    input: UpdateComicSessionInput
+  ): ComicSession! @goField(forceResolver: true) @auth
+  DeleteComicSession(sessionID: String!): DeleteResult!
+    @goField(forceResolver: true)
+    @auth
+}
+
+extend type Query {
+  SessionByComic(comicID: String!): [ComicSession!]
+    @goField(forceResolver: true)
+}
