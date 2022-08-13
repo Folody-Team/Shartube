@@ -1,16 +1,12 @@
-FROM node:gallium-slim as ts-compiler
+FROM node:slim as ts-compiler
 WORKDIR /home/app
-
-COPY package.json .
-
-RUN yarn install
 
 COPY . .
 
+RUN yarn install
 RUN yarn run build
 
-
-FROM node:gallium-slim as ts-remover
+FROM node:slim as ts-remover
 WORKDIR /home/app
 
 COPY --from=ts-compiler /home/app/package.json ./
@@ -18,9 +14,9 @@ COPY --from=ts-compiler /home/app/dist ./
 
 RUN yarn install --production
 
-FROM node:gallium-slim
+FROM node:slim
 WORKDIR /home/app
 COPY --from=ts-remover /home/app ./
-ENV PORT=2100
-EXPOSE 2100
+ENV PORT=3000
+EXPOSE 3000
 CMD ["node","index.js"]
