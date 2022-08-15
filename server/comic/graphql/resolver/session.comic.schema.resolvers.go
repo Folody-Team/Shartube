@@ -147,7 +147,7 @@ func (r *mutationResolver) DeleteComicSession(ctx context.Context, sessionID str
 	if userID != comicSession.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	success, err := deleteUtil.DeleteSession(sessionID, r.Client,true)
+	success, err := deleteUtil.DeleteSession(sessionID, r.Client, true)
 	if err != nil {
 		return nil, err
 	}

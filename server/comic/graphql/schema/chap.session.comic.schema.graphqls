@@ -48,6 +48,9 @@ extend type Mutation {
   DeleteComicChap(chapID: String!): DeleteResult!
     @goField(forceResolver: true)
     @auth
+  DeleteChapImage(chapID: String!, imageID: [String!]!): ComicChap!
+    @goField(forceResolver: true)
+    @auth
 }
 
 input UploadFile {
