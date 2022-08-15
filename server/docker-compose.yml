@@ -12,6 +12,8 @@ services:
     depends_on:
       - shartube-ws-server
     restart: always
+    volumes:
+      - mongoDB:/data/db
 
   shartube-graphql-gateway:
     container_name: shartube-graphql-gateway
@@ -101,3 +103,6 @@ services:
 
 networks:
   shartube-net:
+
+volumes:
+  mongoDB:

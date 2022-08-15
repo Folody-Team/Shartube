@@ -1,20 +1,9 @@
 import express from "express";
-import multer from "multer";
 import { Client, GatewayIntentBits } from "discord.js";
 import path from "path";
 import fs from "fs";
 const app = express();
-const upload = multer({
-  fileFilter(_req, file, callback) {
-    const isValid = [
-      "image/bmp",
-      "image/gif",
-      "image/jpeg",
-      "image/png",
-    ].includes(file.mimetype);
-    callback(null, isValid);
-  },
-});
+
 const allIntent = [
   GatewayIntentBits.Guilds,
   GatewayIntentBits.GuildMembers,
@@ -38,8 +27,15 @@ const client = new Client({
   intents: allIntent,
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+function uuidV4() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 client.on("ready", async () => {
   if (!process.env.CHANNEL_ID) {
@@ -55,15 +51,22 @@ client.on("ready", async () => {
     fs.mkdirSync(tmpFolder);
   }
 
-  app.post("/upload", upload.single("file"), async (req, res) => {
-    const file = req.file;
-    if (!file) {
+  app.post("/upload", async (req, res) => {
+    const { fileBase64, extension } = req.body;
+    const allowedExtensions = ["png", "jpg", "jpeg", "gif", "bmp"];
+    if (!allowedExtensions.includes(extension)) {
+      res.status(400).send("Invalid extension");
+      return;
+    }
+    const fileName = uuidV4() + "." + extension;
+    if (!fileBase64) {
       res.status(400).send("No file");
       return;
     }
+    const FileBuffer = Buffer.from(fileBase64, "base64");
     // save file to tmp folder
-    const tmpFile = path.join(tmpFolder, file.originalname);
-    fs.writeFileSync(tmpFile, file.buffer);
+    const tmpFile = path.join(tmpFolder, fileName);
+    fs.writeFileSync(tmpFile, FileBuffer);
     // send file to channel
     const message = await imageChanel.send({
       files: [tmpFile],

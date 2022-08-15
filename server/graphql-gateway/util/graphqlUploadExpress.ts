@@ -166,7 +166,7 @@ function processRequest(
         mimetype: value.mimetype,
         encoding: value.encoding,
         createReadStream: () => {
-          const stream = Readable.from(value[0].buffer);
+          const stream = Readable.from(value.buffer);
 
           returnedStreams.add(stream);
           return stream;

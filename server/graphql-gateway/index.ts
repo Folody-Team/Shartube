@@ -1,36 +1,16 @@
+import { ApolloGateway, IntrospectAndCompose } from "@apollo/gateway";
 import { ApolloServer } from "apollo-server-express";
+import dotenv from "dotenv";
 import express from "express";
 import http from "http";
-import {
-  ApolloGateway,
-  GraphQLDataSourceProcessOptions,
-  IntrospectAndCompose,
-  RemoteGraphQLDataSource,
-} from "@apollo/gateway";
-import dotenv from "dotenv";
-import path from "path";
-import { graphqlUploadExpress } from "./util/graphqlUploadExpress";
 import multer from "multer";
+import path from "path";
+import FileUploadDataSource from "./util/FileUploadDataSource";
+import { graphqlUploadExpress } from "./util/graphqlUploadExpress";
 
 dotenv.config({
   path: path.join(__dirname, "./.env"),
 });
-
-class InspectionDataSource extends RemoteGraphQLDataSource {
-  static extractFileVariables(rootVariables: any) {
-    Object.values(rootVariables || {}).forEach((value) => {
-      if (value instanceof Promise) {
-        // this is a file upload!
-        console.log(value);
-      }
-    });
-  }
-
-  process(args: GraphQLDataSourceProcessOptions<Record<string, any>>) {
-    InspectionDataSource.extractFileVariables(args.request.variables);
-    return super.process(args);
-  }
-}
 
 const port = process.env.PORT;
 const gateway = new ApolloGateway({
@@ -49,7 +29,7 @@ const gateway = new ApolloGateway({
   }),
   buildService(definition) {
     const { url, name } = definition;
-    return new InspectionDataSource({
+    return new FileUploadDataSource({
       url,
       willSendRequest(options) {
         options.request.http?.headers.set(
@@ -73,10 +53,9 @@ async function startServer() {
   });
   await server.start();
   app.use(multer().any());
-  const graphqlPath = "/graphql";
-  app.use(graphqlPath, graphqlUploadExpress());
+  app.use(graphqlUploadExpress());
 
-  server.applyMiddleware({ app, path: graphqlPath });
+  server.applyMiddleware({ app });
 
   HttpServer.listen(port, () => {
     console.log(

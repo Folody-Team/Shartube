@@ -5,6 +5,7 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Folody-Team/Shartube/database/comic_chap_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
@@ -93,9 +94,7 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 	if err != nil {
 		return nil, err
 	}
-	comicChapDoc, err := comicChapModel.FindOne(bson.D{
-		{Key: "_id", Value: chapID},
-	})
+	comicChapDoc, err := comicChapModel.FindById(chapID)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +121,9 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 		}
 		// save file
 		FileId := uuid.New().String()
-		url, err := util.UploadSingleImage(&v.File.File)
+		FileExtension := util.GetFileExtension(v.File.ContentType)
+		url, err := util.UploadSingleImage(v.File.File, FileExtension)
+		fmt.Printf("v.File.Filename: %v\n", v.File.Filename)
 		if err != nil {
 			return nil, err
 		}
@@ -132,11 +133,16 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 			URL: *url,
 		})
 	}
-
+	ComicChapObjectId, err := primitive.ObjectIDFromHex(comicChapDoc.ID)
+	if err != nil {
+		return nil, err
+	}
 	if _, err := comicChapModel.FindOneAndUpdate(bson.M{
-		"_id": comicChapDoc.ID,
+		"_id": ComicChapObjectId,
 	}, bson.M{
-		"Images": AllImages,
+		"$set": bson.M{
+			"Images": AllImages,
+		},
 	}); err != nil {
 		return nil, err
 	}
@@ -164,8 +170,12 @@ func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, i
 	if userID != comicChap.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
+	ComicChapObjectId, err := primitive.ObjectIDFromHex(chapID)
+	if err != nil {
+		return nil, err
+	}
 	return comicChapModel.FindOneAndUpdate(bson.M{
-		"_id": comicChap.ID,
+		"_id": ComicChapObjectId,
 	}, input)
 }
 

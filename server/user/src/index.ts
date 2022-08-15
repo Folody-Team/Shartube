@@ -8,7 +8,7 @@ import { typeDefs } from './typeDefs/index.ts'
 import client, { DB_NAME } from './util/client.ts'
 
 config({
-	path: PathJoin(import.meta.url, '.env'),
+	path: PathJoin(import.meta.url,"..", '.env'),
 })
 
 const app = new Application()
