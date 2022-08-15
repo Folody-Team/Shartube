@@ -20,6 +20,7 @@ import (
 	"github.com/sacOO7/gowebsocket"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CreatedBy is the resolver for the CreatedBy field.
@@ -142,9 +143,12 @@ func (r *mutationResolver) UpdateComic(ctx context.Context, comicID string, inpu
 			Message: "Access Denied",
 		}
 	}
-
+	ComicObjectId, err := primitive.ObjectIDFromHex(comic.ID)
+	if err != nil {
+		return nil, err
+	}
 	return comicModel.FindOneAndUpdate(bson.M{
-		"_id": comic.ID,
+		"_id": ComicObjectId,
 	}, input)
 }
 

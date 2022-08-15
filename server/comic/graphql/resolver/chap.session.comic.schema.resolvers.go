@@ -5,9 +5,7 @@ package resolver
 
 import (
 	"context"
-	"io"
-	"os"
-	"path"
+	"fmt"
 
 	"github.com/Folody-Team/Shartube/database/comic_chap_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
@@ -96,9 +94,7 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 	if err != nil {
 		return nil, err
 	}
-	comicChapDoc, err := comicChapModel.FindOne(bson.D{
-		{Key: "_id", Value: chapID},
-	})
+	comicChapDoc, err := comicChapModel.FindById(chapID)
 	if err != nil {
 		return nil, err
 	}
@@ -119,39 +115,34 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 		if !util.InSlice(allowType, v.File.ContentType) {
 			return nil, gqlerror.Errorf("file type not allow")
 		}
-		// check file size
-		if v.File.Size > 10*1024*1024 {
+		// check file size only allow 7MB
+		if v.File.Size > 7000000 {
 			return nil, gqlerror.Errorf("file size too large")
 		}
 		// save file
 		FileId := uuid.New().String()
-		fileName := FileId + "." + v.File.ContentType[6:]
-		FilePath := path.Join("public/image", fileName)
-		// open file
-		file, err := os.Create(FilePath)
+		FileExtension := util.GetFileExtension(v.File.ContentType)
+		url, err := util.UploadSingleImage(v.File.File, FileExtension)
+		fmt.Printf("v.File.Filename: %v\n", v.File.Filename)
 		if err != nil {
 			return nil, err
 		}
-		// write file
-		_, err = io.Copy(file, v.File.File)
-		if err != nil {
-			return nil, err
-		}
-		// close file
-		err = file.Close()
-		if err != nil {
-			return nil, err
-		}
+
 		AllImages = append(AllImages, &model.ImageResult{
 			ID:  FileId,
-			URL: path.Join("/public/image", fileName),
+			URL: *url,
 		})
 	}
-
+	ComicChapObjectId, err := primitive.ObjectIDFromHex(comicChapDoc.ID)
+	if err != nil {
+		return nil, err
+	}
 	if _, err := comicChapModel.FindOneAndUpdate(bson.M{
-		"_id": comicChapDoc.ID,
+		"_id": ComicChapObjectId,
 	}, bson.M{
-		"Images": AllImages,
+		"$set": bson.M{
+			"Images": AllImages,
+		},
 	}); err != nil {
 		return nil, err
 	}
@@ -179,8 +170,12 @@ func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, i
 	if userID != comicChap.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
+	ComicChapObjectId, err := primitive.ObjectIDFromHex(chapID)
+	if err != nil {
+		return nil, err
+	}
 	return comicChapModel.FindOneAndUpdate(bson.M{
-		"_id": comicChap.ID,
+		"_id": ComicChapObjectId,
 	}, input)
 }
 
@@ -203,7 +198,7 @@ func (r *mutationResolver) DeleteComicChap(ctx context.Context, chapID string) (
 	if userID != comicChap.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	success, err := deleteUtil.DeleteChap(comicChap.ID, r.Client,true)
+	success, err := deleteUtil.DeleteChap(comicChap.ID, r.Client, true)
 	if err != nil {
 		return nil, err
 	}
