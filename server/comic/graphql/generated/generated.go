@@ -133,6 +133,7 @@ type ComplexityRoot struct {
 		CreateComic        func(childComplexity int, input model.CreateComicInput) int
 		CreateComicChap    func(childComplexity int, input model.CreateComicChapInput) int
 		CreateComicSession func(childComplexity int, input model.CreateComicSessionInput) int
+		DeleteChapImage    func(childComplexity int, chapID string, imageID []string) int
 		DeleteComic        func(childComplexity int, comicID string) int
 		DeleteComicChap    func(childComplexity int, chapID string) int
 		DeleteComicSession func(childComplexity int, sessionID string) int
@@ -184,6 +185,7 @@ type MutationResolver interface {
 	AddImageToChap(ctx context.Context, req []*model.UploadFile, chapID string) (*model.ComicChap, error)
 	UpdateComicChap(ctx context.Context, chapID string, input model.UpdateComicChapInput) (*model.ComicChap, error)
 	DeleteComicChap(ctx context.Context, chapID string) (*model.DeleteResult, error)
+	DeleteChapImage(ctx context.Context, chapID string, imageID []string) (*model.ComicChap, error)
 	CreateComic(ctx context.Context, input model.CreateComicInput) (*model.Comic, error)
 	UpdateComic(ctx context.Context, comicID string, input model.UpdateComicInput) (*model.Comic, error)
 	DeleteComic(ctx context.Context, comicID string) (*model.DeleteResult, error)
@@ -590,6 +592,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateComicSession(childComplexity, args["input"].(model.CreateComicSessionInput)), true
 
+	case "Mutation.DeleteChapImage":
+		if e.complexity.Mutation.DeleteChapImage == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_DeleteChapImage_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteChapImage(childComplexity, args["chapID"].(string), args["imageID"].([]string)), true
+
 	case "Mutation.DeleteComic":
 		if e.complexity.Mutation.DeleteComic == nil {
 			break
@@ -865,6 +879,9 @@ extend type Mutation {
   DeleteComicChap(chapID: String!): DeleteResult!
     @goField(forceResolver: true)
     @auth
+  DeleteChapImage(chapID: String!, imageID: [String!]!): ComicChap!
+    @goField(forceResolver: true)
+    @auth
 }
 
 input UploadFile {
@@ -1133,6 +1150,30 @@ func (ec *executionContext) field_Mutation_CreateComicSession_args(ctx context.C
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_DeleteChapImage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["chapID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chapID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["chapID"] = arg0
+	var arg1 []string
+	if tmp, ok := rawArgs["imageID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("imageID"))
+		arg1, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["imageID"] = arg1
 	return args, nil
 }
 
@@ -3856,6 +3897,103 @@ func (ec *executionContext) fieldContext_Mutation_DeleteComicChap(ctx context.Co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_DeleteComicChap_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_DeleteChapImage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_DeleteChapImage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().DeleteChapImage(rctx, fc.Args["chapID"].(string), fc.Args["imageID"].([]string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Auth == nil {
+				return nil, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*model.ComicChap); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *github.com/Folody-Team/Shartube/graphql/model.ComicChap`, tmp)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ComicChap)
+	fc.Result = res
+	return ec.marshalNComicChap2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐComicChap(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_DeleteChapImage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "_id":
+				return ec.fieldContext_ComicChap__id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ComicChap_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ComicChap_updatedAt(ctx, field)
+			case "CreatedBy":
+				return ec.fieldContext_ComicChap_CreatedBy(ctx, field)
+			case "CreatedByID":
+				return ec.fieldContext_ComicChap_CreatedByID(ctx, field)
+			case "name":
+				return ec.fieldContext_ComicChap_name(ctx, field)
+			case "description":
+				return ec.fieldContext_ComicChap_description(ctx, field)
+			case "SessionId":
+				return ec.fieldContext_ComicChap_SessionId(ctx, field)
+			case "Session":
+				return ec.fieldContext_ComicChap_Session(ctx, field)
+			case "Images":
+				return ec.fieldContext_ComicChap_Images(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ComicChap", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_DeleteChapImage_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -7822,6 +7960,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "DeleteChapImage":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_DeleteChapImage(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createComic":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -8657,6 +8804,38 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
