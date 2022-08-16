@@ -41,6 +41,9 @@ app.use(async (ctx, next) => {
 		})
 		ctx.response.body = user?.comicIDs
 	}
+	// get header token
+	const token = ctx.request.headers.get('authorization')
+
 	await next()
 })
 

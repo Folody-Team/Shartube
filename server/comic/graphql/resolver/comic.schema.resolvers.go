@@ -56,27 +56,25 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateCo
 	if err != nil {
 		return nil, err
 	}
+	ThumbnailUrl := ""
+	if input.Thumbnail != nil {
+		ThumbnailUrlPointer, err := util.UploadImageForGraphql(*input.Thumbnail)
+		if err != nil {
+			return nil, err
+		}
+		ThumbnailUrl = *ThumbnailUrlPointer
+	}
 	comicID, err := comicModel.New(&model.CreateComicInputModel{
 		CreatedByID: userID,
 		Name:        input.Name,
 		Description: input.Description,
+		Thumbnail:   &ThumbnailUrl,
 	}).Save()
 
 	if err != nil {
 		return nil, err
 	}
-	// userModel, err := user_model.InitUserModel()
-	// if err != nil {
-	// 	return nil, err
-	// }
 
-	// userModel.UpdateOne(bson.M{
-	// 	"_id": userIDObject,
-	// }, bson.M{
-	// 	"$push": bson.M{
-	// 		"ComicIDs": comicID,
-	// 	},
-	// })
 	// get data from comic model
 	u := url.URL{
 		Scheme: "ws",

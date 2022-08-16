@@ -64,6 +64,7 @@ type ComplexityRoot struct {
 		Name        func(childComplexity int) int
 		Session     func(childComplexity int) int
 		SessionID   func(childComplexity int) int
+		Thumbnail   func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 	}
 
@@ -91,6 +92,7 @@ type ComplexityRoot struct {
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Name        func(childComplexity int) int
+		Thumbnail   func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
 	}
 
@@ -105,6 +107,7 @@ type ComplexityRoot struct {
 		CreatedByID func(childComplexity int) int
 		Description func(childComplexity int) int
 		Name        func(childComplexity int) int
+		Thumbnail   func(childComplexity int) int
 	}
 
 	CreateComicSessionInputModel struct {
@@ -112,6 +115,7 @@ type ComplexityRoot struct {
 		CreatedByID func(childComplexity int) int
 		Description func(childComplexity int) int
 		Name        func(childComplexity int) int
+		Thumbnail   func(childComplexity int) int
 	}
 
 	DeleteResult struct {
@@ -273,6 +277,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comic.SessionID(childComplexity), true
 
+	case "Comic.thumbnail":
+		if e.complexity.Comic.Thumbnail == nil {
+			break
+		}
+
+		return e.complexity.Comic.Thumbnail(childComplexity), true
+
 	case "Comic.updatedAt":
 		if e.complexity.Comic.UpdatedAt == nil {
 			break
@@ -336,7 +347,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ComicChap.Session(childComplexity), true
 
-	case "ComicChap.SessionId":
+	case "ComicChap.SessionID":
 		if e.complexity.ComicChap.SessionID == nil {
 			break
 		}
@@ -371,7 +382,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ComicSession.Comic(childComplexity), true
 
-	case "ComicSession.ComicId":
+	case "ComicSession.comicID":
 		if e.complexity.ComicSession.ComicID == nil {
 			break
 		}
@@ -419,6 +430,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ComicSession.Name(childComplexity), true
+
+	case "ComicSession.thumbnail":
+		if e.complexity.ComicSession.Thumbnail == nil {
+			break
+		}
+
+		return e.complexity.ComicSession.Thumbnail(childComplexity), true
 
 	case "ComicSession.updatedAt":
 		if e.complexity.ComicSession.UpdatedAt == nil {
@@ -476,6 +494,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CreateComicInputModel.Name(childComplexity), true
 
+	case "CreateComicInputModel.thumbnail":
+		if e.complexity.CreateComicInputModel.Thumbnail == nil {
+			break
+		}
+
+		return e.complexity.CreateComicInputModel.Thumbnail(childComplexity), true
+
 	case "CreateComicSessionInputModel.comicID":
 		if e.complexity.CreateComicSessionInputModel.ComicID == nil {
 			break
@@ -503,6 +528,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreateComicSessionInputModel.Name(childComplexity), true
+
+	case "CreateComicSessionInputModel.thumbnail":
+		if e.complexity.CreateComicSessionInputModel.Thumbnail == nil {
+			break
+		}
+
+		return e.complexity.CreateComicSessionInputModel.Thumbnail(childComplexity), true
 
 	case "DeleteResult.id":
 		if e.complexity.DeleteResult.ID == nil {
@@ -849,7 +881,7 @@ type ImageResult {
   ID: String!
   Url: String!
 }
-type ComicChap implements CreateComic {
+type ComicChap implements CreateComicChap {
   _id: ID!
   createdAt: Time!
   updatedAt: Time!
@@ -857,7 +889,7 @@ type ComicChap implements CreateComic {
   CreatedByID: String!
   name: String!
   description: String
-  SessionId: String!
+  SessionID: String!
   Session: ComicSession! @goField(forceResolver: true)
   Images: [ImageResult!]!
 }
@@ -898,17 +930,20 @@ extend type Query {
 interface CreateComic {
   name: String!
   description: String
+  thumbnail: String
 }
 
 input CreateComicInput {
   name: String!
   description: String
+  thumbnail: Upload
 }
 
 type CreateComicInputModel implements CreateComic {
   name: String!
   description: String
   CreatedByID: String!
+  thumbnail: String
 }
 
 type Comic implements CreateComic {
@@ -921,6 +956,7 @@ type Comic implements CreateComic {
   description: String
   sessionId: [String!]
   session: [ComicSession!] @goField(forceResolver: true)
+  thumbnail: String
 }
 
 input UpdateComicInput {
@@ -974,12 +1010,14 @@ directive @emailInput on INPUT_FIELD_DEFINITION
   name: String!
   description: String
   comicID: String!
+  thumbnail: String
 }
 
 input CreateComicSessionInput {
   name: String!
   description: String
   comicID: String!
+  thumbnail: Upload
 }
 
 type CreateComicSessionInputModel implements CreateComicSession {
@@ -987,9 +1025,10 @@ type CreateComicSessionInputModel implements CreateComicSession {
   description: String
   CreatedByID: String!
   comicID: String!
+  thumbnail: String
 }
 
-type ComicSession implements CreateComic {
+type ComicSession implements CreateComicSession {
   _id: ID!
   createdAt: Time!
   updatedAt: Time!
@@ -997,10 +1036,11 @@ type ComicSession implements CreateComic {
   CreatedByID: String!
   name: String!
   description: String
-  ComicId: String!
+  comicID: String!
   Comic: Comic! @goField(forceResolver: true)
   Chaps: [ComicChap!] @goField(forceResolver: true)
   ChapIds: [String!]
+  thumbnail: String
 }
 
 input UpdateComicSessionInput {
@@ -1808,16 +1848,59 @@ func (ec *executionContext) fieldContext_Comic_session(ctx context.Context, fiel
 				return ec.fieldContext_ComicSession_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicSession_description(ctx, field)
-			case "ComicId":
-				return ec.fieldContext_ComicSession_ComicId(ctx, field)
+			case "comicID":
+				return ec.fieldContext_ComicSession_comicID(ctx, field)
 			case "Comic":
 				return ec.fieldContext_ComicSession_Comic(ctx, field)
 			case "Chaps":
 				return ec.fieldContext_ComicSession_Chaps(ctx, field)
 			case "ChapIds":
 				return ec.fieldContext_ComicSession_ChapIds(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_ComicSession_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ComicSession", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Comic_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.Comic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Comic_thumbnail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Thumbnail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Comic_thumbnail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2133,8 +2216,8 @@ func (ec *executionContext) fieldContext_ComicChap_description(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _ComicChap_SessionId(ctx context.Context, field graphql.CollectedField, obj *model.ComicChap) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ComicChap_SessionId(ctx, field)
+func (ec *executionContext) _ComicChap_SessionID(ctx context.Context, field graphql.CollectedField, obj *model.ComicChap) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ComicChap_SessionID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2164,7 +2247,7 @@ func (ec *executionContext) _ComicChap_SessionId(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ComicChap_SessionId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ComicChap_SessionID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ComicChap",
 		Field:      field,
@@ -2230,14 +2313,16 @@ func (ec *executionContext) fieldContext_ComicChap_Session(ctx context.Context, 
 				return ec.fieldContext_ComicSession_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicSession_description(ctx, field)
-			case "ComicId":
-				return ec.fieldContext_ComicSession_ComicId(ctx, field)
+			case "comicID":
+				return ec.fieldContext_ComicSession_comicID(ctx, field)
 			case "Comic":
 				return ec.fieldContext_ComicSession_Comic(ctx, field)
 			case "Chaps":
 				return ec.fieldContext_ComicSession_Chaps(ctx, field)
 			case "ChapIds":
 				return ec.fieldContext_ComicSession_ChapIds(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_ComicSession_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ComicSession", field.Name)
 		},
@@ -2605,8 +2690,8 @@ func (ec *executionContext) fieldContext_ComicSession_description(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _ComicSession_ComicId(ctx context.Context, field graphql.CollectedField, obj *model.ComicSession) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ComicSession_ComicId(ctx, field)
+func (ec *executionContext) _ComicSession_comicID(ctx context.Context, field graphql.CollectedField, obj *model.ComicSession) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ComicSession_comicID(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2636,7 +2721,7 @@ func (ec *executionContext) _ComicSession_ComicId(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ComicSession_ComicId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ComicSession_comicID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ComicSession",
 		Field:      field,
@@ -2706,6 +2791,8 @@ func (ec *executionContext) fieldContext_ComicSession_Comic(ctx context.Context,
 				return ec.fieldContext_Comic_sessionId(ctx, field)
 			case "session":
 				return ec.fieldContext_Comic_session(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Comic_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comic", field.Name)
 		},
@@ -2763,8 +2850,8 @@ func (ec *executionContext) fieldContext_ComicSession_Chaps(ctx context.Context,
 				return ec.fieldContext_ComicChap_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicChap_description(ctx, field)
-			case "SessionId":
-				return ec.fieldContext_ComicChap_SessionId(ctx, field)
+			case "SessionID":
+				return ec.fieldContext_ComicChap_SessionID(ctx, field)
 			case "Session":
 				return ec.fieldContext_ComicChap_Session(ctx, field)
 			case "Images":
@@ -2805,6 +2892,47 @@ func (ec *executionContext) _ComicSession_ChapIds(ctx context.Context, field gra
 }
 
 func (ec *executionContext) fieldContext_ComicSession_ChapIds(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ComicSession",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ComicSession_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.ComicSession) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ComicSession_thumbnail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Thumbnail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ComicSession_thumbnail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ComicSession",
 		Field:      field,
@@ -3119,6 +3247,47 @@ func (ec *executionContext) fieldContext_CreateComicInputModel_CreatedByID(ctx c
 	return fc, nil
 }
 
+func (ec *executionContext) _CreateComicInputModel_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.CreateComicInputModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateComicInputModel_thumbnail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Thumbnail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateComicInputModel_thumbnail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateComicInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreateComicSessionInputModel_name(ctx context.Context, field graphql.CollectedField, obj *model.CreateComicSessionInputModel) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreateComicSessionInputModel_name(ctx, field)
 	if err != nil {
@@ -3280,6 +3449,47 @@ func (ec *executionContext) _CreateComicSessionInputModel_comicID(ctx context.Co
 }
 
 func (ec *executionContext) fieldContext_CreateComicSessionInputModel_comicID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreateComicSessionInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreateComicSessionInputModel_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.CreateComicSessionInputModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreateComicSessionInputModel_thumbnail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Thumbnail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreateComicSessionInputModel_thumbnail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "CreateComicSessionInputModel",
 		Field:      field,
@@ -3604,8 +3814,8 @@ func (ec *executionContext) fieldContext_Mutation_CreateComicChap(ctx context.Co
 				return ec.fieldContext_ComicChap_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicChap_description(ctx, field)
-			case "SessionId":
-				return ec.fieldContext_ComicChap_SessionId(ctx, field)
+			case "SessionID":
+				return ec.fieldContext_ComicChap_SessionID(ctx, field)
 			case "Session":
 				return ec.fieldContext_ComicChap_Session(ctx, field)
 			case "Images":
@@ -3701,8 +3911,8 @@ func (ec *executionContext) fieldContext_Mutation_AddImageToChap(ctx context.Con
 				return ec.fieldContext_ComicChap_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicChap_description(ctx, field)
-			case "SessionId":
-				return ec.fieldContext_ComicChap_SessionId(ctx, field)
+			case "SessionID":
+				return ec.fieldContext_ComicChap_SessionID(ctx, field)
 			case "Session":
 				return ec.fieldContext_ComicChap_Session(ctx, field)
 			case "Images":
@@ -3798,8 +4008,8 @@ func (ec *executionContext) fieldContext_Mutation_updateComicChap(ctx context.Co
 				return ec.fieldContext_ComicChap_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicChap_description(ctx, field)
-			case "SessionId":
-				return ec.fieldContext_ComicChap_SessionId(ctx, field)
+			case "SessionID":
+				return ec.fieldContext_ComicChap_SessionID(ctx, field)
 			case "Session":
 				return ec.fieldContext_ComicChap_Session(ctx, field)
 			case "Images":
@@ -3976,8 +4186,8 @@ func (ec *executionContext) fieldContext_Mutation_DeleteChapImage(ctx context.Co
 				return ec.fieldContext_ComicChap_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicChap_description(ctx, field)
-			case "SessionId":
-				return ec.fieldContext_ComicChap_SessionId(ctx, field)
+			case "SessionID":
+				return ec.fieldContext_ComicChap_SessionID(ctx, field)
 			case "Session":
 				return ec.fieldContext_ComicChap_Session(ctx, field)
 			case "Images":
@@ -4077,6 +4287,8 @@ func (ec *executionContext) fieldContext_Mutation_createComic(ctx context.Contex
 				return ec.fieldContext_Comic_sessionId(ctx, field)
 			case "session":
 				return ec.fieldContext_Comic_session(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Comic_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comic", field.Name)
 		},
@@ -4172,6 +4384,8 @@ func (ec *executionContext) fieldContext_Mutation_updateComic(ctx context.Contex
 				return ec.fieldContext_Comic_sessionId(ctx, field)
 			case "session":
 				return ec.fieldContext_Comic_session(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Comic_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comic", field.Name)
 		},
@@ -4344,14 +4558,16 @@ func (ec *executionContext) fieldContext_Mutation_CreateComicSession(ctx context
 				return ec.fieldContext_ComicSession_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicSession_description(ctx, field)
-			case "ComicId":
-				return ec.fieldContext_ComicSession_ComicId(ctx, field)
+			case "comicID":
+				return ec.fieldContext_ComicSession_comicID(ctx, field)
 			case "Comic":
 				return ec.fieldContext_ComicSession_Comic(ctx, field)
 			case "Chaps":
 				return ec.fieldContext_ComicSession_Chaps(ctx, field)
 			case "ChapIds":
 				return ec.fieldContext_ComicSession_ChapIds(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_ComicSession_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ComicSession", field.Name)
 		},
@@ -4443,14 +4659,16 @@ func (ec *executionContext) fieldContext_Mutation_updateComicSession(ctx context
 				return ec.fieldContext_ComicSession_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicSession_description(ctx, field)
-			case "ComicId":
-				return ec.fieldContext_ComicSession_ComicId(ctx, field)
+			case "comicID":
+				return ec.fieldContext_ComicSession_comicID(ctx, field)
 			case "Comic":
 				return ec.fieldContext_ComicSession_Comic(ctx, field)
 			case "Chaps":
 				return ec.fieldContext_ComicSession_Chaps(ctx, field)
 			case "ChapIds":
 				return ec.fieldContext_ComicSession_ChapIds(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_ComicSession_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ComicSession", field.Name)
 		},
@@ -4600,8 +4818,8 @@ func (ec *executionContext) fieldContext_Query_ChapBySession(ctx context.Context
 				return ec.fieldContext_ComicChap_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicChap_description(ctx, field)
-			case "SessionId":
-				return ec.fieldContext_ComicChap_SessionId(ctx, field)
+			case "SessionID":
+				return ec.fieldContext_ComicChap_SessionID(ctx, field)
 			case "Session":
 				return ec.fieldContext_ComicChap_Session(ctx, field)
 			case "Images":
@@ -4681,6 +4899,8 @@ func (ec *executionContext) fieldContext_Query_Comics(ctx context.Context, field
 				return ec.fieldContext_Comic_sessionId(ctx, field)
 			case "session":
 				return ec.fieldContext_Comic_session(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Comic_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comic", field.Name)
 		},
@@ -4738,14 +4958,16 @@ func (ec *executionContext) fieldContext_Query_SessionByComic(ctx context.Contex
 				return ec.fieldContext_ComicSession_name(ctx, field)
 			case "description":
 				return ec.fieldContext_ComicSession_description(ctx, field)
-			case "ComicId":
-				return ec.fieldContext_ComicSession_ComicId(ctx, field)
+			case "comicID":
+				return ec.fieldContext_ComicSession_comicID(ctx, field)
 			case "Comic":
 				return ec.fieldContext_ComicSession_Comic(ctx, field)
 			case "Chaps":
 				return ec.fieldContext_ComicSession_Chaps(ctx, field)
 			case "ChapIds":
 				return ec.fieldContext_ComicSession_ChapIds(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_ComicSession_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ComicSession", field.Name)
 		},
@@ -5094,6 +5316,8 @@ func (ec *executionContext) fieldContext_User_comics(ctx context.Context, field 
 				return ec.fieldContext_Comic_sessionId(ctx, field)
 			case "session":
 				return ec.fieldContext_Comic_session(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Comic_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Comic", field.Name)
 		},
@@ -7007,7 +7231,7 @@ func (ec *executionContext) unmarshalInputCreateComicInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description"}
+	fieldsInOrder := [...]string{"name", "description", "thumbnail"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7030,6 +7254,14 @@ func (ec *executionContext) unmarshalInputCreateComicInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "thumbnail":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("thumbnail"))
+			it.Thumbnail, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -7043,7 +7275,7 @@ func (ec *executionContext) unmarshalInputCreateComicSessionInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "comicID"}
+	fieldsInOrder := [...]string{"name", "description", "comicID", "thumbnail"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7071,6 +7303,14 @@ func (ec *executionContext) unmarshalInputCreateComicSessionInput(ctx context.Co
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comicID"))
 			it.ComicID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "thumbnail":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("thumbnail"))
+			it.Thumbnail, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7232,13 +7472,6 @@ func (ec *executionContext) _CreateComic(ctx context.Context, sel ast.SelectionS
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case model.ComicChap:
-		return ec._ComicChap(ctx, sel, &obj)
-	case *model.ComicChap:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ComicChap(ctx, sel, obj)
 	case model.CreateComicInputModel:
 		return ec._CreateComicInputModel(ctx, sel, &obj)
 	case *model.CreateComicInputModel:
@@ -7253,13 +7486,6 @@ func (ec *executionContext) _CreateComic(ctx context.Context, sel ast.SelectionS
 			return graphql.Null
 		}
 		return ec._Comic(ctx, sel, obj)
-	case model.ComicSession:
-		return ec._ComicSession(ctx, sel, &obj)
-	case *model.ComicSession:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ComicSession(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -7276,6 +7502,13 @@ func (ec *executionContext) _CreateComicChap(ctx context.Context, sel ast.Select
 			return graphql.Null
 		}
 		return ec._CreateComicChapInputModel(ctx, sel, obj)
+	case model.ComicChap:
+		return ec._ComicChap(ctx, sel, &obj)
+	case *model.ComicChap:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ComicChap(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -7292,6 +7525,13 @@ func (ec *executionContext) _CreateComicSession(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._CreateComicSessionInputModel(ctx, sel, obj)
+	case model.ComicSession:
+		return ec._ComicSession(ctx, sel, &obj)
+	case *model.ComicSession:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ComicSession(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -7404,6 +7644,10 @@ func (ec *executionContext) _Comic(ctx context.Context, sel ast.SelectionSet, ob
 				return innerFunc(ctx)
 
 			})
+		case "thumbnail":
+
+			out.Values[i] = ec._Comic_thumbnail(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7415,7 +7659,7 @@ func (ec *executionContext) _Comic(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
-var comicChapImplementors = []string{"ComicChap", "CreateComic"}
+var comicChapImplementors = []string{"ComicChap", "CreateComicChap"}
 
 func (ec *executionContext) _ComicChap(ctx context.Context, sel ast.SelectionSet, obj *model.ComicChap) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, comicChapImplementors)
@@ -7481,9 +7725,9 @@ func (ec *executionContext) _ComicChap(ctx context.Context, sel ast.SelectionSet
 
 			out.Values[i] = ec._ComicChap_description(ctx, field, obj)
 
-		case "SessionId":
+		case "SessionID":
 
-			out.Values[i] = ec._ComicChap_SessionId(ctx, field, obj)
+			out.Values[i] = ec._ComicChap_SessionID(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
@@ -7526,7 +7770,7 @@ func (ec *executionContext) _ComicChap(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
-var comicSessionImplementors = []string{"ComicSession", "CreateComic"}
+var comicSessionImplementors = []string{"ComicSession", "CreateComicSession"}
 
 func (ec *executionContext) _ComicSession(ctx context.Context, sel ast.SelectionSet, obj *model.ComicSession) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, comicSessionImplementors)
@@ -7592,9 +7836,9 @@ func (ec *executionContext) _ComicSession(ctx context.Context, sel ast.Selection
 
 			out.Values[i] = ec._ComicSession_description(ctx, field, obj)
 
-		case "ComicId":
+		case "comicID":
 
-			out.Values[i] = ec._ComicSession_ComicId(ctx, field, obj)
+			out.Values[i] = ec._ComicSession_comicID(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
@@ -7639,6 +7883,10 @@ func (ec *executionContext) _ComicSession(ctx context.Context, sel ast.Selection
 		case "ChapIds":
 
 			out.Values[i] = ec._ComicSession_ChapIds(ctx, field, obj)
+
+		case "thumbnail":
+
+			out.Values[i] = ec._ComicSession_thumbnail(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -7725,6 +7973,10 @@ func (ec *executionContext) _CreateComicInputModel(ctx context.Context, sel ast.
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "thumbnail":
+
+			out.Values[i] = ec._CreateComicInputModel_thumbnail(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7771,6 +8023,10 @@ func (ec *executionContext) _CreateComicSessionInputModel(ctx context.Context, s
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "thumbnail":
+
+			out.Values[i] = ec._CreateComicSessionInputModel_thumbnail(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9547,6 +9803,22 @@ func (ec *executionContext) unmarshalOUpdateComicSessionInput2ᚖgithubᚗcomᚋ
 	}
 	res, err := ec.unmarshalInputUpdateComicSessionInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (*graphql.Upload, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalUpload(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v *graphql.Upload) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalUpload(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋFolodyᚑTeamᚋShartubeᚋgraphqlᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {

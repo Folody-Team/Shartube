@@ -5,7 +5,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Folody-Team/Shartube/database/comic_chap_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
@@ -105,32 +104,16 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 	if userID != comicChapDoc.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	allowType := []string{
-		"image/bmp",
-		"image/gif",
-		"image/jpeg", "image/png",
-	}
+
 	AllImages := comicChapDoc.Images
 	for _, v := range req {
-		// check file type
-		if !util.InSlice(allowType, v.File.ContentType) {
-			return nil, gqlerror.Errorf("file type not allow")
-		}
-		// check file size only allow 7MB
-		if v.File.Size > 7000000 {
-			return nil, gqlerror.Errorf("file size too large")
-		}
-		// save file
-		FileId := uuid.New().String()
-		FileExtension := util.GetFileExtension(v.File.ContentType)
-		url, err := util.UploadSingleImage(v.File.File, FileExtension)
-		fmt.Printf("v.File.Filename: %v\n", v.File.Filename)
+		url, err := util.UploadImageForGraphql(v.File)
 		if err != nil {
 			return nil, err
 		}
 
 		AllImages = append(AllImages, &model.ImageResult{
-			ID:  FileId,
+			ID:  uuid.New().String(),
 			URL: *url,
 		})
 	}
