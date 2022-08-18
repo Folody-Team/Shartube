@@ -38,6 +38,13 @@ type ComicSession implements CreateComicSession {
 input UpdateComicSessionInput {
   name: String
   description: String
+  thumbnail: Upload
+}
+
+type UpdateComicSessionInputModel {
+  name: String
+  description: String
+  thumbnail: String
 }
 
 extend type Mutation {
