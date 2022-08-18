@@ -154,6 +154,18 @@ type ComplexityRoot struct {
 		__resolve_entities func(childComplexity int, representations []map[string]interface{}) int
 	}
 
+	UpdateComicInputModel struct {
+		Description func(childComplexity int) int
+		Name        func(childComplexity int) int
+		Thumbnail   func(childComplexity int) int
+	}
+
+	UpdateComicSessionInputModel struct {
+		Description func(childComplexity int) int
+		Name        func(childComplexity int) int
+		Thumbnail   func(childComplexity int) int
+	}
+
 	User struct {
 		ComicIDs func(childComplexity int) int
 		Comics   func(childComplexity int) int
@@ -758,6 +770,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.__resolve_entities(childComplexity, args["representations"].([]map[string]interface{})), true
 
+	case "UpdateComicInputModel.description":
+		if e.complexity.UpdateComicInputModel.Description == nil {
+			break
+		}
+
+		return e.complexity.UpdateComicInputModel.Description(childComplexity), true
+
+	case "UpdateComicInputModel.name":
+		if e.complexity.UpdateComicInputModel.Name == nil {
+			break
+		}
+
+		return e.complexity.UpdateComicInputModel.Name(childComplexity), true
+
+	case "UpdateComicInputModel.thumbnail":
+		if e.complexity.UpdateComicInputModel.Thumbnail == nil {
+			break
+		}
+
+		return e.complexity.UpdateComicInputModel.Thumbnail(childComplexity), true
+
+	case "UpdateComicSessionInputModel.description":
+		if e.complexity.UpdateComicSessionInputModel.Description == nil {
+			break
+		}
+
+		return e.complexity.UpdateComicSessionInputModel.Description(childComplexity), true
+
+	case "UpdateComicSessionInputModel.name":
+		if e.complexity.UpdateComicSessionInputModel.Name == nil {
+			break
+		}
+
+		return e.complexity.UpdateComicSessionInputModel.Name(childComplexity), true
+
+	case "UpdateComicSessionInputModel.thumbnail":
+		if e.complexity.UpdateComicSessionInputModel.Thumbnail == nil {
+			break
+		}
+
+		return e.complexity.UpdateComicSessionInputModel.Thumbnail(childComplexity), true
+
 	case "User.comicIDs":
 		if e.complexity.User.ComicIDs == nil {
 			break
@@ -962,11 +1016,18 @@ type Comic implements CreateComic {
 input UpdateComicInput {
   name: String
   description: String
+  thumbnail: Upload
 }
 
 type DeleteResult {
   success: Boolean!
   id: String!
+}
+
+type UpdateComicInputModel  {
+  name: String
+  description: String
+  thumbnail: String
 }
 
 extend type Mutation {
@@ -1046,6 +1107,13 @@ type ComicSession implements CreateComicSession {
 input UpdateComicSessionInput {
   name: String
   description: String
+  thumbnail: Upload
+}
+
+type UpdateComicSessionInputModel {
+  name: String
+  description: String
+  thumbnail: String
 }
 
 extend type Mutation {
@@ -5218,6 +5286,252 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _UpdateComicInputModel_name(ctx context.Context, field graphql.CollectedField, obj *model.UpdateComicInputModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateComicInputModel_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateComicInputModel_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateComicInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateComicInputModel_description(ctx context.Context, field graphql.CollectedField, obj *model.UpdateComicInputModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateComicInputModel_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateComicInputModel_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateComicInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateComicInputModel_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.UpdateComicInputModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateComicInputModel_thumbnail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Thumbnail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateComicInputModel_thumbnail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateComicInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateComicSessionInputModel_name(ctx context.Context, field graphql.CollectedField, obj *model.UpdateComicSessionInputModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateComicSessionInputModel_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateComicSessionInputModel_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateComicSessionInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateComicSessionInputModel_description(ctx context.Context, field graphql.CollectedField, obj *model.UpdateComicSessionInputModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateComicSessionInputModel_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateComicSessionInputModel_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateComicSessionInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UpdateComicSessionInputModel_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.UpdateComicSessionInputModel) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UpdateComicSessionInputModel_thumbnail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Thumbnail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UpdateComicSessionInputModel_thumbnail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UpdateComicSessionInputModel",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _User__id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User__id(ctx, field)
 	if err != nil {
@@ -7363,7 +7677,7 @@ func (ec *executionContext) unmarshalInputUpdateComicInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description"}
+	fieldsInOrder := [...]string{"name", "description", "thumbnail"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7383,6 +7697,14 @@ func (ec *executionContext) unmarshalInputUpdateComicInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "thumbnail":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("thumbnail"))
+			it.Thumbnail, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7399,7 +7721,7 @@ func (ec *executionContext) unmarshalInputUpdateComicSessionInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description"}
+	fieldsInOrder := [...]string{"name", "description", "thumbnail"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7419,6 +7741,14 @@ func (ec *executionContext) unmarshalInputUpdateComicSessionInput(ctx context.Co
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
 			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "thumbnail":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("thumbnail"))
+			it.Thumbnail, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8429,6 +8759,72 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateComicInputModelImplementors = []string{"UpdateComicInputModel"}
+
+func (ec *executionContext) _UpdateComicInputModel(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateComicInputModel) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateComicInputModelImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateComicInputModel")
+		case "name":
+
+			out.Values[i] = ec._UpdateComicInputModel_name(ctx, field, obj)
+
+		case "description":
+
+			out.Values[i] = ec._UpdateComicInputModel_description(ctx, field, obj)
+
+		case "thumbnail":
+
+			out.Values[i] = ec._UpdateComicInputModel_thumbnail(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateComicSessionInputModelImplementors = []string{"UpdateComicSessionInputModel"}
+
+func (ec *executionContext) _UpdateComicSessionInputModel(ctx context.Context, sel ast.SelectionSet, obj *model.UpdateComicSessionInputModel) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateComicSessionInputModelImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateComicSessionInputModel")
+		case "name":
+
+			out.Values[i] = ec._UpdateComicSessionInputModel_name(ctx, field, obj)
+
+		case "description":
+
+			out.Values[i] = ec._UpdateComicSessionInputModel_description(ctx, field, obj)
+
+		case "thumbnail":
+
+			out.Values[i] = ec._UpdateComicSessionInputModel_thumbnail(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

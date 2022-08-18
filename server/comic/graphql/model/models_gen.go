@@ -130,13 +130,27 @@ type UpdateComicChapInput struct {
 }
 
 type UpdateComicInput struct {
+	Name        *string         `json:"name"`
+	Description *string         `json:"description"`
+	Thumbnail   *graphql.Upload `json:"thumbnail"`
+}
+
+type UpdateComicInputModel struct {
 	Name        *string `json:"name"`
 	Description *string `json:"description"`
+	Thumbnail   *string `json:"thumbnail"`
 }
 
 type UpdateComicSessionInput struct {
+	Name        *string         `json:"name"`
+	Description *string         `json:"description"`
+	Thumbnail   *graphql.Upload `json:"thumbnail"`
+}
+
+type UpdateComicSessionInputModel struct {
 	Name        *string `json:"name"`
 	Description *string `json:"description"`
+	Thumbnail   *string `json:"thumbnail"`
 }
 
 type UploadFile struct {

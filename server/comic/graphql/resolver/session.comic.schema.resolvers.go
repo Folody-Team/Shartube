@@ -132,9 +132,32 @@ func (r *mutationResolver) UpdateComicSession(ctx context.Context, sessionID str
 	if err != nil {
 		return nil, err
 	}
-	return comicSessionModel.FindOneAndUpdate(bson.M{
+	if input.Name != nil {
+		comicSession.Name = *input.Name
+	}
+	if input.Description != nil {
+		comicSession.Description = input.Description
+	}
+	if input.Thumbnail != nil {
+		ThumbnailUrlPointer, err := util.UploadImageForGraphql(*input.Thumbnail)
+		if err != nil {
+			return nil, err
+		}
+		comicSession.Thumbnail = ThumbnailUrlPointer
+	}
+
+	_, err = comicSessionModel.FindOneAndUpdate(bson.M{
 		"_id": ComicSessionObjectId,
-	}, input)
+	}, bson.M{
+		"$set": model.UpdateComicSessionInputModel{
+			Name:        &comicSession.Name,
+			Description: comicSession.Description,
+			Thumbnail:   comicSession.Thumbnail,
+		}})
+	if err != nil {
+		return nil, err
+	}
+	return comicSessionModel.FindById(comicSession.ID)
 }
 
 // DeleteComicSession is the resolver for the DeleteComicSession field.
