@@ -2,12 +2,14 @@ interface CreateComicSession {
   name: String!
   description: String
   comicID: String!
+  thumbnail: String
 }
 
 input CreateComicSessionInput {
   name: String!
   description: String
   comicID: String!
+  thumbnail: Upload
 }
 
 type CreateComicSessionInputModel implements CreateComicSession {
@@ -15,9 +17,10 @@ type CreateComicSessionInputModel implements CreateComicSession {
   description: String
   CreatedByID: String!
   comicID: String!
+  thumbnail: String
 }
 
-type ComicSession implements CreateComic {
+type ComicSession implements CreateComicSession {
   _id: ID!
   createdAt: Time!
   updatedAt: Time!
@@ -25,15 +28,23 @@ type ComicSession implements CreateComic {
   CreatedByID: String!
   name: String!
   description: String
-  ComicId: String!
+  comicID: String!
   Comic: Comic! @goField(forceResolver: true)
   Chaps: [ComicChap!] @goField(forceResolver: true)
   ChapIds: [String!]
+  thumbnail: String
 }
 
 input UpdateComicSessionInput {
   name: String
   description: String
+  thumbnail: Upload
+}
+
+type UpdateComicSessionInputModel {
+  name: String
+  description: String
+  thumbnail: String
 }
 
 extend type Mutation {

@@ -14,8 +14,7 @@ export type Scalars = {
   Int: number;
   Float: number;
   Time: any;
-  _Any: any;
-  _FieldSet: any;
+  Upload: any;
 };
 
 export type Comic = CreateComic & {
@@ -28,15 +27,17 @@ export type Comic = CreateComic & {
   name: Scalars['String'];
   session?: Maybe<Array<ComicSession>>;
   sessionId?: Maybe<Array<Scalars['String']>>;
+  thumbnail?: Maybe<Scalars['String']>;
   updatedAt: Scalars['Time'];
 };
 
-export type ComicChap = CreateComic & {
+export type ComicChap = CreateComicChap & {
   __typename?: 'ComicChap';
   CreatedBy?: Maybe<User>;
   CreatedByID: Scalars['String'];
+  Images: Array<ImageResult>;
   Session: ComicSession;
-  SessionId: Scalars['String'];
+  SessionID: Scalars['String'];
   _id: Scalars['ID'];
   createdAt: Scalars['Time'];
   description?: Maybe<Scalars['String']>;
@@ -44,24 +45,26 @@ export type ComicChap = CreateComic & {
   updatedAt: Scalars['Time'];
 };
 
-export type ComicSession = CreateComic & {
+export type ComicSession = CreateComicSession & {
   __typename?: 'ComicSession';
   ChapIds?: Maybe<Array<Scalars['String']>>;
   Chaps?: Maybe<Array<ComicChap>>;
   Comic: Comic;
-  ComicId: Scalars['String'];
   CreatedBy?: Maybe<User>;
   CreatedByID: Scalars['String'];
   _id: Scalars['ID'];
+  comicID: Scalars['String'];
   createdAt: Scalars['Time'];
   description?: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  thumbnail?: Maybe<Scalars['String']>;
   updatedAt: Scalars['Time'];
 };
 
 export type CreateComic = {
   description?: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  thumbnail?: Maybe<Scalars['String']>;
 };
 
 export type CreateComicChap = {
@@ -87,6 +90,7 @@ export type CreateComicChapInputModel = CreateComicChap & {
 export type CreateComicInput = {
   description?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
+  thumbnail?: InputMaybe<Scalars['Upload']>;
 };
 
 export type CreateComicInputModel = CreateComic & {
@@ -94,18 +98,21 @@ export type CreateComicInputModel = CreateComic & {
   CreatedByID: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  thumbnail?: Maybe<Scalars['String']>;
 };
 
 export type CreateComicSession = {
   comicID: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  thumbnail?: Maybe<Scalars['String']>;
 };
 
 export type CreateComicSessionInput = {
   comicID: Scalars['String'];
   description?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
+  thumbnail?: InputMaybe<Scalars['Upload']>;
 };
 
 export type CreateComicSessionInputModel = CreateComicSession & {
@@ -114,6 +121,19 @@ export type CreateComicSessionInputModel = CreateComicSession & {
   comicID: Scalars['String'];
   description?: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  thumbnail?: Maybe<Scalars['String']>;
+};
+
+export type DeleteResult = {
+  __typename?: 'DeleteResult';
+  id: Scalars['String'];
+  success: Scalars['Boolean'];
+};
+
+export type ImageResult = {
+  __typename?: 'ImageResult';
+  ID: Scalars['String'];
+  Url: Scalars['String'];
 };
 
 export type LoginUserInput = {
@@ -123,21 +143,57 @@ export type LoginUserInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  AddImageToChap: ComicChap;
   CreateComicChap: ComicChap;
   CreateComicSession: ComicSession;
+  DeleteChapImage: ComicChap;
+  DeleteComic: DeleteResult;
+  DeleteComicChap: DeleteResult;
+  DeleteComicSession: DeleteResult;
   Login: UserLoginOrRegisterResponse;
   Register: UserLoginOrRegisterResponse;
+  _empty?: Maybe<Scalars['String']>;
   createComic: Comic;
+  updateComic: Comic;
+  updateComicChap: ComicChap;
+  updateComicSession: ComicSession;
+};
+
+
+export type MutationAddImageToChapArgs = {
+  chapID: Scalars['String'];
+  req: Array<UploadFile>;
 };
 
 
 export type MutationCreateComicChapArgs = {
-  input?: InputMaybe<CreateComicChapInput>;
+  input: CreateComicChapInput;
 };
 
 
 export type MutationCreateComicSessionArgs = {
-  input?: InputMaybe<CreateComicSessionInput>;
+  input: CreateComicSessionInput;
+};
+
+
+export type MutationDeleteChapImageArgs = {
+  chapID: Scalars['String'];
+  imageID: Array<Scalars['String']>;
+};
+
+
+export type MutationDeleteComicArgs = {
+  comicID: Scalars['String'];
+};
+
+
+export type MutationDeleteComicChapArgs = {
+  chapID: Scalars['String'];
+};
+
+
+export type MutationDeleteComicSessionArgs = {
+  sessionID: Scalars['String'];
 };
 
 
@@ -152,16 +208,33 @@ export type MutationRegisterArgs = {
 
 
 export type MutationCreateComicArgs = {
-  input?: InputMaybe<CreateComicInput>;
+  input: CreateComicInput;
+};
+
+
+export type MutationUpdateComicArgs = {
+  comicID: Scalars['String'];
+  input: UpdateComicInput;
+};
+
+
+export type MutationUpdateComicChapArgs = {
+  chapID: Scalars['String'];
+  input: UpdateComicChapInput;
+};
+
+
+export type MutationUpdateComicSessionArgs = {
+  input?: InputMaybe<UpdateComicSessionInput>;
+  sessionID: Scalars['String'];
 };
 
 export type Query = {
   __typename?: 'Query';
   ChapBySession?: Maybe<Array<ComicChap>>;
-  Comics?: Maybe<Array<Comic>>;
+  Comics: Array<Comic>;
   Me: User;
   SessionByComic?: Maybe<Array<ComicSession>>;
-  _service: _Service;
 };
 
 
@@ -180,11 +253,31 @@ export type RegisterUserInput = {
   username: Scalars['String'];
 };
 
+export type UpdateComicChapInput = {
+  description?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+};
+
+export type UpdateComicInput = {
+  description?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+};
+
+export type UpdateComicSessionInput = {
+  description?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+};
+
+export type UploadFile = {
+  file: Scalars['Upload'];
+  id: Scalars['Int'];
+};
+
 export type User = {
   __typename?: 'User';
   _id: Scalars['ID'];
-  comicIDs?: Maybe<Array<Scalars['String']>>;
-  comics?: Maybe<Array<Comic>>;
+  comicIDs?: Maybe<Array<Maybe<Scalars['String']>>>;
+  comics?: Maybe<Array<Maybe<Comic>>>;
   createdAt: Scalars['Time'];
   email: Scalars['String'];
   password?: Maybe<Scalars['String']>;
@@ -196,22 +289,6 @@ export type UserLoginOrRegisterResponse = {
   __typename?: 'UserLoginOrRegisterResponse';
   accessToken: Scalars['String'];
   user: User;
-};
-
-export type UserModelInput = {
-  __typename?: 'UserModelInput';
-  _id: Scalars['ID'];
-  comicIDs?: Maybe<Array<Scalars['String']>>;
-  createdAt: Scalars['Time'];
-  email: Scalars['String'];
-  password?: Maybe<Scalars['String']>;
-  updatedAt: Scalars['Time'];
-  username: Scalars['String'];
-};
-
-export type _Service = {
-  __typename?: '_Service';
-  sdl?: Maybe<Scalars['String']>;
 };
 
 export type UserInfoFragment = { __typename?: 'User', _id: string, username: string, email: string, password?: string | null, createdAt: any, updatedAt: any };
