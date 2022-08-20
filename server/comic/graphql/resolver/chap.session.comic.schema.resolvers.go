@@ -158,9 +158,25 @@ func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, i
 	if err != nil {
 		return nil, err
 	}
-	return comicChapModel.FindOneAndUpdate(bson.M{
+	if input.Name != nil {
+		comicChap.Name = *input.Name
+	}
+	if input.Description != nil {
+		comicChap.Description = input.Description
+	}
+
+	_, err = comicChapModel.FindOneAndUpdate(bson.M{
 		"_id": ComicChapObjectId,
-	}, input)
+	}, bson.M{
+		"$set": model.UpdateComicChapInput{
+			Name:        &comicChap.Name,
+			Description: comicChap.Description,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return comicChapModel.FindById(chapID)
 }
 
 // DeleteComicChap is the resolver for the DeleteComicChap field.

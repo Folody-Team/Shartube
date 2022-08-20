@@ -145,9 +145,32 @@ func (r *mutationResolver) UpdateComic(ctx context.Context, comicID string, inpu
 	if err != nil {
 		return nil, err
 	}
-	return comicModel.FindOneAndUpdate(bson.M{
+	if input.Description != nil {
+		comic.Description = input.Description
+	}
+	if input.Name != nil {
+		comic.Name = *input.Name
+	}
+	if input.Thumbnail != nil {
+		ThumbnailUrlPointer, err := util.UploadImageForGraphql(*input.Thumbnail)
+		if err != nil {
+			return nil, err
+		}
+		comic.Thumbnail = ThumbnailUrlPointer
+	}
+	_, err = comicModel.FindOneAndUpdate(bson.M{
 		"_id": ComicObjectId,
-	}, input)
+	}, bson.M{
+		"$set": &model.UpdateComicInputModel{
+			Description: comic.Description,
+			Name:        &comic.Name,
+			Thumbnail:   comic.Thumbnail,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return comicModel.FindById(comicID)
 }
 
 // DeleteComic is the resolver for the DeleteComic field.
