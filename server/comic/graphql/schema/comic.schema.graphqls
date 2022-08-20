@@ -3,17 +3,20 @@ directive @inherits(type: String!) on OBJECT
 interface CreateComic {
   name: String!
   description: String
+  thumbnail: String
 }
 
 input CreateComicInput {
   name: String!
   description: String
+  thumbnail: Upload
 }
 
 type CreateComicInputModel implements CreateComic {
   name: String!
   description: String
   CreatedByID: String!
+  thumbnail: String
 }
 
 type Comic implements CreateComic {
@@ -26,16 +29,24 @@ type Comic implements CreateComic {
   description: String
   sessionId: [String!]
   session: [ComicSession!] @goField(forceResolver: true)
+  thumbnail: String
 }
 
 input UpdateComicInput {
   name: String
   description: String
+  thumbnail: Upload
 }
 
 type DeleteResult {
   success: Boolean!
   id: String!
+}
+
+type UpdateComicInputModel  {
+  name: String
+  description: String
+  thumbnail: String
 }
 
 extend type Mutation {

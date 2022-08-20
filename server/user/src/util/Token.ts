@@ -5,6 +5,11 @@ import {
 	getNumericDate,
 	verify,
 } from 'https://deno.land/x/djwt@v2.7/mod.ts'
+import { join as PathJoin } from 'https://deno.land/std@0.149.0/path/mod.ts'
+import { config } from 'https://deno.land/x/dotenv@v3.2.0/mod.ts'
+config({
+	path: PathJoin(import.meta.url, '..', '..', '.env'),
+})
 
 interface SessionType {
 	_id: ObjectId

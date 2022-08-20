@@ -30,6 +30,7 @@ type Comic struct {
 	Description *string         `json:"description"`
 	SessionID   []string        `json:"sessionId"`
 	Session     []*ComicSession `json:"session"`
+	Thumbnail   *string         `json:"thumbnail"`
 }
 
 func (Comic) IsCreateComic() {}
@@ -42,12 +43,12 @@ type ComicChap struct {
 	CreatedByID string         `json:"CreatedByID"`
 	Name        string         `json:"name"`
 	Description *string        `json:"description"`
-	SessionID   string         `json:"SessionId"`
+	SessionID   string         `json:"SessionID"`
 	Session     *ComicSession  `json:"Session"`
 	Images      []*ImageResult `json:"Images"`
 }
 
-func (ComicChap) IsCreateComic() {}
+func (ComicChap) IsCreateComicChap() {}
 
 type ComicSession struct {
 	ID          string       `json:"_id" bson:"_id"`
@@ -57,13 +58,14 @@ type ComicSession struct {
 	CreatedByID string       `json:"CreatedByID"`
 	Name        string       `json:"name"`
 	Description *string      `json:"description"`
-	ComicID     string       `json:"ComicId"`
+	ComicID     string       `json:"comicID"`
 	Comic       *Comic       `json:"Comic"`
 	Chaps       []*ComicChap `json:"Chaps"`
 	ChapIds     []string     `json:"ChapIds"`
+	Thumbnail   *string      `json:"thumbnail"`
 }
 
-func (ComicSession) IsCreateComic() {}
+func (ComicSession) IsCreateComicSession() {}
 
 type CreateComicChapInput struct {
 	Name        string  `json:"name"`
@@ -81,22 +83,25 @@ type CreateComicChapInputModel struct {
 func (CreateComicChapInputModel) IsCreateComicChap() {}
 
 type CreateComicInput struct {
-	Name        string  `json:"name"`
-	Description *string `json:"description"`
+	Name        string          `json:"name"`
+	Description *string         `json:"description"`
+	Thumbnail   *graphql.Upload `json:"thumbnail"`
 }
 
 type CreateComicInputModel struct {
 	Name        string  `json:"name"`
 	Description *string `json:"description"`
 	CreatedByID string  `json:"CreatedByID"`
+	Thumbnail   *string `json:"thumbnail"`
 }
 
 func (CreateComicInputModel) IsCreateComic() {}
 
 type CreateComicSessionInput struct {
-	Name        string  `json:"name"`
-	Description *string `json:"description"`
-	ComicID     string  `json:"comicID"`
+	Name        string          `json:"name"`
+	Description *string         `json:"description"`
+	ComicID     string          `json:"comicID"`
+	Thumbnail   *graphql.Upload `json:"thumbnail"`
 }
 
 type CreateComicSessionInputModel struct {
@@ -104,6 +109,7 @@ type CreateComicSessionInputModel struct {
 	Description *string `json:"description"`
 	CreatedByID string  `json:"CreatedByID"`
 	ComicID     string  `json:"comicID"`
+	Thumbnail   *string `json:"thumbnail"`
 }
 
 func (CreateComicSessionInputModel) IsCreateComicSession() {}
@@ -124,13 +130,27 @@ type UpdateComicChapInput struct {
 }
 
 type UpdateComicInput struct {
+	Name        *string         `json:"name"`
+	Description *string         `json:"description"`
+	Thumbnail   *graphql.Upload `json:"thumbnail"`
+}
+
+type UpdateComicInputModel struct {
 	Name        *string `json:"name"`
 	Description *string `json:"description"`
+	Thumbnail   *string `json:"thumbnail"`
 }
 
 type UpdateComicSessionInput struct {
+	Name        *string         `json:"name"`
+	Description *string         `json:"description"`
+	Thumbnail   *graphql.Upload `json:"thumbnail"`
+}
+
+type UpdateComicSessionInputModel struct {
 	Name        *string `json:"name"`
 	Description *string `json:"description"`
+	Thumbnail   *string `json:"thumbnail"`
 }
 
 type UploadFile struct {

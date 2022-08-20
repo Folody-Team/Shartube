@@ -8,7 +8,7 @@ import { typeDefs } from './typeDefs/index.ts'
 import client, { DB_NAME } from './util/client.ts'
 
 config({
-	path: PathJoin(import.meta.url, '.env'),
+	path: PathJoin(import.meta.url,"..", '.env'),
 })
 
 const app = new Application()
@@ -41,6 +41,9 @@ app.use(async (ctx, next) => {
 		})
 		ctx.response.body = user?.comicIDs
 	}
+	// get header token
+	const token = ctx.request.headers.get('authorization')
+
 	await next()
 })
 

@@ -187,6 +187,7 @@ interface IResolvers {
 			sdl: string
 		}
 		_entities: (root: any, args: any) => Promise<any[]>
+		Me(root: any, args: any, context: any, info: any): Promise<User>
 	}
 	Mutation: {
 		Login: (
@@ -232,6 +233,33 @@ export const resolvers: IResolvers = {
 				})
 			}
 			return returnValue
+		},
+		Me: async (root: any, args: any, context: any, ...rest: any[]) => {
+			if (!context.request.headers.get('authorization')) {
+				throw new GQLError({
+					type: 'Unauthorized',
+					message: 'You are not authorized to access this resource',
+				})
+			}
+			const UserSession = await DecodeToken(
+				context.request.headers.get('authorization').replace('Bearer ', ''),
+				client,
+				DB_NAME
+			)
+			if (!UserSession) {
+				throw new GQLError({
+					type: 'Unauthorized',
+					message: 'You are not authorized to access this resource',
+				})
+			}
+			const db = client.database(DB_NAME)
+			const users = db.collection<User>('users')
+			return {
+				...(await users.findOne({
+					_id: new ObjectId(UserSession.userID),
+				})),
+				password: '',
+			}
 		},
 	},
 	Mutation: {

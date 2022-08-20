@@ -75,11 +75,20 @@ func (r *mutationResolver) CreateComicSession(ctx context.Context, input model.C
 	if userID != comicDoc.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
+	ThumbnailUrl := ""
+	if input.Thumbnail != nil {
+		ThumbnailUrlPointer, err := util.UploadImageForGraphql(*input.Thumbnail)
+		if err != nil {
+			return nil, err
+		}
+		ThumbnailUrl = *ThumbnailUrlPointer
+	}
 	sessionID, err := comicSessionModel.New(&model.CreateComicSessionInputModel{
 		Name:        input.Name,
 		Description: input.Description,
 		CreatedByID: userIDObject.Hex(),
 		ComicID:     input.ComicID,
+		Thumbnail:   &ThumbnailUrl,
 	}).Save()
 	if err != nil {
 		return nil, err
@@ -119,9 +128,36 @@ func (r *mutationResolver) UpdateComicSession(ctx context.Context, sessionID str
 	if userID != comicSession.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	return comicSessionModel.FindOneAndUpdate(bson.M{
-		"_id": comicSession.ID,
-	}, input)
+	ComicSessionObjectId, err := primitive.ObjectIDFromHex(comicSession.ID)
+	if err != nil {
+		return nil, err
+	}
+	if input.Name != nil {
+		comicSession.Name = *input.Name
+	}
+	if input.Description != nil {
+		comicSession.Description = input.Description
+	}
+	if input.Thumbnail != nil {
+		ThumbnailUrlPointer, err := util.UploadImageForGraphql(*input.Thumbnail)
+		if err != nil {
+			return nil, err
+		}
+		comicSession.Thumbnail = ThumbnailUrlPointer
+	}
+
+	_, err = comicSessionModel.FindOneAndUpdate(bson.M{
+		"_id": ComicSessionObjectId,
+	}, bson.M{
+		"$set": model.UpdateComicSessionInputModel{
+			Name:        &comicSession.Name,
+			Description: comicSession.Description,
+			Thumbnail:   comicSession.Thumbnail,
+		}})
+	if err != nil {
+		return nil, err
+	}
+	return comicSessionModel.FindById(comicSession.ID)
 }
 
 // DeleteComicSession is the resolver for the DeleteComicSession field.
@@ -143,7 +179,7 @@ func (r *mutationResolver) DeleteComicSession(ctx context.Context, sessionID str
 	if userID != comicSession.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	success, err := deleteUtil.DeleteSession(sessionID, r.Client,true)
+	success, err := deleteUtil.DeleteSession(sessionID, r.Client, true)
 	if err != nil {
 		return nil, err
 	}
