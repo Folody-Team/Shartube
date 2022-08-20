@@ -1,5 +1,5 @@
 .Logo{
-  animation: 0.5s ease-in-out fadeIn;
+  animation: 5s ease-in-out fadeIn infinite;
 }
 .Logo * {
   box-shadow: 0 0rem 15px #5770ffb9;
