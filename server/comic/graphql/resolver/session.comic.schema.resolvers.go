@@ -128,36 +128,9 @@ func (r *mutationResolver) UpdateComicSession(ctx context.Context, sessionID str
 	if userID != comicSession.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	ComicSessionObjectId, err := primitive.ObjectIDFromHex(comicSession.ID)
-	if err != nil {
-		return nil, err
-	}
-	if input.Name != nil {
-		comicSession.Name = *input.Name
-	}
-	if input.Description != nil {
-		comicSession.Description = input.Description
-	}
-	if input.Thumbnail != nil {
-		ThumbnailUrlPointer, err := util.UploadImageForGraphql(*input.Thumbnail)
-		if err != nil {
-			return nil, err
-		}
-		comicSession.Thumbnail = ThumbnailUrlPointer
-	}
-
-	_, err = comicSessionModel.FindOneAndUpdate(bson.M{
-		"_id": ComicSessionObjectId,
-	}, bson.M{
-		"$set": model.UpdateComicSessionInputModel{
-			Name:        &comicSession.Name,
-			Description: comicSession.Description,
-			Thumbnail:   comicSession.Thumbnail,
-		}})
-	if err != nil {
-		return nil, err
-	}
-	return comicSessionModel.FindById(comicSession.ID)
+	return comicSessionModel.FindOneAndUpdate(bson.M{
+		"_id": comicSession.ID,
+	}, input)
 }
 
 // DeleteComicSession is the resolver for the DeleteComicSession field.

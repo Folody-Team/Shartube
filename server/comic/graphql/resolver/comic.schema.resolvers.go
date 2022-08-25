@@ -20,7 +20,6 @@ import (
 	"github.com/sacOO7/gowebsocket"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CreatedBy is the resolver for the CreatedBy field.
@@ -141,36 +140,10 @@ func (r *mutationResolver) UpdateComic(ctx context.Context, comicID string, inpu
 			Message: "Access Denied",
 		}
 	}
-	ComicObjectId, err := primitive.ObjectIDFromHex(comic.ID)
-	if err != nil {
-		return nil, err
-	}
-	if input.Description != nil {
-		comic.Description = input.Description
-	}
-	if input.Name != nil {
-		comic.Name = *input.Name
-	}
-	if input.Thumbnail != nil {
-		ThumbnailUrlPointer, err := util.UploadImageForGraphql(*input.Thumbnail)
-		if err != nil {
-			return nil, err
-		}
-		comic.Thumbnail = ThumbnailUrlPointer
-	}
-	_, err = comicModel.FindOneAndUpdate(bson.M{
-		"_id": ComicObjectId,
-	}, bson.M{
-		"$set": &model.UpdateComicInputModel{
-			Description: comic.Description,
-			Name:        &comic.Name,
-			Thumbnail:   comic.Thumbnail,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	return comicModel.FindById(comicID)
+
+	return comicModel.FindOneAndUpdate(bson.M{
+		"_id": comic.ID,
+	}, input)
 }
 
 // DeleteComic is the resolver for the DeleteComic field.

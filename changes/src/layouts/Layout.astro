@@ -1,0 +1,21 @@
+---
+// 1. The frontmatter prop gives access to frontmatter and other data
+const { frontmatter } = Astro.props;
+---
+<html>
+  <head>
+    <!-- Add other Head elements here, like styles and meta tags. -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{frontmatter.title}</title>
+  </head>
+  <body>
+    <!-- Add other UI components here, like common headers and footers. -->
+    <h1>{frontmatter.title}</h1>
+		<slot />
+  </body>
+</html>
+<style>
+	* {
+		font-family: sans-serif;
+	}
+</style>

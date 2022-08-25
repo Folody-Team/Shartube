@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "preact/hooks";
 import { Logo } from "../../components/logo";
 import { MeDocument, MeQuery, useLoginMutation } from "../../generated/graphql";
 import { checkAuth } from "../../utils/checkAuth";
