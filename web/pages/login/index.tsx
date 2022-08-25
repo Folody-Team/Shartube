@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "preact/hooks";
 import { Logo } from "../../components/logo";
 import { MeDocument, MeQuery, useLoginMutation } from "../../generated/graphql";
 import { checkAuth } from "../../utils/checkAuth";
@@ -161,7 +161,7 @@ export default function login() {
               />
             </div>
 
-            <button className="bg-[#2F4DEE] w-[100%] py-[8px] mt-[20px] rounded-[6px] hover:bg-[#3b58fa]">
+            <button className="bg-[#2F4DEE] w-[100%] py-[8px] mt-[20px] rounded-[6px] hover:bg-[#3b58fa]" onClick={OnSubmit}>
               Login
             </button>
           </div>

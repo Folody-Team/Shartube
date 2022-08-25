@@ -5,9 +5,6 @@ package resolver
 
 import (
 	"context"
-	"io"
-	"os"
-	"path"
 
 	"github.com/Folody-Team/Shartube/database/comic_chap_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
@@ -20,6 +17,7 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/exp/slices"
 )
 
 // CreatedBy is the resolver for the CreatedBy field.
@@ -96,9 +94,7 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 	if err != nil {
 		return nil, err
 	}
-	comicChapDoc, err := comicChapModel.FindOne(bson.D{
-		{Key: "_id", Value: chapID},
-	})
+	comicChapDoc, err := comicChapModel.FindById(chapID)
 	if err != nil {
 		return nil, err
 	}
@@ -108,50 +104,29 @@ func (r *mutationResolver) AddImageToChap(ctx context.Context, req []*model.Uplo
 	if userID != comicChapDoc.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	allowType := []string{
-		"image/bmp",
-		"image/gif",
-		"image/jpeg", "image/png",
-	}
+
 	AllImages := comicChapDoc.Images
 	for _, v := range req {
-		// check file type
-		if !util.InSlice(allowType, v.File.ContentType) {
-			return nil, gqlerror.Errorf("file type not allow")
-		}
-		// check file size
-		if v.File.Size > 10*1024*1024 {
-			return nil, gqlerror.Errorf("file size too large")
-		}
-		// save file
-		FileId := uuid.New().String()
-		fileName := FileId + "." + v.File.ContentType[6:]
-		FilePath := path.Join("public/image", fileName)
-		// open file
-		file, err := os.Create(FilePath)
+		url, err := util.UploadImageForGraphql(v.File)
 		if err != nil {
 			return nil, err
 		}
-		// write file
-		_, err = io.Copy(file, v.File.File)
-		if err != nil {
-			return nil, err
-		}
-		// close file
-		err = file.Close()
-		if err != nil {
-			return nil, err
-		}
+
 		AllImages = append(AllImages, &model.ImageResult{
-			ID:  FileId,
-			URL: path.Join("/public/image", fileName),
+			ID:  uuid.New().String(),
+			URL: *url,
 		})
 	}
-
+	ComicChapObjectId, err := primitive.ObjectIDFromHex(comicChapDoc.ID)
+	if err != nil {
+		return nil, err
+	}
 	if _, err := comicChapModel.FindOneAndUpdate(bson.M{
-		"_id": comicChapDoc.ID,
+		"_id": ComicChapObjectId,
 	}, bson.M{
-		"Images": AllImages,
+		"$set": bson.M{
+			"Images": AllImages,
+		},
 	}); err != nil {
 		return nil, err
 	}
@@ -203,7 +178,7 @@ func (r *mutationResolver) DeleteComicChap(ctx context.Context, chapID string) (
 	if userID != comicChap.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	success, err := deleteUtil.DeleteChap(comicChap.ID, r.Client,true)
+	success, err := deleteUtil.DeleteChap(comicChap.ID, r.Client, true)
 	if err != nil {
 		return nil, err
 	}
@@ -211,6 +186,53 @@ func (r *mutationResolver) DeleteComicChap(ctx context.Context, chapID string) (
 		Success: success,
 		ID:      comicChap.ID,
 	}, nil
+}
+
+// DeleteChapImage is the resolver for the DeleteChapImage field.
+func (r *mutationResolver) DeleteChapImage(ctx context.Context, chapID string, imageID []string) (*model.ComicChap, error) {
+	comicChapModel, err := comic_chap_model.InitComicChapModel(r.Client)
+	if err != nil {
+		return nil, err
+	}
+
+	userID := ctx.Value(directives.AuthString("session")).(*directives.SessionDataReturn).UserID
+	if err != nil {
+		return nil, err
+	}
+	comicChapDoc, err := comicChapModel.FindById(chapID)
+	if err != nil {
+		return nil, err
+	}
+	if comicChapDoc == nil {
+		return nil, gqlerror.Errorf("comic chap not found")
+	}
+	if userID != comicChapDoc.CreatedByID {
+		return nil, gqlerror.Errorf("Access Denied")
+	}
+	ComicChapObjectId, err := primitive.ObjectIDFromHex(comicChapDoc.ID)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range imageID {
+		imageIndex := slices.IndexFunc(comicChapDoc.Images, func(ir *model.ImageResult) bool {
+			return ir.ID == v
+		})
+		if imageIndex == -1 {
+			// return nil, gqlerror.Errorf("image not found")
+			continue
+		}
+		comicChapDoc.Images = util.RemoveIndex(comicChapDoc.Images, imageIndex)
+	}
+	if _, err := comicChapModel.FindOneAndUpdate(bson.M{
+		"_id": ComicChapObjectId,
+	}, bson.M{
+		"$set": bson.M{
+			"Images": comicChapDoc.Images,
+		},
+	}); err != nil {
+		return nil, err
+	}
+	return comicChapModel.FindById(comicChapDoc.ID)
 }
 
 // ChapBySession is the resolver for the ChapBySession field.

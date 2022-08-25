@@ -12,6 +12,8 @@ services:
     depends_on:
       - shartube-ws-server
     restart: always
+    volumes:
+      - mongoDB:/data/db
 
   shartube-graphql-gateway:
     container_name: shartube-graphql-gateway
@@ -57,6 +59,7 @@ services:
       - WS_HOST=shartube-ws-server
       - WS_PORT=3012
       - UserHost=shartube-user-server
+      - UploadServer=http://shartube-upload-server:3000/upload
     env_file:
       - ./comic/.env
     restart: always
@@ -83,5 +86,23 @@ services:
     expose:
       - 8080
 
+  shartube-upload-server:
+    container_name: shartube-upload-server
+    networks:
+      - shartube-net
+    depends_on:
+      - shartube-ws-server
+    build: ./save-service
+    env_file:
+      - ./save-service/.env
+    restart: always
+    expose:
+      - 3000
+    environment:
+      - CHANNEL_ID=990113063187390465
+
 networks:
   shartube-net:
+
+volumes:
+  mongoDB:

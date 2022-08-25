@@ -55,27 +55,25 @@ func (r *mutationResolver) CreateComic(ctx context.Context, input model.CreateCo
 	if err != nil {
 		return nil, err
 	}
+	ThumbnailUrl := ""
+	if input.Thumbnail != nil {
+		ThumbnailUrlPointer, err := util.UploadImageForGraphql(*input.Thumbnail)
+		if err != nil {
+			return nil, err
+		}
+		ThumbnailUrl = *ThumbnailUrlPointer
+	}
 	comicID, err := comicModel.New(&model.CreateComicInputModel{
 		CreatedByID: userID,
 		Name:        input.Name,
 		Description: input.Description,
+		Thumbnail:   &ThumbnailUrl,
 	}).Save()
 
 	if err != nil {
 		return nil, err
 	}
-	// userModel, err := user_model.InitUserModel()
-	// if err != nil {
-	// 	return nil, err
-	// }
 
-	// userModel.UpdateOne(bson.M{
-	// 	"_id": userIDObject,
-	// }, bson.M{
-	// 	"$push": bson.M{
-	// 		"ComicIDs": comicID,
-	// 	},
-	// })
 	// get data from comic model
 	u := url.URL{
 		Scheme: "ws",
@@ -239,9 +237,9 @@ type comicResolver struct{ *Resolver }
 // !!! WARNING !!!
 // The code below was going to be deleted when updating resolvers. It has been copied here so you have
 // one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
 type WsRequest struct {
 	Url     string       `json:"url"`
 	Header  *interface{} `json:"header"`

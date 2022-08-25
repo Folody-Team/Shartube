@@ -1,8 +1,6 @@
 package deleteUtil
 
 import (
-	"fmt"
-
 	"github.com/Folody-Team/Shartube/database/comic_model"
 	"github.com/Folody-Team/Shartube/database/comic_session_model"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,7 +16,6 @@ func DeleteComic(id string, client *mongo.Client) (bool, error) {
 		return false, err
 	}
 	ComicData, err := ComicModel.FindById(id)
-	fmt.Printf("ComicData: %v\n", ComicData)
 	if err != nil {
 		return false, err
 	}

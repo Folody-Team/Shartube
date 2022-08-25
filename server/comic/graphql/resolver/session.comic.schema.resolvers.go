@@ -75,11 +75,20 @@ func (r *mutationResolver) CreateComicSession(ctx context.Context, input model.C
 	if userID != comicDoc.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
+	ThumbnailUrl := ""
+	if input.Thumbnail != nil {
+		ThumbnailUrlPointer, err := util.UploadImageForGraphql(*input.Thumbnail)
+		if err != nil {
+			return nil, err
+		}
+		ThumbnailUrl = *ThumbnailUrlPointer
+	}
 	sessionID, err := comicSessionModel.New(&model.CreateComicSessionInputModel{
 		Name:        input.Name,
 		Description: input.Description,
 		CreatedByID: userIDObject.Hex(),
 		ComicID:     input.ComicID,
+		Thumbnail:   &ThumbnailUrl,
 	}).Save()
 	if err != nil {
 		return nil, err
@@ -143,7 +152,7 @@ func (r *mutationResolver) DeleteComicSession(ctx context.Context, sessionID str
 	if userID != comicSession.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	success, err := deleteUtil.DeleteSession(sessionID, r.Client,true)
+	success, err := deleteUtil.DeleteSession(sessionID, r.Client, true)
 	if err != nil {
 		return nil, err
 	}

@@ -18,7 +18,7 @@ type ImageResult {
   ID: String!
   Url: String!
 }
-type ComicChap implements CreateComic {
+type ComicChap implements CreateComicChap {
   _id: ID!
   createdAt: Time!
   updatedAt: Time!
@@ -26,7 +26,7 @@ type ComicChap implements CreateComic {
   CreatedByID: String!
   name: String!
   description: String
-  SessionId: String!
+  SessionID: String!
   Session: ComicSession! @goField(forceResolver: true)
   Images: [ImageResult!]!
 }
@@ -46,6 +46,9 @@ extend type Mutation {
     @goField(forceResolver: true)
     @auth
   DeleteComicChap(chapID: String!): DeleteResult!
+    @goField(forceResolver: true)
+    @auth
+  DeleteChapImage(chapID: String!, imageID: [String!]!): ComicChap!
     @goField(forceResolver: true)
     @auth
 }

@@ -1,0 +1,28 @@
+---
+import HomeLayout from '../layouts/HomeLayout.astro';
+import Card from '../components/Card.astro';
+// Also, you can import multiple files with Astro.glob
+const posts = await Astro.glob('./post/*.mdx');
+---
+
+<HomeLayout>
+  <div class="change-list-container">
+    {posts.map(post => <Card href={post.url} title={post.frontmatter.title} body='hello'/>)}
+  </div>
+</HomeLayout>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  .change-list-container {
+    width: 100%;
+    height: 100vh;
+    background: #1a1a1a;
+    padding: 20px;
+  }
+</style>

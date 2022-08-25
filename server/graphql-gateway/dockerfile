@@ -1,10 +1,14 @@
 FROM node:gallium-slim as ts-compiler
 WORKDIR /home/app
 
-COPY . .
+COPY package.json .
 
 RUN yarn install
+
+COPY . .
+
 RUN yarn run build
+
 
 FROM node:gallium-slim as ts-remover
 WORKDIR /home/app
