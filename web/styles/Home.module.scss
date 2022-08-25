@@ -1,11 +1,11 @@
 .main {
   min-height: 100vh;
-  padding: 4rem 0;
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: #141518;
 }
 
 .footer {
@@ -102,6 +102,34 @@
 .logo {
   height: 1em;
   margin-left: 0.5rem;
+}
+.inputSearchContainer * {
+  transition: all 0.2s ease;
+}
+.inputSearch {
+  width: 100%;
+  height: 100%;
+  background-color: #25272E;
+  border: none;
+  border-radius: 8px;
+  border-bottom-right-radius: 0px;
+  border-top-right-radius: 0px;
+  color: #B7B7B7;
+  padding: 0px 12px;
+  outline: none;
+}
+.inputSearchIcon {
+  color: #959696;
+  font-size: 1.5em;
+}
+.inputSearchIconContainer {
+  background-color: #25272E;
+}
+.inputSearchContainer:hover .inputSearch {
+  background-color: #2e3038;
+}
+.inputSearchContainer:hover .inputSearchIconContainer {
+  background-color: #2e3038;
 }
 
 @media (max-width: 600px) {
