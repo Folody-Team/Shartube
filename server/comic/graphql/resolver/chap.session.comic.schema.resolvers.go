@@ -154,12 +154,8 @@ func (r *mutationResolver) UpdateComicChap(ctx context.Context, chapID string, i
 	if userID != comicChap.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	ComicChapObjectId, err := primitive.ObjectIDFromHex(chapID)
-	if err != nil {
-		return nil, err
-	}
 	return comicChapModel.FindOneAndUpdate(bson.M{
-		"_id": ComicChapObjectId,
+		"_id": comicChap.ID,
 	}, input)
 }
 

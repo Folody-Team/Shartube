@@ -35,11 +35,18 @@ type Comic implements CreateComic {
 input UpdateComicInput {
   name: String
   description: String
+  thumbnail: Upload
 }
 
 type DeleteResult {
   success: Boolean!
   id: String!
+}
+
+type UpdateComicInputModel  {
+  name: String
+  description: String
+  thumbnail: String
 }
 
 extend type Mutation {

@@ -8,12 +8,14 @@ import { Logo } from "../components/logo";
 import { MenuBar } from "../components/MenuBar"
 import { ComicCard } from "../components/ComicCard";
 import { DefaultComicCard } from "../components/DefaultComicCard";
+import Image from "next/image";
 
 
 const Home: NextPage = () => {
   const { data, loading } = checkAuth();
   const [height, setHeight] = useState(0);
   const [heightContain, setHeightContain] = useState(0);
+
 
   useEffect(() => {
     if (window !== undefined) {
@@ -28,7 +30,7 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>SharBlock</title>
+        <title>Shartube</title>
         <meta name="description" content="Online sharing platform" />
       </Head>
       {loading || (!loading && data?.Me) ? (

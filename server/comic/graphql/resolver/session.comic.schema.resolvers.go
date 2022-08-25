@@ -128,12 +128,8 @@ func (r *mutationResolver) UpdateComicSession(ctx context.Context, sessionID str
 	if userID != comicSession.CreatedByID {
 		return nil, gqlerror.Errorf("Access Denied")
 	}
-	ComicSessionObjectId, err := primitive.ObjectIDFromHex(comicSession.ID)
-	if err != nil {
-		return nil, err
-	}
 	return comicSessionModel.FindOneAndUpdate(bson.M{
-		"_id": ComicSessionObjectId,
+		"_id": comicSession.ID,
 	}, input)
 }
 
