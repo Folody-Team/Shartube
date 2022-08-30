@@ -22,7 +22,7 @@
     "apollo3-cache-persist": "^0.14.1",
     "critters": "^0.0.16",
     "graphql": "^16.5.0",
-    "next": "12.2.3",
+    "next": "12.2.4",
     "next-pwa": "^5.5.5",
     "preact": "^10.10.3",
     "react": "18.2.0",
