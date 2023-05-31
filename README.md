@@ -1,4 +1,4 @@
-<p align="center"><a href="#"><img src="https://cdn.folody.xyz/Group_6.svg" height="120"/></a></p>
+<p align="center"><a href="#"><img src="https://fcdn.fantasybot.tech/Group_6.svg" height="120"/></a></p>
 
 <br/>
 <h1 align="center">Shartube</h1>
